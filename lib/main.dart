@@ -1,4 +1,4 @@
-import 'package:attendance_system_nodejs/Pages/Welcome/WelcomePage.dart';
+import 'package:attendance_system_nodejs/Pages/Welcome/screens/WelcomePage.dart';
 import 'package:flutter/material.dart';
 
 void main() {
