@@ -1,3 +1,4 @@
+import 'package:attendance_system_nodejs/Pages/ForgotPassword/screens/ForgotPassword.dart';
 import 'package:attendance_system_nodejs/Pages/Register/screens/RegisterPage.dart';
 import 'package:attendance_system_nodejs/Pages/SignIn/screens/SignInPage.dart';
 import 'package:attendance_system_nodejs/Pages/Welcome/screens/WelcomePage.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const RegisterPage(),
+      home: const ForgotPassword(),
       debugShowCheckedModeBanner: false,
     );
   }
