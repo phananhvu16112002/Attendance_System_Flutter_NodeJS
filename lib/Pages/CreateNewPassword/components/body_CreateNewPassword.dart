@@ -50,7 +50,7 @@ class BodyCreateNewPassword extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText),
                   SizedBox(
-                    height: 5,
+                    height: 10,
                   ),
                   CustomTextField(
                       controller: password,
@@ -67,7 +67,7 @@ class BodyCreateNewPassword extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText),
                   SizedBox(
-                    height: 5,
+                    height: 10,
                   ),
                   CustomTextField(
                       controller: password,

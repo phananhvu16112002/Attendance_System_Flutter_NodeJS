@@ -4,6 +4,7 @@ import 'package:attendance_system_nodejs/Pages/OTP/screens/OTPPage.dart';
 import 'package:attendance_system_nodejs/Pages/Register/screens/RegisterPage.dart';
 import 'package:attendance_system_nodejs/Pages/SignIn/screens/SignInPage.dart';
 import 'package:attendance_system_nodejs/Pages/Welcome/screens/WelcomePage.dart';
+import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
         useMaterial3: true,
       ),
       home: const CreateNewPassword(),

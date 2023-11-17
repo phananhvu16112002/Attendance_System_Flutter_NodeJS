@@ -55,7 +55,7 @@ class BodyRegister extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryText),
                       SizedBox(
-                        height: 5,
+                        height: 10,
                       ),
                       CustomTextField(
                           controller: username,
@@ -72,7 +72,7 @@ class BodyRegister extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryText),
                       SizedBox(
-                        height: 5,
+                        height: 10,
                       ),
                       CustomTextField(
                           controller: emailAddress,
@@ -89,7 +89,7 @@ class BodyRegister extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryText),
                       SizedBox(
-                        height: 5,
+                        height: 10,
                       ),
                       CustomTextField(
                           controller: password,
@@ -106,7 +106,7 @@ class BodyRegister extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryText),
                       SizedBox(
-                        height: 5,
+                        height: 10,
                       ),
                       CustomTextField(
                           controller: confirmPassword,

@@ -35,10 +35,13 @@ class Body extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryText,
                   ),
+                  SizedBox(
+                    height: 5,
+                  ),
                   CustomText(
                     message: 'Login to continue using the app',
                     fontSize: 15,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.secondaryText,
                   ),
 
@@ -61,7 +64,7 @@ class Body extends StatelessWidget {
                       suffixIcon: Icon(null),
                       hintText: "Enter your email"),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   CustomText(
                     message: 'Password',

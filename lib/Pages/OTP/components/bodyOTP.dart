@@ -40,7 +40,7 @@ class bodyOTP extends StatelessWidget {
                   CustomText(
                       message: description,
                       fontSize: 20,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.secondaryText),
                   SizedBox(
                     height: 20,

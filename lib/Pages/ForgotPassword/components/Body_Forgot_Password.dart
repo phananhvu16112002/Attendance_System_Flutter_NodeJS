@@ -34,12 +34,12 @@ class BodyForgotPassword extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText),
                   SizedBox(
-                    height: 5,
+                    height: 10,
                   ),
                   CustomText(
                       message: description,
                       fontSize: 20,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.secondaryText),
                   SizedBox(
                     height: 15,
@@ -50,7 +50,7 @@ class BodyForgotPassword extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText),
                   SizedBox(
-                    height: 5,
+                    height: 10,
                   ),
                   CustomTextField(
                       controller: emailAddress,
