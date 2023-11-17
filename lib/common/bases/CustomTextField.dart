@@ -1,8 +1,8 @@
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:flutter/material.dart';
 
-class customTextField extends StatelessWidget {
-  const customTextField({
+class CustomTextField extends StatelessWidget {
+  const CustomTextField({
     super.key,
     required this.controller,
     required this.textInputType,

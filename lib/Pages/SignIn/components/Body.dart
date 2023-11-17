@@ -1,4 +1,4 @@
-import 'package:attendance_system_nodejs/Pages/SignIn/components/CustomTextField.dart';
+import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
@@ -54,7 +54,7 @@ class Body extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  customTextField(
+                  CustomTextField(
                       controller: emailAddress,
                       textInputType: TextInputType.emailAddress,
                       obscureText: false,
@@ -72,7 +72,7 @@ class Body extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  customTextField(
+                  CustomTextField(
                       controller: password,
                       textInputType: TextInputType.visiblePassword,
                       obscureText: true,
@@ -159,7 +159,7 @@ class Body extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomText(
@@ -168,11 +168,14 @@ class Body extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         color: AppColors.primaryText,
                       ),
-                      CustomText(
-                        message: 'Register',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.importantText,
+                      GestureDetector(
+                        onTap: () {},
+                        child: CustomText(
+                          message: 'Register',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.importantText,
+                        ),
                       ),
                     ],
                   )
