@@ -1,8 +1,4 @@
 import 'package:attendance_system_nodejs/Pages/ForgotPassword/components/Body_Forgot_Password.dart';
-import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
-import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
-import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
-import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPassword extends StatefulWidget {
