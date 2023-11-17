@@ -49,6 +49,9 @@ class BodyForgotPassword extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText),
+                  SizedBox(
+                    height: 5,
+                  ),
                   CustomTextField(
                       controller: emailAddress,
                       textInputType: TextInputType.emailAddress,

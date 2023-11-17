@@ -1,3 +1,4 @@
+import 'package:attendance_system_nodejs/Pages/CreateNewPassword/screens/CreateNewPassword.dart';
 import 'package:attendance_system_nodejs/Pages/ForgotPassword/screens/ForgotPassword.dart';
 import 'package:attendance_system_nodejs/Pages/OTP/screens/OTPPage.dart';
 import 'package:attendance_system_nodejs/Pages/Register/screens/RegisterPage.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const OTPPage(),
+      home: const CreateNewPassword(),
       debugShowCheckedModeBanner: false,
     );
   }
