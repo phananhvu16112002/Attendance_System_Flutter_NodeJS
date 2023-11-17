@@ -1,3 +1,4 @@
+import 'package:attendance_system_nodejs/Pages/SignIn/screens/SignInPage.dart';
 import 'package:attendance_system_nodejs/Pages/Welcome/screens/WelcomePage.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const WelcomePage(),
+      home: const SignInPage(),
       debugShowCheckedModeBanner: false,
     );
   }
