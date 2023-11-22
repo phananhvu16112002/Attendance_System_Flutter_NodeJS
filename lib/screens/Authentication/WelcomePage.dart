@@ -1,4 +1,4 @@
-import 'package:attendance_system_nodejs/Pages/SignIn/screens/SignInPage.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';

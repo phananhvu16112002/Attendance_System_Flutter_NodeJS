@@ -9,6 +9,8 @@ class CustomTextField extends StatelessWidget {
     required this.obscureText,
     required this.suffixIcon,
     required this.hintText,
+    this.validator,
+    this.onSaved,
   });
 
   final TextEditingController controller;
@@ -16,6 +18,8 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final Icon suffixIcon;
   final String hintText;
+  final String? Function(String?)? validator; // Specify the type here
+  final Function(String?)? onSaved;
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +45,8 @@ class CustomTextField extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(15.0)),
               borderSide: BorderSide(width: 1, color: AppColors.primaryButton),
             )),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please enter some text';
-          }
-          return null;
-        },
+        validator: validator,
+        onSaved: onSaved,
       ),
     );
   }

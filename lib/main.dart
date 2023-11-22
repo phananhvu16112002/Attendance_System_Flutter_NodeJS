@@ -1,9 +1,9 @@
-import 'package:attendance_system_nodejs/Pages/CreateNewPassword/screens/CreateNewPassword.dart';
-import 'package:attendance_system_nodejs/Pages/ForgotPassword/screens/ForgotPassword.dart';
-import 'package:attendance_system_nodejs/Pages/OTP/screens/OTPPage.dart';
-import 'package:attendance_system_nodejs/Pages/Register/screens/RegisterPage.dart';
-import 'package:attendance_system_nodejs/Pages/SignIn/screens/SignInPage.dart';
-import 'package:attendance_system_nodejs/Pages/Welcome/screens/WelcomePage.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/CreateNewPassword.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/OTPPage.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:flutter/material.dart';
 
