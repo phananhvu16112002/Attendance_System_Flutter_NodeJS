@@ -23,7 +23,16 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.backgroundColor),
         useMaterial3: true,
       ),
-      home: const CreateNewPassword(),
+      initialRoute: '/',
+      routes: {
+        '/Welcome': (context) => WelcomePage(),
+        '/Login': (context) => SignInPage(),
+        '/Register': (context) => RegisterPage(),
+        '/ForgotPassword': (context) => ForgotPassword(),
+        '/CreateNewPassword': (context) => CreateNewPassword(),
+        '/OTP': (context) => OTPPage(),
+      },
+      home: const SignInPage(),
       debugShowCheckedModeBanner: false,
     );
   }

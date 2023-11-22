@@ -21,7 +21,7 @@ class CustomTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 380,
-      child: TextField(
+      child: TextFormField(
         controller: controller,
         keyboardType: textInputType,
         style: TextStyle(
@@ -38,9 +38,15 @@ class CustomTextField extends StatelessWidget {
                 borderSide:
                     BorderSide(width: 1, color: AppColors.secondaryText)),
             focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                borderSide:
-                    BorderSide(width: 1, color: AppColors.primaryButton))),
+              borderRadius: BorderRadius.all(Radius.circular(15.0)),
+              borderSide: BorderSide(width: 1, color: AppColors.primaryButton),
+            )),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter some text';
+          }
+          return null;
+        },
       ),
     );
   }
