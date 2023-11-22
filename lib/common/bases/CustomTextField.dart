@@ -11,6 +11,7 @@ class CustomTextField extends StatelessWidget {
     required this.hintText,
     this.validator,
     this.onSaved,
+    this.onChanged,
   });
 
   final TextEditingController controller;
@@ -20,6 +21,7 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final String? Function(String?)? validator; // Specify the type here
   final Function(String?)? onSaved;
+  final Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +49,7 @@ class CustomTextField extends StatelessWidget {
             )),
         validator: validator,
         onSaved: onSaved,
+        onChanged: onChanged,
       ),
     );
   }

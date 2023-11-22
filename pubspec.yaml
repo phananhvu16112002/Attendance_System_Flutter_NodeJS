@@ -41,6 +41,7 @@ dependencies:
   bloc: ^8.1.2
   another_flushbar: ^1.12.30
   http:
+  provider: ^6.1.1
 
 dev_dependencies:
   flutter_test:

@@ -4,7 +4,10 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -22,6 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -62,11 +66,15 @@ class _RegisterPageState extends State<RegisterPage> {
                             height: 10,
                           ),
                           CustomTextField(
-                              controller: username,
-                              textInputType: TextInputType.text,
-                              obscureText: false,
-                              suffixIcon: Icon(null),
-                              hintText: 'Enter your userName'),
+                            controller: username,
+                            textInputType: TextInputType.text,
+                            obscureText: false,
+                            suffixIcon: Icon(null),
+                            hintText: 'Enter your userName',
+                            onChanged: (value) {
+                              studentDataProvider.setStudentName(value);
+                            },
+                          ),
                           SizedBox(
                             height: 15,
                           ),
@@ -79,28 +87,37 @@ class _RegisterPageState extends State<RegisterPage> {
                             height: 10,
                           ),
                           CustomTextField(
-                              controller: emailAddress,
-                              textInputType: TextInputType.emailAddress,
-                              obscureText: false,
-                              suffixIcon: Icon(null),
-                              hintText: 'Enter your email'),
+                            controller: emailAddress,
+                            textInputType: TextInputType.emailAddress,
+                            obscureText: false,
+                            suffixIcon: Icon(null),
+                            hintText: 'Enter your email',
+                            onChanged: (value) {
+                              studentDataProvider.setStudentEmail(value);
+                            },
+                          ),
                           SizedBox(
                             height: 15,
                           ),
                           CustomText(
-                              message: 'Password',
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryText),
+                            message: 'Password',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryText,
+                          ),
                           SizedBox(
                             height: 10,
                           ),
                           CustomTextField(
-                              controller: password,
-                              textInputType: TextInputType.visiblePassword,
-                              obscureText: true,
-                              suffixIcon: Icon(Icons.visibility),
-                              hintText: 'Enter your password'),
+                            controller: password,
+                            textInputType: TextInputType.visiblePassword,
+                            obscureText: true,
+                            suffixIcon: Icon(Icons.visibility),
+                            hintText: 'Enter your password',
+                            onChanged: (value) {
+                              studentDataProvider.setPassword(value);
+                            },
+                          ),
                           SizedBox(
                             height: 15,
                           ),
@@ -126,11 +143,25 @@ class _RegisterPageState extends State<RegisterPage> {
                               backgroundColorButton: AppColors.primaryButton,
                               borderColor: Colors.white,
                               textColor: Colors.white,
-                              function: () {
+                              function: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text('Processing Data')));
+                                  print(username.text.toString());
+                                  print(emailAddress.text.toString());
+                                  print(password.text.toString());
+
+                                  try {
+                                    await Authenticate().registerUser(
+                                        username.text,
+                                        emailAddress.text,
+                                        password.text);
+                                    Flushbar(
+                                      title: "Successfully",
+                                      message: "Please Enter Your OTP",
+                                      duration: Duration(seconds: 5),
+                                    ).show(context);
+                                  } catch (e) {
+                                    print(e);
+                                  }
                                 } else {
                                   Flushbar(
                                     title: "Invalid Form",

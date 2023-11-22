@@ -1,3 +1,4 @@
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/CreateNewPassword.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/OTPPage.dart';
@@ -6,9 +7,17 @@ import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart'
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => StudentDataProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -32,7 +41,7 @@ class MyApp extends StatelessWidget {
         '/CreateNewPassword': (context) => CreateNewPassword(),
         '/OTP': (context) => OTPPage(),
       },
-      home: const SignInPage(),
+      home: RegisterPage(),
       debugShowCheckedModeBanner: false,
     );
   }
