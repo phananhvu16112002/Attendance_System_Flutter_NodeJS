@@ -7,6 +7,7 @@ class StudentDataProvider with ChangeNotifier {
       studentName: '',
       studentEmail: '',
       password: '',
+      hashedOTP: '',
       accessToken: '',
       refreshToken: '',
       active: false);
@@ -30,6 +31,11 @@ class StudentDataProvider with ChangeNotifier {
 
   void setPassword(String password) {
     _student.password = password;
+    notifyListeners();
+  }
+
+  void setHashedOTP(String hashedOTP) {
+    _student.hashedOTP = hashedOTP;
     notifyListeners();
   }
 

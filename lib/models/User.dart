@@ -5,6 +5,7 @@ class Student {
   String studentName = '';
   String studentEmail = '';
   String password = '';
+  String hashedOTP = '';
   String accessToken = '';
   String refreshToken = '';
   bool active = false;
@@ -14,6 +15,7 @@ class Student {
     required this.studentName,
     required this.studentEmail,
     required this.password,
+    required this.hashedOTP,
     required this.accessToken,
     required this.refreshToken,
     required this.active,

@@ -21,4 +21,21 @@ class Authenticate {
       print('Failed to register. Error: ${response.body}');
     }
   }
+
+  Future<bool> verifyOTP(String email, String OTP) async {
+    final response = await http.post(
+        Uri.parse('http://10.0.2.2:8080/api/student/verifyRegister'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, String>{'email': email, 'OTP': OTP}));
+
+    if (response.statusCode == 200) {
+      print('Registration successful');
+      return true;
+    } else {
+      print('Failed to register. Error: ${response.body}');
+      return false;
+    }
+  }
 }

@@ -148,12 +148,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                   print(username.text.toString());
                                   print(emailAddress.text.toString());
                                   print(password.text.toString());
-
                                   try {
                                     await Authenticate().registerUser(
                                         username.text,
                                         emailAddress.text,
                                         password.text);
+                                    Navigator.pushNamed(context, '/OTP');
                                     Flushbar(
                                       title: "Successfully",
                                       message: "Please Enter Your OTP",

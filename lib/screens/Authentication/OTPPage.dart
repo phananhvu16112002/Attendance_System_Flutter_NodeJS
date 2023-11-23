@@ -1,9 +1,13 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
+import 'package:provider/provider.dart';
 
 class OTPPage extends StatefulWidget {
   const OTPPage({super.key});
@@ -18,6 +22,7 @@ class _OTPPageState extends State<OTPPage> {
       "Please enter the verification code we just sent on your email address.";
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -49,7 +54,20 @@ class _OTPPageState extends State<OTPPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(right: 20),
-                      child: OTPBoxInput(context),
+                      child: OTPTextField(
+                        controller: otpController,
+                        textFieldAlignment: MainAxisAlignment.spaceEvenly,
+                        length: 6,
+                        width: MediaQuery.of(context).size.width,
+                        outlineBorderRadius: 10,
+                        fieldWidth: 50,
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w500),
+                        fieldStyle: FieldStyle.box,
+                        onChanged: (pin) {
+                          studentDataProvider.setHashedOTP(pin);
+                        },
+                      ),
                     ),
                     SizedBox(
                       height: 20,
@@ -59,7 +77,29 @@ class _OTPPageState extends State<OTPPage> {
                         backgroundColorButton: AppColors.primaryButton,
                         borderColor: Colors.white,
                         textColor: Colors.white,
-                        function: () {}),
+                        function: () async {
+                          try {
+                            bool check = await Authenticate().verifyOTP(
+                                studentDataProvider.userData.studentEmail,
+                                studentDataProvider.userData.hashedOTP);
+                            if (check == true) {
+                              Navigator.pushNamed(context, '/Login');
+                              Flushbar(
+                                title: "Successfully",
+                                message: "Login to use the app",
+                                duration: Duration(seconds: 5),
+                              ).show(context);
+                            } else {
+                              Flushbar(
+                                title: "Failed",
+                                message: "OTP is not valid",
+                                duration: Duration(seconds: 5),
+                              ).show(context);
+                            }
+                          } catch (e) {
+                            print(e);
+                          }
+                        }),
                     SizedBox(
                       height: 15,
                     ),
@@ -91,20 +131,6 @@ class _OTPPageState extends State<OTPPage> {
           ],
         ),
       ),
-    );
-  }
-
-  OTPTextField OTPBoxInput(BuildContext context) {
-    return OTPTextField(
-      controller: otpController,
-      textFieldAlignment: MainAxisAlignment.spaceEvenly,
-      length: 5,
-      width: MediaQuery.of(context).size.width,
-      outlineBorderRadius: 10,
-      fieldWidth: 50,
-      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-      fieldStyle: FieldStyle.box,
-      onChanged: (pin) {},
     );
   }
 }
