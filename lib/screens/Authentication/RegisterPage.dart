@@ -157,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     Flushbar(
                                       title: "Successfully",
                                       message: "Please Enter Your OTP",
-                                      duration: Duration(seconds: 5),
+                                      duration: Duration(seconds: 3),
                                     ).show(context);
                                   } catch (e) {
                                     print(e);
