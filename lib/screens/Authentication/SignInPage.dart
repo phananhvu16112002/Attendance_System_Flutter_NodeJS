@@ -17,10 +17,19 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController emailAddress = TextEditingController();
   TextEditingController password = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool isCheckPassword = false;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    emailAddress.dispose();
+    password.dispose();
   }
 
   @override
@@ -103,9 +112,16 @@ class _SignInPageState extends State<SignInPage> {
                     CustomTextField(
                       controller: password,
                       textInputType: TextInputType.visiblePassword,
-                      obscureText: true,
+                      obscureText: isCheckPassword,
                       suffixIcon: IconButton(
-                          onPressed: () {}, icon: Icon(Icons.visibility)),
+                          onPressed: () {
+                            setState(() {
+                              isCheckPassword = !isCheckPassword;
+                            });
+                          },
+                          icon: isCheckPassword
+                              ? Icon(Icons.visibility)
+                              : Icon(Icons.visibility_off)),
                       hintText: "Enter your password",
                       validator: (value) {
                         if (value == null || value.isEmpty) {

@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         '/CreateNewPassword': (context) => CreateNewPassword(),
         '/OTP': (context) => OTPPage(),
       },
-      home: RegisterPage(),
+      home: SignInPage(),
       debugShowCheckedModeBanner: false,
     );
   }

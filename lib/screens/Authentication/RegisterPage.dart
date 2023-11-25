@@ -37,8 +37,19 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    username.dispose();
+    emailAddress.dispose();
+    password.dispose();
+    confirmPassword.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
