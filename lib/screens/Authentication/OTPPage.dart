@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:another_flushbar/flushbar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
@@ -20,6 +22,8 @@ class _OTPPageState extends State<OTPPage> {
   OtpFieldController otpController = OtpFieldController();
   String description =
       "Please enter the verification code we just sent on your email address.";
+  int secondsRemaining = 60; // Initial value for 1 minute
+  bool canResend = true;
   @override
   Widget build(BuildContext context) {
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
@@ -114,9 +118,16 @@ class _OTPPageState extends State<OTPPage> {
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryText),
                           GestureDetector(
-                            onTap: () {},
-                            child: const CustomText(
-                                message: "Re-send",
+                            onTap: () {
+                              if (canResend) {
+                                // Start the countdown timer
+                                startTimer();
+                              }
+                            },
+                            child: CustomText(
+                                message: canResend
+                                    ? "Re-send"
+                                    : "Resend in $secondsRemaining seconds",
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.importantText),
@@ -132,5 +143,24 @@ class _OTPPageState extends State<OTPPage> {
         ),
       ),
     );
+  }
+
+  void startTimer() {
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (secondsRemaining > 0) {
+          secondsRemaining--;
+        } else {
+          canResend = true;
+          timer.cancel(); // Stop the timer when it reaches 0
+        }
+      });
+    });
+
+    // Disable the button during the countdown
+    setState(() {
+      canResend = false;
+      secondsRemaining = 60; // Reset the timer to 1 minute
+    });
   }
 }
