@@ -93,7 +93,7 @@ class _OTPPageState extends State<OTPPage> {
                               Flushbar(
                                 title: "Failed",
                                 message: "OTP is not valid",
-                                duration:  Duration(seconds: 5),
+                                duration: Duration(seconds: 5),
                               ).show(context);
                             }
                           } catch (e) {
