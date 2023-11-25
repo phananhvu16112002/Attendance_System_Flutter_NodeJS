@@ -60,7 +60,7 @@ class _WelcomePageState extends State<WelcomePage> {
                         height: 20,
                       ),
                       Padding(
-                        padding: EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 15),
                         child: CustomButton(
                             buttonName: 'Login',
                             backgroundColorButton: AppColors.primaryButton,
@@ -75,13 +75,13 @@ class _WelcomePageState extends State<WelcomePage> {
                         height: 20,
                       ),
                       Padding(
-                        padding: EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 15),
                         child: CustomButton(
                           buttonName: 'Register',
                           backgroundColorButton: Colors.white,
                           borderColor: AppColors.primaryText,
                           textColor: AppColors.primaryText,
-                          function: () {},
+                          function: () => Navigator.pushNamed(context, "/Register"),
                         ),
                       )
                     ],

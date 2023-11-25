@@ -36,12 +36,12 @@ class _OTPPageState extends State<OTPPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
+                    const CustomText(
                         message: "OTP Verification",
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primaryText),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     CustomText(
@@ -49,7 +49,7 @@ class _OTPPageState extends State<OTPPage> {
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: AppColors.secondaryText),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Padding(
@@ -61,7 +61,7 @@ class _OTPPageState extends State<OTPPage> {
                         width: MediaQuery.of(context).size.width,
                         outlineBorderRadius: 10,
                         fieldWidth: 50,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 15, fontWeight: FontWeight.w500),
                         fieldStyle: FieldStyle.box,
                         onChanged: (pin) {
@@ -69,7 +69,7 @@ class _OTPPageState extends State<OTPPage> {
                         },
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     CustomButton(
@@ -93,14 +93,14 @@ class _OTPPageState extends State<OTPPage> {
                               Flushbar(
                                 title: "Failed",
                                 message: "OTP is not valid",
-                                duration: Duration(seconds: 5),
+                                duration:  Duration(seconds: 5),
                               ).show(context);
                             }
                           } catch (e) {
                             print(e);
                           }
                         }),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     Padding(
@@ -108,14 +108,14 @@ class _OTPPageState extends State<OTPPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          CustomText(
+                          const CustomText(
                               message: "Didn't recieved code ? ",
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryText),
                           GestureDetector(
                             onTap: () {},
-                            child: CustomText(
+                            child: const CustomText(
                                 message: "Re-send",
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,

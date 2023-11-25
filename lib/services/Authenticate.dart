@@ -38,4 +38,12 @@ class Authenticate {
       return false;
     }
   }
+
+  Future<void> login(String email, String OTP) async {}
+
+  Future<void> forgotPassword(String email) async {}
+
+  Future<void> verifyForgotPassword(String email,String OTP) async {}
+
+  Future<void> resetPassword(String email, String newPassword) async {}
 }

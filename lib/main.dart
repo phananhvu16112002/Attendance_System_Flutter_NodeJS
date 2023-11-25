@@ -15,7 +15,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => StudentDataProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }

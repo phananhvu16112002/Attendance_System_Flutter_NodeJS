@@ -30,12 +30,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CustomText(
+                  const CustomText(
                       message: 'Forgot Your Password?',
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   CustomText(
@@ -43,24 +43,25 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: AppColors.secondaryText),
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
-                  CustomText(
+                  const CustomText(
                       message: "Email",
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   CustomTextField(
                       controller: emailAddress,
                       textInputType: TextInputType.emailAddress,
                       obscureText: false,
-                      suffixIcon: Icon(null),
+                      suffixIcon:
+                          IconButton(onPressed: () {}, icon: const Icon(null)),
                       hintText: 'Enter your email address'),
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
                   Padding(
@@ -72,7 +73,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         textColor: Colors.white,
                         function: () {}),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
                   Padding(
@@ -80,14 +81,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CustomText(
+                        const CustomText(
                             message: 'Already have an account ? ',
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                             color: AppColors.primaryText),
                         GestureDetector(
                           onTap: () {},
-                          child: CustomText(
+                          child: const CustomText(
                               message: 'Log In',
                               fontSize: 15,
                               fontWeight: FontWeight.bold,

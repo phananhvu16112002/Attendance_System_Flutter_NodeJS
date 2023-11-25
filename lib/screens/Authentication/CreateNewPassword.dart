@@ -32,12 +32,12 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
+                    const CustomText(
                         message: "Create New Password",
                         fontSize: 42,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primaryText),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     CustomText(
@@ -45,41 +45,43 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: AppColors.secondaryText),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
-                    CustomText(
+                    const CustomText(
                         message: "New Password",
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primaryText),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     CustomTextField(
                         controller: password,
                         textInputType: TextInputType.visiblePassword,
                         obscureText: true,
-                        suffixIcon: Icon(Icons.visibility_off),
+                        suffixIcon: IconButton(
+                            onPressed: () {}, icon: Icon(Icons.visibility_off)),
                         hintText: "New Password"),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
-                    CustomText(
+                    const CustomText(
                         message: "Confirm Password",
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primaryText),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     CustomTextField(
                         controller: password,
                         textInputType: TextInputType.visiblePassword,
                         obscureText: true,
-                        suffixIcon: Icon(Icons.visibility_off),
+                        suffixIcon: IconButton(
+                            onPressed: () {}, icon: Icon(Icons.visibility_off)),
                         hintText: "Confirm Password"),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     Padding(

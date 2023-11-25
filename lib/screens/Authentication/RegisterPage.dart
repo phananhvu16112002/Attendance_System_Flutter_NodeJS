@@ -8,6 +8,7 @@ import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:email_validator/email_validator.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -21,7 +22,19 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController emailAddress = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController confirmPassword = TextEditingController();
+  bool isCheckPassword = false;
+  bool isCheckConfirmPassword = false;
   final _formKey = GlobalKey<FormState>();
+  RegExp upperCaseRegex = RegExp(r'[A-Z]');
+  RegExp digitRegex = RegExp(r'[0-9]');
+
+  bool isTDTUEmail(String email) {
+    // Biểu thức chính quy để kiểm tra phần sau ký tự '@'
+    final RegExp tdtuEmailRegExp =
+        RegExp(r'^[0-9A-Z]+@(student\.)?tdtu\.edu\.vn$', caseSensitive: false);
+
+    return tdtuEmailRegExp.hasMatch(email);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ImageSlider(),
+            const ImageSlider(),
             Container(
                 height: MediaQuery.of(context).size.height,
                 child: Padding(
@@ -41,101 +54,162 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CustomText(
+                          const CustomText(
                               message: 'Register',
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryText),
-                          SizedBox(
+                          const SizedBox(
                             height: 5,
                           ),
-                          CustomText(
+                          const CustomText(
                               message: 'Enter your personal information',
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: AppColors.secondaryText),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
-                          CustomText(
+                          const CustomText(
                               message: 'Username',
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryText),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           CustomTextField(
                             controller: username,
                             textInputType: TextInputType.text,
                             obscureText: false,
-                            suffixIcon: Icon(null),
+                            suffixIcon: IconButton(
+                                onPressed: () {}, icon: const Icon(null)),
                             hintText: 'Enter your userName',
                             onChanged: (value) {
                               studentDataProvider.setStudentName(value);
                             },
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value.length > 50) {
+                                return 'Please check username(must not 50 characters) ';
+                              }
+                              return null;
+                            },
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 15,
                           ),
-                          CustomText(
+                          const CustomText(
                               message: 'Email',
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryText),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           CustomTextField(
                             controller: emailAddress,
                             textInputType: TextInputType.emailAddress,
                             obscureText: false,
-                            suffixIcon: Icon(null),
+                            suffixIcon: IconButton(
+                                onPressed: () {}, icon: const Icon(null)),
                             hintText: 'Enter your email',
                             onChanged: (value) {
                               studentDataProvider.setStudentEmail(value);
                             },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Email is required';
+                              }
+                              final RegExp tdtuEmailExp = RegExp(
+                                  r'^[0-9A-Z]+@(student\.)?tdtu\.edu\.vn$',
+                                  caseSensitive: false);
+                              if (!tdtuEmailExp.hasMatch(value)) {
+                                return 'Please check your valid email TDTU';
+                              }
+                              return null;
+                            },
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 15,
                           ),
-                          CustomText(
+                          const CustomText(
                             message: 'Password',
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: AppColors.primaryText,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           CustomTextField(
                             controller: password,
                             textInputType: TextInputType.visiblePassword,
-                            obscureText: true,
-                            suffixIcon: Icon(Icons.visibility),
+                            obscureText: isCheckPassword,
+                            suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isCheckPassword = !isCheckPassword;
+                                  });
+                                },
+                                icon: isCheckPassword
+                                    ? Icon(Icons.visibility)
+                                    : Icon(Icons.visibility_off)),
                             hintText: 'Enter your password',
                             onChanged: (value) {
                               studentDataProvider.setPassword(value);
                             },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Password is required';
+                              }
+                              if (value.length < 8) {
+                                return 'Password must be at least 8 characters long';
+                              }
+                              if (!upperCaseRegex.hasMatch(value)) {
+                                return 'Password must be contain at least one uppercase letter';
+                              }
+                              if (!digitRegex.hasMatch(value)) {
+                                return 'Password must be contain at least one digit number';
+                              }
+                              return null;
+                            },
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 15,
                           ),
-                          CustomText(
+                          const CustomText(
                               message: 'Confirm Password',
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryText),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           CustomTextField(
-                              controller: confirmPassword,
-                              textInputType: TextInputType.visiblePassword,
-                              obscureText: true,
-                              suffixIcon: Icon(Icons.visibility),
-                              hintText: 'Confirm your password'),
-                          SizedBox(
+                            controller: confirmPassword,
+                            textInputType: TextInputType.visiblePassword,
+                            obscureText: isCheckConfirmPassword,
+                            suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isCheckConfirmPassword =
+                                        !isCheckConfirmPassword;
+                                  });
+                                },
+                                icon: isCheckConfirmPassword
+                                    ? Icon(Icons.visibility)
+                                    : Icon(Icons.visibility_off)),
+                            hintText: 'Confirm your password',
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Confirm password required';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(
                             height: 20,
                           ),
                           CustomButton(
@@ -145,33 +219,29 @@ class _RegisterPageState extends State<RegisterPage> {
                               textColor: Colors.white,
                               function: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  print(username.text.toString());
-                                  print(emailAddress.text.toString());
-                                  print(password.text.toString());
                                   try {
                                     await Authenticate().registerUser(
                                         username.text,
                                         emailAddress.text,
                                         password.text);
                                     Navigator.pushNamed(context, '/OTP');
-                                    Flushbar(
-                                      title: "Successfully",
-                                      message: "Please Enter Your OTP",
-                                      duration: Duration(seconds: 3),
-                                    ).show(context);
+                                    showFlushBarNotification(
+                                        context,
+                                        "Successfully",
+                                        "Please enter your OTP",
+                                        3);
                                   } catch (e) {
                                     print(e);
                                   }
                                 } else {
-                                  Flushbar(
-                                    title: "Invalid Form",
-                                    message:
-                                        "Please complete the form property",
-                                    duration: Duration(seconds: 10),
-                                  ).show(context);
+                                  showFlushBarNotification(
+                                      context,
+                                      "Invalid Form",
+                                      "Please complete the form property",
+                                      3);
                                 }
                               }),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Padding(
@@ -179,7 +249,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                CustomText(
+                                const CustomText(
                                     message: 'Already have an account ? ',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
@@ -187,7 +257,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 GestureDetector(
                                   onTap: () =>
                                       Navigator.pushNamed(context, "/Login"),
-                                  child: CustomText(
+                                  child: const CustomText(
                                       message: 'Log In',
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -203,5 +273,14 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+
+  void showFlushBarNotification(
+      BuildContext context, String title, String message, int second) {
+    Flushbar(
+      title: title,
+      message: message,
+      duration: Duration(seconds: second),
+    ).show(context);
   }
 }

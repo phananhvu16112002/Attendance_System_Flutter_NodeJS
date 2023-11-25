@@ -20,7 +20,6 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -31,7 +30,7 @@ class _SignInPageState extends State<SignInPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ImageSlider(),
+          const ImageSlider(),
           Container(
             height: MediaQuery.of(context).size.height,
             child: Padding(
@@ -41,16 +40,16 @@ class _SignInPageState extends State<SignInPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
+                    const CustomText(
                       message: 'Login',
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryText,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
-                    CustomText(
+                    const CustomText(
                       message: 'Login to continue using the app',
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -60,7 +59,7 @@ class _SignInPageState extends State<SignInPage> {
                     const SizedBox(
                       height: 20,
                     ),
-                    CustomText(
+                    const CustomText(
                       message: 'Email',
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -70,15 +69,29 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     CustomTextField(
-                        controller: emailAddress,
-                        textInputType: TextInputType.emailAddress,
-                        obscureText: false,
-                        suffixIcon: Icon(null),
-                        hintText: "Enter your email"),
+                      controller: emailAddress,
+                      textInputType: TextInputType.emailAddress,
+                      obscureText: false,
+                      suffixIcon:
+                          IconButton(onPressed: () {}, icon: Icon(null)),
+                      hintText: "Enter your email",
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Email is required";
+                        }
+                        final RegExp tdtuEmailExp = RegExp(
+                            r'^[0-9A-Z]+@(student\.)?tdtu\.edu\.vn$',
+                            caseSensitive: false);
+                        if (!tdtuEmailExp.hasMatch(value)) {
+                          return 'Please check your valid email TDTU';
+                        }
+                        return null;
+                      },
+                    ),
                     const SizedBox(
                       height: 15,
                     ),
-                    CustomText(
+                    const CustomText(
                       message: 'Password',
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -88,16 +101,24 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     CustomTextField(
-                        controller: password,
-                        textInputType: TextInputType.visiblePassword,
-                        obscureText: true,
-                        suffixIcon: Icon(Icons.visibility),
-                        hintText: "Enter your password"),
+                      controller: password,
+                      textInputType: TextInputType.visiblePassword,
+                      obscureText: true,
+                      suffixIcon: IconButton(
+                          onPressed: () {}, icon: Icon(Icons.visibility)),
+                      hintText: "Enter your password",
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Password is required";
+                        }
+                        return null;
+                      },
+                    ),
                     const SizedBox(
                       height: 10,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 250),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 250),
                       child: CustomText(
                         message: 'Forgot Password?',
                         fontSize: 15,
@@ -129,7 +150,7 @@ class _SignInPageState extends State<SignInPage> {
                             }
                           }),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     //Build third login
@@ -146,7 +167,7 @@ class _SignInPageState extends State<SignInPage> {
                           const SizedBox(
                             width: 10,
                           ),
-                          CustomText(
+                          const CustomText(
                             message: 'Or Login With',
                             fontSize: 15,
                             fontWeight: FontWeight.normal,
@@ -189,7 +210,7 @@ class _SignInPageState extends State<SignInPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CustomText(
+                        const CustomText(
                           message: "Don't you have an account ? ",
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
@@ -197,7 +218,7 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         GestureDetector(
                           onTap: () {},
-                          child: CustomText(
+                          child: const CustomText(
                             message: 'Register',
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
