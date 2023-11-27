@@ -1,37 +1,44 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 
 class Authenticate {
   Future<void> registerUser(
       String userName, String email, String password) async {
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/api/student/register'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-      body: jsonEncode(<String, String>{
-        'username': userName,
-        'email': email,
-        'password': password
-      }),
-    );
+    final URL = 'http://10.0.2.2:8080/api/student/register';
+    var headers = {
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    var request = {'email': email, 'password': password, 'username': userName};
+    var body = json.encode(request);
+    final response =
+        await http.post(Uri.parse(URL), headers: headers, body: body);
     if (response.statusCode == 200) {
+      print(response);
+      print(response.body);
       print('Registration successful');
     } else {
       print('Failed to register. Error: ${response.body}');
     }
   }
 
-  Future<bool> verifyOTP(String email, String OTP) async {
-    final response = await http.post(
-        Uri.parse('http://10.0.2.2:8080/api/student/verifyRegister'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, String>{'email': email, 'OTP': OTP}));
+  Future<bool> verifyOTP(String email, String otp) async {
+    final URL = 'http://10.0.2.2:8080/api/student/verifyRegister';
+    var headers = {
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    var request = {'email': email, 'OTP': otp};
+    var body = json.encode(request);
+    final response =
+        await http.post(Uri.parse(URL), headers: headers, body: body);
 
     if (response.statusCode == 200) {
       print('Registration successful');
+      print(response);
+      print(response.body);
       return true;
     } else {
       print('Failed to register. Error: ${response.body}');
@@ -39,11 +46,27 @@ class Authenticate {
     }
   }
 
-  Future<void> login(String email, String OTP) async {}
+  Future<void> login(String email, String password) async {
+    final URL = 'http://10.0.2.2:8080/api/student/login';
+    var request = {'email': email, 'password': password};
+    var body = json.encode(request);
+    var headers = {
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    final response =
+        await http.post(Uri.parse(URL), headers: headers, body: body);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      print('Response Data: ' + responseData);
+      print('RefreshToken:' + responseData['refreshToken']);
+      print('AccessToken:' + responseData['accessToken']);
+    }
+  }
 
   Future<void> forgotPassword(String email) async {}
 
-  Future<void> verifyForgotPassword(String email,String OTP) async {}
+  Future<void> verifyForgotPassword(String email, String otp) async {}
 
   Future<void> resetPassword(String email, String newPassword) async {}
 }

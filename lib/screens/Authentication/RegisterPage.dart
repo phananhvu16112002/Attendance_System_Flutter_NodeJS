@@ -8,7 +8,6 @@ import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:email_validator/email_validator.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -210,8 +209,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   });
                                 },
                                 icon: isCheckConfirmPassword
-                                    ? Icon(Icons.visibility)
-                                    : Icon(Icons.visibility_off)),
+                                    ? const Icon(Icons.visibility)
+                                    : const Icon(Icons.visibility_off)),
                             hintText: 'Confirm your password',
                             validator: (value) {
                               if (value == null || value.isEmpty) {

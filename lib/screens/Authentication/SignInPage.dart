@@ -4,6 +4,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
@@ -152,11 +153,19 @@ class _SignInPageState extends State<SignInPage> {
                           backgroundColorButton: AppColors.primaryButton,
                           borderColor: Colors.white,
                           textColor: Colors.white,
-                          function: () {
+                          function: () async {
                             if (_formKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Processing Data')));
+                              try {
+                                await Authenticate()
+                                    .login(emailAddress.text, password.text);
+                                Flushbar(
+                                  title: "Successfully",
+                                  message: "Processing Data...",
+                                  duration: Duration(seconds: 10),
+                                ).show(context);
+                              } catch (e) {
+                                print(e);
+                              }
                             } else {
                               Flushbar(
                                 title: "Invalid Form",
