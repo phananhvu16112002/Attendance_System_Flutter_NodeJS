@@ -103,18 +103,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 bool check = await Authenticate()
                                     .forgotPassword(emailAddress.text);
                                 if (check) {
-                                  Navigator.pushNamed(context, '/OTP');
-                                  Flushbar(
-                                    title: 'Verify OTP',
-                                    message: 'OTP has been sent to your email',
-                                    duration: Duration(seconds: 3),
-                                  );
+                                  Navigator.pushNamedAndRemoveUntil(context,
+                                      ('/OTPForgotPassword'), (route) => false);
+                                  showFlushBarNotification(
+                                      context,
+                                      'Verify OTP',
+                                      'OTP has been sent to your email',
+                                      3);
                                 } else {
-                                  Flushbar(
-                                    title: 'Failed',
-                                    message: 'Check your email',
-                                    duration: Duration(seconds: 3),
-                                  );
+                                  showFlushBarNotification(context, 'Failed',
+                                      'Email is not exist', 3);
                                 }
                               } catch (e) {
                                 print(e);
@@ -157,5 +155,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         ],
       ),
     ));
+  }
+
+  void showFlushBarNotification(
+      BuildContext context, String title, String message, int second) {
+    Flushbar(
+      title: title,
+      message: message,
+      duration: Duration(seconds: second),
+    ).show(context);
   }
 }

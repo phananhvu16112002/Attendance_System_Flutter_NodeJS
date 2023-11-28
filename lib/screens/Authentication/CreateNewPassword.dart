@@ -1,8 +1,12 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CreateNewPassword extends StatefulWidget {
   const CreateNewPassword({super.key});
@@ -24,6 +28,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
       'Your new password must be unique from those previously used';
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -136,7 +141,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                             backgroundColorButton: AppColors.primaryButton,
                             borderColor: Colors.white,
                             textColor: Colors.white,
-                            function: () {
+                            function: () async {
                               if (_formKey.currentState!.validate()) {}
                             }),
                       )
@@ -149,5 +154,14 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
         ),
       ),
     );
+  }
+
+  void showFlushBarNotification(
+      BuildContext context, String title, String message, int second) {
+    Flushbar(
+      title: title,
+      message: message,
+      duration: Duration(seconds: second),
+    ).show(context);
   }
 }
