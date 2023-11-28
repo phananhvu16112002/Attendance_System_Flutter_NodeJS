@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 
 class Authenticate {
@@ -16,8 +15,6 @@ class Authenticate {
     final response =
         await http.post(Uri.parse(URL), headers: headers, body: body);
     if (response.statusCode == 200) {
-      print(response);
-      print(response.body);
       print('Registration successful');
     } else {
       print('Failed to register. Error: ${response.body}');
@@ -37,8 +34,6 @@ class Authenticate {
 
     if (response.statusCode == 200) {
       print('Registration successful');
-      print(response);
-      print(response.body);
       return true;
     } else {
       print('Failed to register. Error: ${response.body}');
@@ -46,7 +41,7 @@ class Authenticate {
     }
   }
 
-  Future<void> login(String email, String password) async {
+  Future<bool> login(String email, String password) async {
     final URL = 'http://10.0.2.2:8080/api/student/login';
     var request = {'email': email, 'password': password};
     var body = json.encode(request);
@@ -63,14 +58,32 @@ class Authenticate {
 
       await SecureStorage().writeSecureData('accessToken', accessToken);
       await SecureStorage().writeSecureData('refreshToken', refreshToken);
-
-      // String printToken = await SecureStorage().readSecureData("accessToken");
-      // print("----------------------------------------------------------------------");
-      // print(printToken);
+      return true;
+    } else {
+      // ignore: avoid_print
+      print('User is not exist');
+      return false;
     }
   }
 
-  Future<void> forgotPassword(String email) async {}
+  Future<bool> forgotPassword(String email) async {
+    final URL = 'http://10.0.2.2:8080/api/student/forgotPassword';
+    var request = {'email': email};
+    var body = jsonEncode(request);
+    var headers = {
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    final response =
+        await http.post(Uri.parse(URL), headers: headers, body: body);
+    if (response.statusCode == 200) {
+      print('Successfully...');
+      return true;
+    } else {
+      print('Failed');
+      return false;
+    }
+  }
 
   Future<void> verifyForgotPassword(String email, String otp) async {}
 

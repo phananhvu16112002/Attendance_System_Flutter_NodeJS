@@ -1,8 +1,7 @@
-import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,49 +11,56 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late var accessTokenDatabase;
-
-  Future<String> getAccessTokenDatabase() async {
-    return await SecureStorage().readSecureData("accessToken");
-  }
+  final storage = SecureStorage();
+  String? accessToken;
+  String? refreshToken;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    setState(() {
-      accessTokenDatabase = getAccessTokenDatabase();
-    });
+    _loadToken();
+  }
+
+  Future<void> _loadToken() async {
+    String? loadToken = await storage.readSecureData('accessToken');
+    String? refreshToken1 = await storage.readSecureData('refreshToken');
+    if (loadToken.isEmpty ||
+        refreshToken1.isEmpty ||
+        loadToken.contains('No Data Found') ||
+        refreshToken1.contains('No Data Found')) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WelcomePage()),
+      );
+    } else {
+      setState(() {
+        accessToken = loadToken;
+        refreshToken = refreshToken1;
+      });
+    }
   }
 
   @override
-  void dispose(){
-    print("Home Page dispose");
+  void dispose() {
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final studentDataProvider = Provider.of<StudentDataProvider>(context);
-    return MaterialApp(
-      home: Scaffold(
-        body: FutureBuilder<String>(
-        future: accessTokenDatabase,
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != "No Data Found"){
-            studentDataProvider.setAccessToken(snapshot.data!);
-            return Text(snapshot.data!);
-
-          }else if (studentDataProvider.userData.accessToken.isNotEmpty){
-            return Text(studentDataProvider.userData.accessToken);
-
-          }else if (snapshot.data == "No Data Found" && studentDataProvider.userData.accessToken == ""){
-            return const WelcomePage();
-          }
-          return const CircularProgressIndicator();
-        }
-        )
-      ) 
-    );
+    return Scaffold(
+        body: Center(
+            child: Column(
+      children: [
+        Text('AccessToken: ${accessToken ?? "N/A"}'),
+        Text('RefreshToken: ${refreshToken ?? "N/A"}'),
+        ElevatedButton(
+            onPressed: () async {
+              await SecureStorage().deleteSecureData('accessToken');
+              await SecureStorage().deleteSecureData('refreshToken');
+            },
+            child: Text('Delete'))
+      ],
+    )));
   }
 }

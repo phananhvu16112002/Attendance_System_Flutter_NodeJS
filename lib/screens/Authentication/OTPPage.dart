@@ -83,10 +83,10 @@ class _OTPPageState extends State<OTPPage> {
                         textColor: Colors.white,
                         function: () async {
                           try {
-                            bool check = await Authenticate().verifyOTP(
+                            bool checkLogin = await Authenticate().verifyOTP(
                                 studentDataProvider.userData.studentEmail,
                                 studentDataProvider.userData.hashedOTP);
-                            if (check == true) {
+                            if (checkLogin == true) {
                               Navigator.pushNamed(context, '/Login');
                               Flushbar(
                                 title: "Successfully",

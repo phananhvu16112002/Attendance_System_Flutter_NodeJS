@@ -230,16 +230,24 @@ class _RegisterPageState extends State<RegisterPage> {
                               function: () async {
                                 if (_formKey.currentState!.validate()) {
                                   try {
-                                    await Authenticate().registerUser(
-                                        username.text,
-                                        emailAddress.text,
-                                        password.text);
-                                    Navigator.pushNamed(context, '/OTP');
-                                    showFlushBarNotification(
-                                        context,
-                                        "Successfully",
-                                        "Please enter your OTP",
-                                        3);
+                                    if (password.text == confirmPassword.text) {
+                                      await Authenticate().registerUser(
+                                          username.text,
+                                          emailAddress.text,
+                                          password.text);
+                                      Navigator.pushNamed(context, '/OTP');
+                                      showFlushBarNotification(
+                                          context,
+                                          "Successfully",
+                                          "Please enter your OTP",
+                                          3);
+                                    } else {
+                                      showFlushBarNotification(
+                                          context,
+                                          "Failed",
+                                          "Check your password and confirm password",
+                                          3);
+                                    }
                                   } catch (e) {
                                     print(e);
                                   }

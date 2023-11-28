@@ -30,8 +30,6 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    print("Sign in page dispose");
     emailAddress.dispose();
     password.dispose();
     super.dispose();
@@ -88,7 +86,7 @@ class _SignInPageState extends State<SignInPage> {
                       textInputType: TextInputType.emailAddress,
                       obscureText: false,
                       suffixIcon:
-                          IconButton(onPressed: () {}, icon: Icon(null)),
+                          IconButton(onPressed: () {}, icon: const Icon(null)),
                       hintText: "Enter your email",
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -126,8 +124,8 @@ class _SignInPageState extends State<SignInPage> {
                             });
                           },
                           icon: isCheckPassword
-                              ? Icon(Icons.visibility)
-                              : Icon(Icons.visibility_off)),
+                              ? const Icon(Icons.visibility)
+                              : const Icon(Icons.visibility_off)),
                       hintText: "Enter your password",
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -139,15 +137,21 @@ class _SignInPageState extends State<SignInPage> {
                     const SizedBox(
                       height: 10,
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(left: 250),
-                      child: CustomText(
-                        message: 'Forgot Password?',
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.importantText,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 250),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, ('/ForgotPassword'));
+                        },
+                        child: const CustomText(
+                          message: 'Forgot Password?',
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.importantText,
+                        ),
                       ),
                     ),
+
                     const SizedBox(
                       height: 20,
                     ),
@@ -161,23 +165,33 @@ class _SignInPageState extends State<SignInPage> {
                           function: () async {
                             if (_formKey.currentState!.validate()) {
                               try {
-                                await Authenticate()
+                                bool check = await Authenticate()
                                     .login(emailAddress.text, password.text);
-                                var accessToken = await SecureStorage()
-                                        .readSecureData('accessToken');
-                                var refreshToken = await SecureStorage()
-                                        .readSecureData('refreshToken');
-                                studentDataProvider.setAccessToken(accessToken
-                                    );
-                                studentDataProvider.setRefreshToken(refreshToken
-                                );    
-                                
-                                Navigator.pushNamed(context, "/");
-                                Flushbar(
-                                  title: "Successfully",
-                                  message: "Processing Data...",
-                                  duration: Duration(seconds: 10),
-                                ).show(context);
+                                // var accessToken = await SecureStorage()
+                                //     .readSecureData('accessToken');
+                                // var refreshToken = await SecureStorage()
+                                //     .readSecureData('refreshToken');
+                                // studentDataProvider.setAccessToken(accessToken);
+                                // studentDataProvider
+                                //     .setRefreshToken(refreshToken);
+                                if (check) {
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, ('/HomePage'), (route) => false);
+                                  // ignore: use_build_context_synchronously
+                                  Flushbar(
+                                    title: "Successfully",
+                                    message: "Processing Data...",
+                                    duration: const Duration(seconds: 3),
+                                  ).show(context);
+                                } else {
+                                  // ignore: use_build_context_synchronously
+                                  Flushbar(
+                                    title: "Failed",
+                                    message: "Email or Password is not correct",
+                                    duration: const Duration(seconds: 3),
+                                  ).show(context);
+                                }
                               } catch (e) {
                                 print(e);
                               }
@@ -185,7 +199,7 @@ class _SignInPageState extends State<SignInPage> {
                               Flushbar(
                                 title: "Invalid Form",
                                 message: "Please complete the form property",
-                                duration: Duration(seconds: 10),
+                                duration: const Duration(seconds: 10),
                               ).show(context);
                             }
                           }),
@@ -257,7 +271,10 @@ class _SignInPageState extends State<SignInPage> {
                           color: AppColors.primaryText,
                         ),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, ('/Register'), (route) => false);
+                          },
                           child: const CustomText(
                             message: 'Register',
                             fontSize: 15,

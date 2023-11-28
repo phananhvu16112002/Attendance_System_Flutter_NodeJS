@@ -33,7 +33,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(

@@ -123,6 +123,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                           if (value == null || value.isEmpty) {
                             return "Please enter confirm password";
                           }
+                          return null;
                         },
                       ),
                       const SizedBox(

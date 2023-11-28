@@ -1,4 +1,3 @@
-import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
@@ -17,7 +16,7 @@ class _WelcomePageState extends State<WelcomePage> {
   String descriptionSchool =
       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi sit maiores, perferendis suscipit veniam ratione fuga cumque incidunt quam deleniti vitae maxime totam omnis quidem quo consectetur ad? Veniam, harum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi sit maiores, perferendis suscipit veniam ratione fuga cumque incidunt quam deleniti vitae maxime totam omnis quidem quo consectetur ad? Veniam, harum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi sit maiores, perferendis suscipit veniam ratione fuga cumque incidunt quam deleniti vitae maxime totam omnis quidem quo consectetur ad? Veniam, harum?';
   @override
-  void dispose(){
+  void dispose() {
     print("Welcome Page dispose");
     super.dispose();
   }
@@ -72,10 +71,8 @@ class _WelcomePageState extends State<WelcomePage> {
                             backgroundColorButton: AppColors.primaryButton,
                             borderColor: Colors.white,
                             textColor: Colors.white,
-                            function: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (builder) => SignInPage()))),
+                            function: () =>
+                                Navigator.of(context).pushNamed('/Login')),
                       ),
                       const SizedBox(
                         height: 20,
@@ -87,7 +84,9 @@ class _WelcomePageState extends State<WelcomePage> {
                           backgroundColorButton: Colors.white,
                           borderColor: AppColors.primaryText,
                           textColor: AppColors.primaryText,
-                          function: () => Navigator.pushNamed(context, "/Register"),
+                          function: () =>
+                              Navigator.of(context, rootNavigator: true)
+                                  .pushNamed('/Register'),
                         ),
                       )
                     ],

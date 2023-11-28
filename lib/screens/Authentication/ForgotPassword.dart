@@ -1,8 +1,12 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
@@ -19,6 +23,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
+
     return Scaffold(
         body: SingleChildScrollView(
       child: Column(
@@ -77,6 +83,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         }
                         return null;
                       },
+                      onChanged: (value) {
+                        studentDataProvider.setStudentEmail(value);
+                      },
                     ),
                     const SizedBox(
                       height: 15,
@@ -88,8 +97,29 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           backgroundColorButton: AppColors.primaryButton,
                           borderColor: Colors.white,
                           textColor: Colors.white,
-                          function: () {
-                            if (_formKey.currentState!.validate()) {}
+                          function: () async {
+                            if (_formKey.currentState!.validate()) {
+                              try {
+                                bool check = await Authenticate()
+                                    .forgotPassword(emailAddress.text);
+                                if (check) {
+                                  Navigator.pushNamed(context, '/OTP');
+                                  Flushbar(
+                                    title: 'Verify OTP',
+                                    message: 'OTP has been sent to your email',
+                                    duration: Duration(seconds: 3),
+                                  );
+                                } else {
+                                  Flushbar(
+                                    title: 'Failed',
+                                    message: 'Check your email',
+                                    duration: Duration(seconds: 3),
+                                  );
+                                }
+                              } catch (e) {
+                                print(e);
+                              }
+                            }
                           }),
                     ),
                     const SizedBox(
@@ -106,7 +136,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryText),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, "/Login", (route) => false);
+                            },
                             child: const CustomText(
                                 message: 'Log In',
                                 fontSize: 15,
