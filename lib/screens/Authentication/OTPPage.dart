@@ -23,7 +23,21 @@ class _OTPPageState extends State<OTPPage> {
   String description =
       "Please enter the verification code we just sent on your email address.";
   int secondsRemaining = 60; // Initial value for 1 minute
-  bool canResend = true;
+  bool canResend = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    startTimer();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
@@ -118,9 +132,23 @@ class _OTPPageState extends State<OTPPage> {
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryText),
                           GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               if (canResend) {
                                 // Start the countdown timer
+                                bool check = await Authenticate().resendOTP(
+                                    studentDataProvider.userData.studentEmail);
+                                if (check) {
+                                  // ignore: use_build_context_synchronously
+                                  showFlushBarNotification(
+                                      context,
+                                      'Resend OTP',
+                                      "OTP has been sent your email",
+                                      3);
+                                } else {
+                                  // ignore: use_build_context_synchronously
+                                  showFlushBarNotification(context,
+                                      'Failed resend OTP', 'message', 3);
+                                }
                                 startTimer();
                               }
                             },
@@ -162,5 +190,14 @@ class _OTPPageState extends State<OTPPage> {
       canResend = false;
       secondsRemaining = 60; // Reset the timer to 1 minute
     });
+  }
+
+  void showFlushBarNotification(
+      BuildContext context, String title, String message, int second) {
+    Flushbar(
+      title: title,
+      message: message,
+      duration: Duration(seconds: second),
+    ).show(context);
   }
 }
