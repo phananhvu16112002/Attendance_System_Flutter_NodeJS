@@ -1,8 +1,12 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CreateNewPassword extends StatefulWidget {
   const CreateNewPassword({super.key});
@@ -24,6 +28,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
       'Your new password must be unique from those previously used';
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -136,8 +141,27 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                             backgroundColorButton: AppColors.primaryButton,
                             borderColor: Colors.white,
                             textColor: Colors.white,
-                            function: () {
-                              if (_formKey.currentState!.validate()) {}
+                            function: () async {
+                              if (_formKey.currentState!.validate()) {
+                                bool check = await Authenticate().resetPassword(
+                                  studentDataProvider.userData.studentEmail
+                                  ,password.text
+                                  );
+                                if (check){
+                                  Navigator.pushNamed(context, "/Login");
+                                  Flushbar(
+                                    title: "Successfully",
+                                    message: "Login to use the app",
+                                    duration: Duration(seconds: 5),
+                                  ).show(context);
+                                }else{
+                                  Flushbar(
+                                    title: "Failed create new password",
+                                    message: "Failed create new password",
+                                    duration: Duration(seconds: 5),
+                                  ).show(context);
+                                }
+                              }
                             }),
                       )
                     ],

@@ -103,7 +103,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 bool check = await Authenticate()
                                     .forgotPassword(emailAddress.text);
                                 if (check) {
-                                  Navigator.pushNamed(context, '/OTP');
+                                  Navigator.pushNamed(context, '/ForgotPasswordOTP');
                                   Flushbar(
                                     title: 'Verify OTP',
                                     message: 'OTP has been sent to your email',

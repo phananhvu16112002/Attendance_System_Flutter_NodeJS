@@ -85,7 +85,42 @@ class Authenticate {
     }
   }
 
-  Future<void> verifyForgotPassword(String email, String otp) async {}
+  Future<bool> verifyForgotPassword(String email, String otp) async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8080/api/student/verifyForgotPassword'),
+      headers: <String,String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode(<String,String>{'email' : email, 'OTP': otp})
+      );
 
-  Future<void> resetPassword(String email, String newPassword) async {}
+      if (response.statusCode == 200){
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        var resetToken = responseData['resetToken'];
+        await SecureStorage().writeSecureData('resetToken', resetToken);
+        return true;
+      }else{
+        return false;
+      }
+  }
+
+  Future<bool> resetPassword(String email, String newPassword) async {
+    final resetToken = await SecureStorage().readSecureData("resetToken");
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8080/api/student/resetPassword'),
+      headers: <String,String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+        'authorization': resetToken
+      },
+      body: jsonEncode(<String,String>{'email' : email, 'newPassword': newPassword})
+      );
+
+      if (response.statusCode == 200){
+        return true;
+      }else{
+        return false;
+      }
+  }
 }
