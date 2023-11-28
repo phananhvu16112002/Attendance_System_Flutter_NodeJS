@@ -41,14 +41,13 @@ class _HomePageState extends State<HomePage> {
         body: FutureBuilder<String>(
         future: accessTokenDatabase,
         builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != "No Data Found" || studentDataProvider.userData.accessToken.isNotEmpty){
-            return Column(
-              children: [
-                Text(studentDataProvider.userData.accessToken),
-                Text(snapshot.data!),
-              ],
-            );
-              
+          if (snapshot.hasData && snapshot.data != "No Data Found"){
+            studentDataProvider.setAccessToken(snapshot.data!);
+            return Text(snapshot.data!);
+
+          }else if (studentDataProvider.userData.accessToken.isNotEmpty){
+            return Text(studentDataProvider.userData.accessToken);
+
           }else if (snapshot.data == "No Data Found" && studentDataProvider.userData.accessToken == ""){
             return const WelcomePage();
           }
