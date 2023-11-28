@@ -83,24 +83,30 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                         textColor: Colors.white,
                         function: () async {
                           try {
-                            bool checkLogin = await Authenticate().verifyForgotPassword(
-                                studentDataProvider.userData.studentEmail,
-                                studentDataProvider.userData.hashedOTP);
+                            bool checkLogin = await Authenticate()
+                                .verifyForgotPassword(
+                                    studentDataProvider.userData.studentEmail,
+                                    studentDataProvider.userData.hashedOTP);
                             if (checkLogin == true) {
-                              Navigator.pushNamed(context, '/CreateNewPassword');
+                              // ignore: use_build_context_synchronously
+                              Navigator.pushNamed(
+                                  context, '/CreateNewPassword');
+                              // ignore: use_build_context_synchronously
                               Flushbar(
                                 title: "Successfully",
                                 message: "Create new password",
-                                duration: Duration(seconds: 5),
+                                duration: const Duration(seconds: 5),
                               ).show(context);
                             } else {
+                              // ignore: use_build_context_synchronously
                               Flushbar(
                                 title: "Failed",
                                 message: "OTP is not valid",
-                                duration: Duration(seconds: 5),
+                                duration: const Duration(seconds: 5),
                               ).show(context);
                             }
                           } catch (e) {
+                            // ignore: avoid_print
                             print(e);
                           }
                         }),
@@ -118,10 +124,25 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryText),
                           GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               if (canResend) {
                                 // Start the countdown timer
                                 startTimer();
+                              } else {
+                                bool check = await Authenticate().resendOTP(
+                                    studentDataProvider.userData.studentEmail);
+                                if (check) {
+                                  // ignore: use_build_context_synchronously
+                                  showFlushBarNotification(
+                                      context,
+                                      'Resend OTP',
+                                      "OTP has been sent your email",
+                                      3);
+                                } else {
+                                  // ignore: use_build_context_synchronously
+                                  showFlushBarNotification(context,
+                                      'Failed resend OTP', 'message', 3);
+                                }
                               }
                             },
                             child: CustomText(
@@ -146,7 +167,7 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
   }
 
   void startTimer() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if (secondsRemaining > 0) {
           secondsRemaining--;
@@ -162,5 +183,14 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
       canResend = false;
       secondsRemaining = 60; // Reset the timer to 1 minute
     });
+  }
+
+  void showFlushBarNotification(
+      BuildContext context, String title, String message, int second) {
+    Flushbar(
+      title: title,
+      message: message,
+      duration: Duration(seconds: second),
+    ).show(context);
   }
 }
