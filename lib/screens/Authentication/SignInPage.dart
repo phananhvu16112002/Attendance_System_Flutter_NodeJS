@@ -4,8 +4,11 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -28,13 +31,15 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
+    print("Sign in page dispose");
     emailAddress.dispose();
     password.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return Scaffold(
         body: SingleChildScrollView(
       child: Column(
@@ -158,6 +163,16 @@ class _SignInPageState extends State<SignInPage> {
                               try {
                                 await Authenticate()
                                     .login(emailAddress.text, password.text);
+                                var accessToken = await SecureStorage()
+                                        .readSecureData('accessToken');
+                                var refreshToken = await SecureStorage()
+                                        .readSecureData('refreshToken');
+                                studentDataProvider.setAccessToken(accessToken
+                                    );
+                                studentDataProvider.setRefreshToken(refreshToken
+                                );    
+                                
+                                Navigator.pushNamed(context, "/");
                                 Flushbar(
                                   title: "Successfully",
                                   message: "Processing Data...",
