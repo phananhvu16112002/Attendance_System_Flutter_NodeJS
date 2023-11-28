@@ -31,9 +31,10 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
+    print("Sign in page dispose");
     emailAddress.dispose();
     password.dispose();
+    super.dispose();
   }
 
   @override
@@ -162,13 +163,16 @@ class _SignInPageState extends State<SignInPage> {
                               try {
                                 await Authenticate()
                                     .login(emailAddress.text, password.text);
-                                studentDataProvider.setAccessToken(
-                                    await SecureStorage()
-                                        .readSecureData('accessToken'));
-                                studentDataProvider.setRefreshToken(
-                                    await SecureStorage()
-                                        .readSecureData('refreshToken'));
-                                Navigator.pushNamed(context, ('/HomePage'));
+                                var accessToken = await SecureStorage()
+                                        .readSecureData('accessToken');
+                                var refreshToken = await SecureStorage()
+                                        .readSecureData('refreshToken');
+                                studentDataProvider.setAccessToken(accessToken
+                                    );
+                                studentDataProvider.setRefreshToken(refreshToken
+                                );    
+                                
+                                Navigator.pushNamed(context, "/");
                                 Flushbar(
                                   title: "Successfully",
                                   message: "Processing Data...",

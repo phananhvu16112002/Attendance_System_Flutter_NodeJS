@@ -58,12 +58,15 @@ class Authenticate {
         await http.post(Uri.parse(URL), headers: headers, body: body);
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
-      final String accessToken = jsonDecode(response.body)['accessToken'];
-      final String refreshToken = jsonDecode(response.body)['refreshToken'];
-      final aToken =
-          await SecureStorage().writeSecureData('accessToken', accessToken);
-      final rToken =
-          await SecureStorage().writeSecureData('refreshToken', refreshToken);
+      var accessToken = responseData['refreshToken'];
+      var refreshToken = responseData['accessToken'];
+
+      await SecureStorage().writeSecureData('accessToken', accessToken);
+      await SecureStorage().writeSecureData('refreshToken', refreshToken);
+
+      // String printToken = await SecureStorage().readSecureData("accessToken");
+      // print("----------------------------------------------------------------------");
+      // print(printToken);
     }
   }
 
