@@ -6,6 +6,7 @@ import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dar
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -40,8 +42,9 @@ class MyApp extends StatelessWidget {
         '/ForgotPassword': (context) => ForgotPassword(),
         '/CreateNewPassword': (context) => CreateNewPassword(),
         '/OTP': (context) => OTPPage(),
+        '/HomePage': (context) => HomePage(),
       },
-      home: SignInPage(),
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }
