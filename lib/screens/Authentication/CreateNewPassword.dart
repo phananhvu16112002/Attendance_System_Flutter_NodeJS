@@ -18,8 +18,8 @@ class CreateNewPassword extends StatefulWidget {
 class _CreateNewPasswordState extends State<CreateNewPassword> {
   TextEditingController password = TextEditingController();
   TextEditingController confirmPassword = TextEditingController();
-  bool isCheckNewPassword = false;
-  bool isCheckConfirmPassword = false;
+  bool isCheckNewPassword = true;
+  bool isCheckConfirmPassword = true;
   final _formKey = GlobalKey<FormState>();
   RegExp upperCaseRegex = RegExp(r'[A-Z]');
   RegExp digitRegex = RegExp(r'[0-9]');

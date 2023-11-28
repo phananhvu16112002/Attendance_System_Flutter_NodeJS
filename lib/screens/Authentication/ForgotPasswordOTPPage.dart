@@ -23,7 +23,21 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
   String description =
       "Please enter the verification code we just sent on your email address.";
   int secondsRemaining = 60; // Initial value for 1 minute
-  bool canResend = true;
+  bool canResend = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    startTimer();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
@@ -126,9 +140,8 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                           GestureDetector(
                             onTap: () async {
                               if (canResend) {
+                                // true
                                 // Start the countdown timer
-                                startTimer();
-                              } else {
                                 bool check = await Authenticate().resendOTP(
                                     studentDataProvider.userData.studentEmail);
                                 if (check) {
@@ -143,10 +156,11 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                                   showFlushBarNotification(context,
                                       'Failed resend OTP', 'message', 3);
                                 }
+                                startTimer();
                               }
                             },
                             child: CustomText(
-                                message: canResend
+                                message: canResend // true
                                     ? "Re-send"
                                     : "Resend in $secondsRemaining seconds",
                                 fontSize: 15,

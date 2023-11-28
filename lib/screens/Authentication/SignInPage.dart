@@ -18,7 +18,7 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController emailAddress = TextEditingController();
   TextEditingController password = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool isCheckPassword = false;
+  bool isCheckPassword = true;
 
   @override
   void initState() {

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 
 class Authenticate {
-  Future<void> registerUser(
+  Future<bool> registerUser(
       String userName, String email, String password) async {
     final URL = 'http://10.0.2.2:8080/api/student/register';
     var headers = {
@@ -16,8 +16,10 @@ class Authenticate {
         await http.post(Uri.parse(URL), headers: headers, body: body);
     if (response.statusCode == 200) {
       print('Registration successful');
+      return true;
     } else {
       print('Failed to register. Error: ${response.body}');
+      return false;
     }
   }
 

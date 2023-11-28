@@ -21,8 +21,8 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController emailAddress = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController confirmPassword = TextEditingController();
-  bool isCheckPassword = false;
-  bool isCheckConfirmPassword = false;
+  bool isCheckPassword = true;
+  bool isCheckConfirmPassword = true;
   final _formKey = GlobalKey<FormState>();
   RegExp upperCaseRegex = RegExp(r'[A-Z]');
   RegExp digitRegex = RegExp(r'[0-9]');
@@ -81,7 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             height: 20,
                           ),
                           const CustomText(
-                              message: 'Username',
+                              message: 'Student ID',
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryText),
@@ -94,7 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             obscureText: false,
                             suffixIcon: IconButton(
                                 onPressed: () {}, icon: const Icon(null)),
-                            hintText: 'Enter your userName',
+                            hintText: 'Enter your student ID',
                             onChanged: (value) {
                               studentDataProvider.setStudentName(value);
                             },
@@ -102,7 +102,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               if (value == null ||
                                   value.isEmpty ||
                                   value.length > 50) {
-                                return 'Please check username(must not 50 characters) ';
+                                return 'Please check studentID(must not 50 characters) ';
                               }
                               return null;
                             },
@@ -164,8 +164,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   });
                                 },
                                 icon: isCheckPassword
-                                    ? Icon(Icons.visibility)
-                                    : Icon(Icons.visibility_off)),
+                                    ? const Icon(Icons.visibility)
+                                    : const Icon(Icons.visibility_off)),
                             hintText: 'Enter your password',
                             onChanged: (value) {
                               studentDataProvider.setPassword(value);
@@ -231,16 +231,26 @@ class _RegisterPageState extends State<RegisterPage> {
                                 if (_formKey.currentState!.validate()) {
                                   try {
                                     if (password.text == confirmPassword.text) {
-                                      await Authenticate().registerUser(
-                                          username.text,
-                                          emailAddress.text,
-                                          password.text);
-                                      Navigator.pushNamed(context, '/OTP');
-                                      showFlushBarNotification(
-                                          context,
-                                          "Successfully",
-                                          "Please enter your OTP",
-                                          3);
+                                      bool check = await Authenticate()
+                                          .registerUser(username.text,
+                                              emailAddress.text, password.text);
+                                      if (check) {
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.pushNamed(context, '/OTP');
+                                        // ignore: use_build_context_synchronously
+                                        showFlushBarNotification(
+                                            context,
+                                            "Successfully",
+                                            "Please enter your OTP",
+                                            3);
+                                      } else {
+                                        // ignore: use_build_context_synchronously
+                                        showFlushBarNotification(
+                                            context,
+                                            "Failed",
+                                            "User is not exist or active",
+                                            3);
+                                      }
                                     } else {
                                       showFlushBarNotification(
                                           context,
