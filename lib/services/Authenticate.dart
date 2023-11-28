@@ -86,27 +86,41 @@ class Authenticate {
   }
 
   Future<bool> verifyForgotPassword(String email, String otp) async {
-    final URL = 'http://10.0.2.2:8080/api/student/verifyForgotPassword';
-    var headers = {
-      'Content-type': 'application/json; charset=UTF-8',
-      'Accept': 'application/json',
-    };
-    var request = {'email': email, 'OTP': otp};
-    var body = json.encode(request);
-    final response =
-        await http.post(Uri.parse(URL), headers: headers, body: body);
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8080/api/student/verifyForgotPassword'),
+      headers: <String,String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode(<String,String>{'email' : email, 'OTP': otp})
+      );
 
-    if (response.statusCode == 200) {
-      print('Verification successfully');
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-      var resetToken = responseData['resetToken'];
-      await SecureStorage().writeSecureData('resetToken', resetToken);
-      return true;
-    } else {
-      print('Failed to verify. Error: ${response.body}');
-      return false;
-    }
+      if (response.statusCode == 200){
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        var resetToken = responseData['resetToken'];
+        await SecureStorage().writeSecureData('resetToken', resetToken);
+        return true;
+      }else{
+        return false;
+      }
   }
 
-  Future<void> resetPassword(String email, String newPassword) async {}
+  Future<bool> resetPassword(String email, String newPassword) async {
+    final resetToken = await SecureStorage().readSecureData("resetToken");
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8080/api/student/resetPassword'),
+      headers: <String,String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+        'authorization': resetToken
+      },
+      body: jsonEncode(<String,String>{'email' : email, 'newPassword': newPassword})
+      );
+
+      if (response.statusCode == 200){
+        return true;
+      }else{
+        return false;
+      }
+  }
 }

@@ -142,7 +142,26 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                             borderColor: Colors.white,
                             textColor: Colors.white,
                             function: () async {
-                              if (_formKey.currentState!.validate()) {}
+                              if (_formKey.currentState!.validate()) {
+                                bool check = await Authenticate().resetPassword(
+                                  studentDataProvider.userData.studentEmail
+                                  ,password.text
+                                  );
+                                if (check){
+                                  Navigator.pushNamed(context, "/Login");
+                                  Flushbar(
+                                    title: "Successfully",
+                                    message: "Login to use the app",
+                                    duration: Duration(seconds: 5),
+                                  ).show(context);
+                                }else{
+                                  Flushbar(
+                                    title: "Failed create new password",
+                                    message: "Failed create new password",
+                                    duration: Duration(seconds: 5),
+                                  ).show(context);
+                                }
+                              }
                             }),
                       )
                     ],

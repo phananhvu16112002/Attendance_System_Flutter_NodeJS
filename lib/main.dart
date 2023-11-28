@@ -1,7 +1,7 @@
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/CreateNewPassword.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
-import 'package:attendance_system_nodejs/screens/Authentication/OTPForgotPassword.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/ForgotPasswordOTPPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/OTPPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
@@ -46,6 +46,7 @@ class _MyAppState extends State<MyApp> {
         '/Login': (context) => SignInPage(),
         '/Register': (context) => RegisterPage(),
         '/ForgotPassword': (context) => ForgotPassword(),
+        '/ForgotPasswordOTP': (context) => ForgotPasswordOTPPage(),
         '/CreateNewPassword': (context) => CreateNewPassword(),
         '/OTP': (context) => OTPPage(),
         '/OTPForgotPassword': (context) => OTPForgotPassword(),
