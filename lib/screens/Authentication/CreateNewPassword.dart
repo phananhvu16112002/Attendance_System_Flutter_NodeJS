@@ -72,6 +72,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                         controller: password,
                         textInputType: TextInputType.visiblePassword,
                         obscureText: isCheckNewPassword,
+                        prefixIcon: const Icon(null),
                         suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
@@ -113,6 +114,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                         controller: confirmPassword,
                         textInputType: TextInputType.visiblePassword,
                         obscureText: isCheckConfirmPassword,
+                        prefixIcon: const Icon(null),
                         suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
@@ -137,47 +139,50 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                       Padding(
                         padding: const EdgeInsets.only(right: 20),
                         child: CustomButton(
-                            buttonName: "Reset Password",
-                            backgroundColorButton: AppColors.primaryButton,
-                            borderColor: Colors.white,
-                            textColor: Colors.white,
-                            function: () async {
-                              if (_formKey.currentState!.validate()) {
-                                if (password.text == confirmPassword.text ||
-                                    password.text
-                                        .contains(confirmPassword.text)) {
-                                  bool check = await Authenticate()
-                                      .resetPassword(
-                                          studentDataProvider
-                                              .userData.studentEmail,
-                                          password.text);
-                                  if (check) {
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.pushNamed(context, "/Login");
-                                    // ignore: use_build_context_synchronously
-                                    showFlushBarNotification(
-                                        context,
-                                        "Successfully",
-                                        "Updated password successfully",
-                                        3);
-                                  } else {
-                                    // ignore: use_build_context_synchronously
-                                    showFlushBarNotification(
-                                        context,
-                                        "Failed updating",
-                                        "Failed update password",
-                                        3);
-                                  }
+                          fontSize: 20,
+                          height: 60,
+                          width: 400,
+                          buttonName: "Reset Password",
+                          backgroundColorButton: AppColors.primaryButton,
+                          borderColor: Colors.white,
+                          textColor: Colors.white,
+                          function: () async {
+                            if (_formKey.currentState!.validate()) {
+                              if (password.text == confirmPassword.text ||
+                                  password.text
+                                      .contains(confirmPassword.text)) {
+                                bool check = await Authenticate().resetPassword(
+                                    studentDataProvider.userData.studentEmail,
+                                    password.text);
+                                if (check) {
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, "/Login", (route) => false);
+                                  // ignore: use_build_context_synchronously
+                                  showFlushBarNotification(
+                                      context,
+                                      "Successfully",
+                                      "Updated password successfully",
+                                      3);
                                 } else {
                                   // ignore: use_build_context_synchronously
                                   showFlushBarNotification(
                                       context,
-                                      "Error",
-                                      "Check your password and confirm password",
+                                      "Failed updating",
+                                      "Failed update password",
                                       3);
                                 }
+                              } else {
+                                // ignore: use_build_context_synchronously
+                                showFlushBarNotification(
+                                    context,
+                                    "Error",
+                                    "Check your password and confirm password",
+                                    3);
                               }
-                            }),
+                            }
+                          }, 
+                        ),
                       )
                     ],
                   ),

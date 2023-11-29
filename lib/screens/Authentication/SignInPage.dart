@@ -81,6 +81,7 @@ class _SignInPageState extends State<SignInPage> {
                       controller: emailAddress,
                       textInputType: TextInputType.emailAddress,
                       obscureText: false,
+                      prefixIcon: const Icon(null),
                       suffixIcon:
                           IconButton(onPressed: () {}, icon: const Icon(null)),
                       hintText: "Enter your email",
@@ -113,6 +114,7 @@ class _SignInPageState extends State<SignInPage> {
                       controller: password,
                       textInputType: TextInputType.visiblePassword,
                       obscureText: isCheckPassword,
+                      prefixIcon: const Icon(null),
                       suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
@@ -154,6 +156,9 @@ class _SignInPageState extends State<SignInPage> {
                     Padding(
                       padding: const EdgeInsets.only(right: 20),
                       child: CustomButton(
+                          fontSize: 20,
+                          height: 60,
+                          width: 400,
                           buttonName: 'Login',
                           backgroundColorButton: AppColors.primaryButton,
                           borderColor: Colors.white,

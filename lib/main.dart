@@ -49,7 +49,6 @@ class _MyAppState extends State<MyApp> {
         '/ForgotPasswordOTP': (context) => ForgotPasswordOTPPage(),
         '/CreateNewPassword': (context) => CreateNewPassword(),
         '/OTP': (context) => OTPPage(),
-        '/OTPForgotPassword': (context) => ForgotPasswordOTPPage(),
         '/HomePage': (context) => HomePage(),
       },
       home: const HomePage(),

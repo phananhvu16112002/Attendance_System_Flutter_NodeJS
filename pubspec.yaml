@@ -44,6 +44,7 @@ dependencies:
   provider: ^6.1.1
   email_validator: ^2.0.1
   flutter_secure_storage: ^9.0.0
+  easy_date_timeline: ^1.0.2
 
 dev_dependencies:
   flutter_test:

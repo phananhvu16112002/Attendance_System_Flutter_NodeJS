@@ -67,6 +67,9 @@ class _WelcomePageState extends State<WelcomePage> {
                       Padding(
                         padding: const EdgeInsets.only(right: 15),
                         child: CustomButton(
+                            fontSize: 20,
+                            height: 60,
+                            width: 400,
                             buttonName: 'Login',
                             backgroundColorButton: AppColors.primaryButton,
                             borderColor: Colors.white,
@@ -80,6 +83,9 @@ class _WelcomePageState extends State<WelcomePage> {
                       Padding(
                         padding: const EdgeInsets.only(right: 15),
                         child: CustomButton(
+                          fontSize: 20,
+                          height: 60,
+                          width: 400,
                           buttonName: 'Register',
                           backgroundColorButton: Colors.white,
                           borderColor: AppColors.primaryText,

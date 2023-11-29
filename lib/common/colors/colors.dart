@@ -11,11 +11,16 @@ class AppColors {
   //Secondary Text
   static const Color secondaryText = Color.fromARGB(233, 190, 188, 188);
 
+  //Text Hi
+  static const Color thirdText = Color.fromARGB(186, 255, 255, 255);
   //Important Text
   static const Color importantText = Color(0xffDB5757);
 
   //Color PrimaryButton
   static const Color primaryButton = Color(0xff0165FF);
+
+  //AppBar in home
+  static const Color colorAppbar = Color(0xff1770F0);
 
   //Color SecondaryButton
   static const Color secondaryButton = Colors.white;

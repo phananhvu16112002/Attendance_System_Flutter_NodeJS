@@ -12,6 +12,7 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.onSaved,
     this.onChanged,
+    required this.prefixIcon,
   });
 
   final TextEditingController controller;
@@ -22,6 +23,7 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator; // Specify the type here
   final Function(String?)? onSaved;
   final Function(String)? onChanged;
+  final Icon prefixIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +39,7 @@ class CustomTextField extends StatelessWidget {
         obscureText: obscureText,
         decoration: InputDecoration(
             contentPadding: EdgeInsets.all(20),
+            prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             hintText: hintText,
             enabledBorder: OutlineInputBorder(

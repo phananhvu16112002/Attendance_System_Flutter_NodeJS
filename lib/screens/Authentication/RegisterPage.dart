@@ -92,6 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             controller: username,
                             textInputType: TextInputType.text,
                             obscureText: false,
+                            prefixIcon: const Icon(null),
                             suffixIcon: IconButton(
                                 onPressed: () {}, icon: const Icon(null)),
                             hintText: 'Enter your student ID',
@@ -122,6 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             controller: emailAddress,
                             textInputType: TextInputType.emailAddress,
                             obscureText: false,
+                            prefixIcon: const Icon(null),
                             suffixIcon: IconButton(
                                 onPressed: () {}, icon: const Icon(null)),
                             hintText: 'Enter your email',
@@ -157,6 +159,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             controller: password,
                             textInputType: TextInputType.visiblePassword,
                             obscureText: isCheckPassword,
+                            prefixIcon: const Icon(null),
                             suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
@@ -201,6 +204,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             controller: confirmPassword,
                             textInputType: TextInputType.visiblePassword,
                             obscureText: isCheckConfirmPassword,
+                            prefixIcon: const Icon(null),
                             suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
@@ -223,6 +227,9 @@ class _RegisterPageState extends State<RegisterPage> {
                             height: 20,
                           ),
                           CustomButton(
+                              fontSize: 20,
+                              height: 60,
+                              width: 400,
                               buttonName: 'Register',
                               backgroundColorButton: AppColors.primaryButton,
                               borderColor: Colors.white,

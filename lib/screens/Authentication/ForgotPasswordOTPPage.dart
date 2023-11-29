@@ -35,6 +35,7 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
   @override
   void dispose() {
     // TODO: implement dispose
+    startTimer();
     super.dispose();
   }
 
@@ -91,6 +92,9 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                       height: 20,
                     ),
                     CustomButton(
+                        fontSize: 20,
+                        height: 60,
+                        width: 400,
                         buttonName: "Verify",
                         backgroundColorButton: AppColors.primaryButton,
                         borderColor: Colors.white,

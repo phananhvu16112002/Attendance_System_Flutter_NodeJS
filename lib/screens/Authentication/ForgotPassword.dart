@@ -68,6 +68,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       controller: emailAddress,
                       textInputType: TextInputType.emailAddress,
                       obscureText: false,
+                      prefixIcon: const Icon(null),
                       suffixIcon:
                           IconButton(onPressed: () {}, icon: const Icon(null)),
                       hintText: 'Enter your email address',
@@ -93,6 +94,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     Padding(
                       padding: const EdgeInsets.only(right: 20),
                       child: CustomButton(
+                          fontSize: 20,
+                          height: 60,
+                          width: 400,
                           buttonName: "Send OTP",
                           backgroundColorButton: AppColors.primaryButton,
                           borderColor: Colors.white,
