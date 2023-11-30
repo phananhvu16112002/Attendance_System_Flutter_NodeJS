@@ -42,7 +42,7 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: '/',
       routes: {
-        '/Welcome': (context) => WelcomePage(),
+        '/Welcome': (context) => const WelcomePage(),
         '/Login': (context) => SignInPage(),
         '/Register': (context) => RegisterPage(),
         '/ForgotPassword': (context) => ForgotPassword(),
