@@ -7,7 +7,9 @@ import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dar
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
+import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -50,6 +52,8 @@ class _MyAppState extends State<MyApp> {
         '/CreateNewPassword': (context) => CreateNewPassword(),
         '/OTP': (context) => OTPPage(),
         '/HomePage': (context) => HomePage(),
+        '/AttendanceForm': (context) => AttendanceForm(),
+        '/ProfilePage': (context) => ProfilePage(),
       },
       home: const HomePage(),
       debugShowCheckedModeBanner: false,

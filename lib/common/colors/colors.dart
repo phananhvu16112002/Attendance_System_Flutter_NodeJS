@@ -28,6 +28,11 @@ class AppColors {
   //Color Card in Home
   static const Color cardHome = Color.fromARGB(231, 245, 249, 3);
 
+  //Color Card in Attendance
+  static const Color cardAttendance = Color.fromARGB(255, 238, 246, 254);
+
+  //Color Card in Report Page
+  static const Color cardReport = Colors.white;
   //Color text Approved
   static const Color textApproved = Color(0xff8AD240);
 
