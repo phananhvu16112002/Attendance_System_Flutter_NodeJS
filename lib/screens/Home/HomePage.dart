@@ -1,6 +1,6 @@
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
-import 'package:attendance_system_nodejs/screens/Home/HomePageBody.dart';
+import 'package:attendance_system_nodejs/screens/Home/components/HomePageBody.dart';
 import 'package:attendance_system_nodejs/screens/Home/NotificationsPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
 import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
@@ -97,15 +97,15 @@ class _HomePageState extends State<HomePage> {
   Widget _buildBody() {
     switch (_bottomNavIndex) {
       case 0:
-        return HomePageBody(); // Thay thế bằng trang chính của bạn
+        return const HomePageBody();
       case 1:
-        return ReportPage(); // Thay thế bằng trang thư của bạn
+        return const ReportPage();
       case 2:
-        return NotificationsPage(); // Thay thế bằng trang thông báo của bạn
+        return const NotificationsPage();
       case 3:
-        return ProfilePage(); // Thay thế bằng trang hồ sơ của bạn
+        return const ProfilePage();
       default:
-        return HomePageBody(); // Mặc định hiển thị trang chính
+        return const HomePageBody();
     }
   }
 }

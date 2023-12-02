@@ -28,14 +28,14 @@ class _OTPPageState extends State<OTPPage> {
   @override
   void initState() {
     // TODO: implement initState
-    startTimer();
     super.initState();
+    startTimer();
+
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    startTimer();
     super.dispose();
   }
 
@@ -177,22 +177,37 @@ class _OTPPageState extends State<OTPPage> {
     );
   }
 
-  void startTimer() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        if (secondsRemaining > 0) {
-          secondsRemaining--;
-        } else {
-          canResend = true;
-          timer.cancel(); // Stop the timer when it reaches 0
-        }
-      });
-    });
+  // void startTimer() {
+  //   Timer.periodic(Duration(seconds: 1), (timer) {
+  //     setState(() {
+  //       if (secondsRemaining > 0) {
+  //         secondsRemaining--;
+  //       } else {
+  //         canResend = true;
+  //         timer.cancel(); // Stop the timer when it reaches 0
+  //       }
+  //     });
+  //   });
 
-    // Disable the button during the countdown
-    setState(() {
-      canResend = false;
-      secondsRemaining = 60; // Reset the timer to 1 minute
+  //   // Disable the button during the countdown
+  //   setState(() {
+  //     canResend = false;
+  //     secondsRemaining = 60; // Reset the timer to 1 minute
+  //   });
+  // }
+
+  void startTimer() {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (secondsRemaining > 0) {
+        setState(() {
+          secondsRemaining--;
+        });
+      } else {
+        setState(() {
+          canResend = true;
+        });
+        timer.cancel(); // Stop the timer when it reaches 0
+      }
     });
   }
 

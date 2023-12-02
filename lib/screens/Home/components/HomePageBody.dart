@@ -55,7 +55,9 @@ class _HomePageBodyState extends State<HomePageBody> {
                           blurRadius: 15.0,
                           offset: Offset(0.0, 0.0))
                     ]),
+                //Fix PrefixIcon
                 child: CustomTextField(
+                  readOnly: false,
                   controller: searchController,
                   textInputType: TextInputType.text,
                   obscureText: false,
@@ -139,61 +141,60 @@ class _HomePageBodyState extends State<HomePageBody> {
                 const SizedBox(
                   height: 10,
                 ),
-                !activeQR
-                    //List Class
-                    ? Column(
-                        children: [
-                          classInformation(true),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          classInformation(false),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          classInformation(false),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          classInformation(false),
-                        ],
-                      )
-                    //QR Code
-                    : Container(
-                        height: 500,
-                        child: Column(
-                          children: [
-                            const Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CustomText(
-                                      message: 'SCAN QR CODE',
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryText),
-                                  CustomText(
-                                      message:
-                                          'Scanning will be started automatically',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.primaryText),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              height: 400,
-                              width: 400,
-                              color: Colors.black,
-                              // child: QRView(
-                              //     key: qrKey, onQRViewCreated: _onQRViewCreated),
-                            )
-                          ],
-                        ),
+                if (!activeQR)
+                  Column(
+                    children: [
+                      classInformation(true),
+                      const SizedBox(
+                        height: 10,
                       ),
+                      classInformation(false),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      classInformation(false),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      classInformation(false),
+                    ],
+                  )
+                else
+                  Container(
+                    height: 500,
+                    child: Column(
+                      children: [
+                        const Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CustomText(
+                                  message: 'SCAN QR CODE',
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryText),
+                              CustomText(
+                                  message:
+                                      'Scanning will be started automatically',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.primaryText),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          height: 400,
+                          width: 400,
+                          color: Colors.black,
+                          // child: QRView(
+                          //     key: qrKey, onQRViewCreated: _onQRViewCreated),
+                        )
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

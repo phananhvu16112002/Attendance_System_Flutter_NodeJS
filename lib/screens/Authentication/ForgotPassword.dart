@@ -66,6 +66,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     ),
                     CustomTextField(
                       controller: emailAddress,
+                      readOnly: false,
                       textInputType: TextInputType.emailAddress,
                       obscureText: false,
                       prefixIcon: const Icon(null),

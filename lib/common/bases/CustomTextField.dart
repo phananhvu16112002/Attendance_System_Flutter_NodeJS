@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
     this.onSaved,
     this.onChanged,
     required this.prefixIcon,
+    required this.readOnly,
   });
 
   final TextEditingController controller;
@@ -24,29 +25,30 @@ class CustomTextField extends StatelessWidget {
   final Function(String?)? onSaved;
   final Function(String)? onChanged;
   final Icon prefixIcon;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 380,
       child: TextFormField(
+        readOnly: readOnly,
         controller: controller,
         keyboardType: textInputType,
-        style: TextStyle(
+        style: const TextStyle(
             color: AppColors.primaryText,
             fontWeight: FontWeight.normal,
             fontSize: 15),
         obscureText: obscureText,
         decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(20),
-            prefixIcon: prefixIcon,
+            contentPadding: const EdgeInsets.all(20),
             suffixIcon: suffixIcon,
             hintText: hintText,
-            enabledBorder: OutlineInputBorder(
+            enabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),
                 borderSide:
                     BorderSide(width: 1, color: AppColors.secondaryText)),
-            focusedBorder: OutlineInputBorder(
+            focusedBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(15.0)),
               borderSide: BorderSide(width: 1, color: AppColors.primaryButton),
             )),

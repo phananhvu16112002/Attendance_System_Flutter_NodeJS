@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -31,13 +32,15 @@ class CustomButton extends StatelessWidget {
         width: width,
         decoration: BoxDecoration(
             color: backgroundColorButton,
-            borderRadius: BorderRadius.all(Radius.circular(15)),
+            borderRadius: const BorderRadius.all(Radius.circular(15)),
             border: Border.all(width: 1, color: borderColor)),
         child: Center(
           child: Text(
             buttonName,
-            style: TextStyle(
-                fontSize: fontSize, fontWeight: FontWeight.bold, color: textColor),
+            style: GoogleFonts.inter(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: textColor),
           ),
         ),
       ),

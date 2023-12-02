@@ -69,6 +69,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                         height: 10,
                       ),
                       CustomTextField(
+                        readOnly: false,
                         controller: password,
                         textInputType: TextInputType.visiblePassword,
                         obscureText: isCheckNewPassword,
@@ -111,6 +112,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                         height: 10,
                       ),
                       CustomTextField(
+                        readOnly: false,
                         controller: confirmPassword,
                         textInputType: TextInputType.visiblePassword,
                         obscureText: isCheckConfirmPassword,
@@ -181,7 +183,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                                     3);
                               }
                             }
-                          }, 
+                          },
                         ),
                       )
                     ],

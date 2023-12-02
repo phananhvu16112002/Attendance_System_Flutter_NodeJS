@@ -7,7 +7,10 @@ import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dar
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceForm.dart';
+import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
+import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
 import 'package:flutter/material.dart';
@@ -45,17 +48,19 @@ class _MyAppState extends State<MyApp> {
       initialRoute: '/',
       routes: {
         '/Welcome': (context) => const WelcomePage(),
-        '/Login': (context) => SignInPage(),
-        '/Register': (context) => RegisterPage(),
-        '/ForgotPassword': (context) => ForgotPassword(),
-        '/ForgotPasswordOTP': (context) => ForgotPasswordOTPPage(),
-        '/CreateNewPassword': (context) => CreateNewPassword(),
-        '/OTP': (context) => OTPPage(),
-        '/HomePage': (context) => HomePage(),
-        '/AttendanceForm': (context) => AttendanceForm(),
-        '/ProfilePage': (context) => ProfilePage(),
+        '/Login': (context) => const SignInPage(),
+        '/Register': (context) => const RegisterPage(),
+        '/ForgotPassword': (context) => const ForgotPassword(),
+        '/ForgotPasswordOTP': (context) => const ForgotPasswordOTPPage(),
+        '/CreateNewPassword': (context) => const CreateNewPassword(),
+        '/OTP': (context) => const OTPPage(),
+        '/HomePage': (context) => const HomePage(),
+        '/AttendanceForm': (context) => const AttendanceForm(),
+        '/ProfilePage': (context) => const ProfilePage(),
+        '/DetailReport': (context) => const DetailReport(),
+        '/DetailPage': (context) => const DetailPage()
       },
-      home: const HomePage(),
+      home: const ReportAttendance(),
       debugShowCheckedModeBanner: false,
     );
   }

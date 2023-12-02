@@ -37,7 +37,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     username.dispose();
     emailAddress.dispose();
@@ -89,6 +88,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             height: 10,
                           ),
                           CustomTextField(
+                            readOnly: false,
                             controller: username,
                             textInputType: TextInputType.text,
                             obscureText: false,
@@ -120,6 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             height: 10,
                           ),
                           CustomTextField(
+                            readOnly: false,
                             controller: emailAddress,
                             textInputType: TextInputType.emailAddress,
                             obscureText: false,
@@ -156,6 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             height: 10,
                           ),
                           CustomTextField(
+                            readOnly: false,
                             controller: password,
                             textInputType: TextInputType.visiblePassword,
                             obscureText: isCheckPassword,
@@ -201,6 +203,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             height: 10,
                           ),
                           CustomTextField(
+                            readOnly: false,
                             controller: confirmPassword,
                             textInputType: TextInputType.visiblePassword,
                             obscureText: isCheckConfirmPassword,
@@ -266,6 +269,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           3);
                                     }
                                   } catch (e) {
+                                    // ignore: avoid_print
                                     print(e);
                                   }
                                 } else {

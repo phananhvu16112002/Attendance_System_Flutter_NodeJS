@@ -78,6 +78,7 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     CustomTextField(
+                      readOnly: false,
                       controller: emailAddress,
                       textInputType: TextInputType.emailAddress,
                       obscureText: false,
@@ -111,6 +112,7 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     CustomTextField(
+                      readOnly: false,
                       controller: password,
                       textInputType: TextInputType.visiblePassword,
                       obscureText: isCheckPassword,

@@ -28,14 +28,13 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
   @override
   void initState() {
     // TODO: implement initState
-    startTimer();
     super.initState();
+    startTimer();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    startTimer();
     super.dispose();
   }
 
@@ -184,22 +183,37 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
     );
   }
 
+  // void startTimer() {
+  //   Timer.periodic(const Duration(seconds: 1), (timer) {
+  //     setState(() {
+  //       if (secondsRemaining > 0) {
+  //         secondsRemaining--;
+  //       } else {
+  //         canResend = true;
+  //         timer.cancel(); // Stop the timer when it reaches 0
+  //       }
+  //     });
+  //   });
+
+  //   // Disable the button during the countdown
+  //   setState(() {
+  //     canResend = false;
+  //     secondsRemaining = 60; // Reset the timer to 1 minute
+  //   });
+  // }
+
   void startTimer() {
     Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (secondsRemaining > 0) {
+      if (secondsRemaining > 0) {
+        setState(() {
           secondsRemaining--;
-        } else {
+        });
+      } else {
+        setState(() {
           canResend = true;
-          timer.cancel(); // Stop the timer when it reaches 0
-        }
-      });
-    });
-
-    // Disable the button during the countdown
-    setState(() {
-      canResend = false;
-      secondsRemaining = 60; // Reset the timer to 1 minute
+        });
+        timer.cancel(); // Stop the timer when it reaches 0
+      }
     });
   }
 
