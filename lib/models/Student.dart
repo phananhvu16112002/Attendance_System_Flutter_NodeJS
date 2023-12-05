@@ -1,12 +1,12 @@
 class Student {
-  String studentID = '';
-  String studentName = '';
-  String studentEmail = '';
-  String password = '';
-  String hashedOTP = '';
-  String accessToken = '';
-  String refreshToken = '';
-  bool active = false;
+  String studentID;
+  String studentName;
+  String studentEmail;
+  String password;
+  String hashedOTP;
+  String accessToken;
+  String refreshToken;
+  bool active;
 
   Student({
     required this.studentID,

@@ -55,7 +55,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                           color: activeTotal
                               ? AppColors.cardAttendance
                               : Colors.white,
-                          borderRadius: const BorderRadius.all(Radius.circular(10))),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10))),
                       child: const Center(
                         child: CustomText(
                             message: 'Total: 10',
@@ -80,7 +81,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                           color: activePresent
                               ? const Color.fromARGB(94, 137, 210, 64)
                               : Colors.white,
-                          borderRadius: const BorderRadius.all(Radius.circular(10))),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10))),
                       child: const Center(
                         child: CustomText(
                             message: 'Present: 5',
@@ -131,7 +133,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                           color: activeLate
                               ? const Color.fromARGB(231, 232, 156, 63)
                               : Colors.white,
-                          borderRadius: const BorderRadius.all(Radius.circular(10))),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10))),
                       child: const Center(
                         child: CustomText(
                             message: 'Late: 2',
