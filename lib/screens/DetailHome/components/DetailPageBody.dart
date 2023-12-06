@@ -1,6 +1,10 @@
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
+import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DetailPageBody extends StatefulWidget {
   const DetailPageBody({super.key});
@@ -16,6 +20,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   bool activeLate = false;
   @override
   Widget build(BuildContext context) {
+    final attendanceDetailDataProvider =
+        Provider.of<AttendanceDetailDataProvider>(context, listen: false);
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -147,25 +153,40 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            customCard('Tuesday 7 November, 2023', '15:30 PM', 'Successfully'),
-            const SizedBox(
-              height: 15,
-            ),
-            customCard('Thursday 9 November, 2023', '15:30 PM', 'Late'),
-            const SizedBox(
-              height: 15,
-            ),
-            customCard('Thursday 9 November, 2023', '', 'Absent')
+            FutureBuilder(
+                future: API().getAttendanceDetail(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData) {
+                    if (snapshot.data != null) {
+                      List<AttendanceDetail> attendanceDetail = snapshot.data!;
+                      // Cập nhật dữ liệu vào Provider
+                      Future.delayed(Duration.zero, () {
+                        attendanceDetailDataProvider
+                            .setAttendanceDetailList(attendanceDetail);
+                      });
+                      return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: attendanceDetail.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            var data = attendanceDetail[index];
+                            return customCard(
+                                 DateTime.parse(data.dateAttendanced.toString()), DateTime.parse(data.dateAttendanced.toString()), 'Successfully');
+                          });
+                    }
+                  }
+                  return Text('Null');
+                })
           ],
         ),
       ),
     );
   }
 
-  Container customCard(String date, String timeAttendance, String status) {
+  Container customCard(DateTime date, DateTime timeAttendance, String status) {
     return Container(
       width: 405,
       height: 220,
@@ -181,7 +202,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
       child: Column(
         children: [
           CustomText(
-              message: date,
+              message: date.toString(),
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryText),
@@ -219,7 +240,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       ),
                       customRichText(
                           'Time Attendance: ',
-                          timeAttendance,
+                          timeAttendance.toString(),
                           FontWeight.bold,
                           FontWeight.w500,
                           AppColors.primaryText,

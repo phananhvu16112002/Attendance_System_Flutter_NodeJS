@@ -1,4 +1,5 @@
-import 'package:attendance_system_nodejs/providers/class_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/CreateNewPassword.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
@@ -23,6 +24,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => StudentDataProvider()),
         ChangeNotifierProvider(create: (_) => ClassDataProvider()),
+        ChangeNotifierProvider(create: (_) => AttendanceDetailDataProvider())
       ],
       child: const MyApp(),
     ),
@@ -62,7 +64,7 @@ class _MyAppState extends State<MyApp> {
         '/DetailReport': (context) => const DetailReport(),
         '/DetailPage': (context) => const DetailPage()
       },
-      home: const HomePage(),
+      home: const DetailPage(),
       debugShowCheckedModeBanner: false,
     );
   }
