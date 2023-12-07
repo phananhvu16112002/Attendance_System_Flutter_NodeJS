@@ -47,7 +47,7 @@ class _HomePageBodyState extends State<HomePageBody> {
   @override
   Widget build(BuildContext context) {
     final classDataProvider =
-        Provider.of<ClassDataProvider>(context, listen: false);
+        Provider.of<StudentClassesDataProvider>(context, listen: false);
     return SingleChildScrollView(
         //Column Tổng body
         child: Column(

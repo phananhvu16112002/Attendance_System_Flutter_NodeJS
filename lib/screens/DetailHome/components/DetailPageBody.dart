@@ -2,8 +2,10 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class DetailPageBody extends StatefulWidget {
@@ -22,6 +24,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   Widget build(BuildContext context) {
     final attendanceDetailDataProvider =
         Provider.of<AttendanceDetailDataProvider>(context, listen: false);
+    final studentClassesDataProvider =
+        Provider.of<StudentClassesDataProvider>(context);
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -91,7 +95,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               const BorderRadius.all(Radius.circular(10))),
                       child: const Center(
                         child: CustomText(
-                            message: 'Present: 5',
+                            message: 'Present: 4',
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: AppColors.primaryText),
@@ -153,6 +157,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                 ],
               ),
             ),
+            const SizedBox(height: 10),
             FutureBuilder(
                 future: API().getAttendanceDetail(),
                 builder: (context, snapshot) {
@@ -173,12 +178,17 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                           itemCount: attendanceDetail.length,
                           itemBuilder: (BuildContext context, int index) {
                             var data = attendanceDetail[index];
-                            return customCard(
-                                 DateTime.parse(data.dateAttendanced.toString()), DateTime.parse(data.dateAttendanced.toString()), 'Successfully');
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: customCard(
+                                  formatDate(data.dateAttendanced.toString()),
+                                  formatTime(data.dateAttendanced.toString()),
+                                  'Successfully'),
+                            );
                           });
                     }
                   }
-                  return Text('Null');
+                  return const Text('Data is not available');
                 })
           ],
         ),
@@ -186,7 +196,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     );
   }
 
-  Container customCard(DateTime date, DateTime timeAttendance, String status) {
+  Container customCard(String date, String timeAttendance, String status) {
     return Container(
       width: 405,
       height: 220,
@@ -330,5 +340,17 @@ class _DetailPageBodyState extends State<DetailPageBody> {
       // Mặc định hoặc trường hợp khác
       return AppColors.primaryText;
     }
+  }
+
+  String formatDate(String date) {
+    DateTime serverDateTime = DateTime.parse(date);
+    String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+    return formattedDate;
+  }
+
+  String formatTime(String time) {
+    DateTime serverDateTime = DateTime.parse(time);
+    String formattedTime = DateFormat('HH:mm:ss').format(serverDateTime);
+    return formattedTime;
   }
 }

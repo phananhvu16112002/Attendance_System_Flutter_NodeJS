@@ -23,7 +23,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => StudentDataProvider()),
-        ChangeNotifierProvider(create: (_) => ClassDataProvider()),
+        ChangeNotifierProvider(create: (_) => StudentClassesDataProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceDetailDataProvider())
       ],
       child: const MyApp(),
