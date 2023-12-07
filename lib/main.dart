@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
         '/DetailReport': (context) => const DetailReport(),
         '/DetailPage': (context) => const DetailPage()
       },
-      home: const WelcomePage(),
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

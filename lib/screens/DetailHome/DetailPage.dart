@@ -55,9 +55,19 @@ class _DetailPageState extends State<DetailPage> {
     return PreferredSize(
       preferredSize: const Size.fromHeight(100.0),
       child: AppBar(
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: const Icon(Icons.arrow_back,
+                color: Colors.white), // Thay đổi icon và màu sắc tùy ý
+          ),
+        ),
         backgroundColor: AppColors.colorAppbar,
         flexibleSpace: Padding(
-          padding: const EdgeInsets.only(left: 10.0),
+          padding: const EdgeInsets.only(left: 50.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,

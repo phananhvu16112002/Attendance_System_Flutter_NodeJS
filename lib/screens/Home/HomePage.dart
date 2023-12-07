@@ -93,8 +93,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _bottomNavIndex = index;
     });
-
-    
   }
 
   Widget _buildBody() {

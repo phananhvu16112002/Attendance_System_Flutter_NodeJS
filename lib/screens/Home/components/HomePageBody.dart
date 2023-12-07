@@ -6,6 +6,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -83,7 +84,7 @@ class _HomePageBodyState extends State<HomePageBody> {
           //Body 2
 
           Container(
-            color: Colors.white,
+            color: AppColors.cardAttendance,
             height: MediaQuery.of(context).size.height,
             margin: const EdgeInsets.only(top: 350),
             child: Column(
@@ -174,18 +175,40 @@ class _HomePageBodyState extends State<HomePageBody> {
                             itemBuilder: (BuildContext context, int index) {
                               var data = studentClasses[index];
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: classInformation(
-                                  data.classes.course.totalWeeks,
-                                  data.classes.course.courseName,
-                                  data.classes.teacher.teacherName,
-                                  data.classes.course.courseID,
-                                  data.classes.shiftNumber,
-                                  data.classes.roomNumber,
-                                  data.presenceTotal,
-                                  data.lateTotal,
-                                  data.absenceTotal,
-                                  activeForm, // Chỉnh thành status Form
+                                padding: const EdgeInsets.only(
+                                    left: 5, right: 5, bottom: 10),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                                secondaryAnimation) =>
+                                            const DetailPage(),
+                                        transitionDuration:
+                                            const Duration(milliseconds: 200),
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          return ScaleTransition(
+                                            scale: animation,
+                                            child: child,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                  child: classInformation(
+                                    data.classes.course.totalWeeks,
+                                    data.classes.course.courseName,
+                                    data.classes.teacher.teacherName,
+                                    data.classes.course.courseID,
+                                    data.classes.shiftNumber,
+                                    data.classes.roomNumber,
+                                    data.presenceTotal,
+                                    data.lateTotal,
+                                    data.absenceTotal,
+                                    activeForm, // Chỉnh thành status Form
+                                  ),
                                 ),
                               );
                             },
@@ -260,10 +283,10 @@ class _HomePageBodyState extends State<HomePageBody> {
               BoxShadow(
                   color: AppColors.secondaryText,
                   blurRadius: 5.0,
-                  offset: Offset(0.0, 0.0))
+                  offset: Offset(3.0, 2.0))
             ]),
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20),
+          padding: const EdgeInsets.only(left: 20, top: 10),
           child: Row(
             children: [
               Padding(

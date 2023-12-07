@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
@@ -6,7 +5,6 @@ import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});

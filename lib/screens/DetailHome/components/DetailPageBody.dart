@@ -24,10 +24,10 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     final attendanceDetailDataProvider =
         Provider.of<AttendanceDetailDataProvider>(context, listen: false);
 
-
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
+      color: AppColors.cardAttendance,
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -66,7 +66,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               : Colors.white,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10))),
-                      child:  Center(
+                      child: const Center(
                         child: CustomText(
                             message: 'Total: 10',
                             fontSize: 15,
@@ -92,7 +92,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               : Colors.white,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10))),
-                      child: Center(
+                      child: const Center(
                         child: CustomText(
                             message: 'Present: 5',
                             fontSize: 15,
@@ -118,7 +118,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               : Colors.white,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10))),
-                      child: Center(
+                      child: const Center(
                         child: CustomText(
                             message: 'Absent: 3',
                             fontSize: 15,
@@ -144,7 +144,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               : Colors.white,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10))),
-                      child: Center(
+                      child: const Center(
                         child: CustomText(
                             message: 'Late: 2',
                             fontSize: 15,
@@ -161,7 +161,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                 future: API().getAttendanceDetail(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (snapshot.hasData) {
@@ -178,7 +178,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                           itemBuilder: (BuildContext context, int index) {
                             var data = attendanceDetail[index];
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.only(bottom: 15),
                               child: customCard(
                                   formatDate(data.dateAttendanced.toString()),
                                   formatTime(data.dateAttendanced.toString()),
@@ -200,13 +200,13 @@ class _DetailPageBodyState extends State<DetailPageBody> {
       width: 405,
       height: 220,
       decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 243, 248, 253),
+          color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
           boxShadow: [
             BoxShadow(
-                color: AppColors.secondaryText,
+                color: Color.fromARGB(195, 190, 188, 188),
                 blurRadius: 5.0,
-                offset: Offset(0.0, 0.0))
+                offset: Offset(2.0, 1.0))
           ]),
       child: Column(
         children: [
