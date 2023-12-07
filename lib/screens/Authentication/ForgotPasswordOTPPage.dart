@@ -5,6 +5,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/CreateNewPassword.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
@@ -24,6 +25,7 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
       "Please enter the verification code we just sent on your email address.";
   int secondsRemaining = 60; // Initial value for 1 minute
   bool canResend = false;
+  late Timer _timer;
 
   @override
   void initState() {
@@ -35,6 +37,8 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
   @override
   void dispose() {
     // TODO: implement dispose
+    print('Forgot dispose');
+    _timer.cancel();
     super.dispose();
   }
 
@@ -106,8 +110,31 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                                     studentDataProvider.userData.hashedOTP);
                             if (checkLogin == true) {
                               // ignore: use_build_context_synchronously
-                              Navigator.pushNamed(
-                                  context, '/CreateNewPassword');
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      const CreateNewPassword(),
+                                  transitionDuration:
+                                      const Duration(milliseconds: 1000),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    var curve = Curves.easeInOutCubic;
+                                    var tween = Tween(
+                                            begin: const Offset(1.0, 0.0),
+                                            end: Offset.zero)
+                                        .chain(CurveTween(curve: curve));
+                                    var offsetAnimation =
+                                        animation.drive(tween);
+                                    return SlideTransition(
+                                      position: offsetAnimation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                                (route) => false,
+                              );
                               // ignore: use_build_context_synchronously
                               Flushbar(
                                 title: "Successfully",
@@ -202,8 +229,23 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
   //   });
   // }
 
+  // void startTimer() {
+  //   Timer.periodic(const Duration(seconds: 1), (timer) {
+  //     if (secondsRemaining > 0) {
+  //       setState(() {
+  //         secondsRemaining--;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         canResend = true;
+  //       });
+  //       timer.cancel(); // Stop the timer when it reaches 0
+  //     }
+  //   });
+  // }
+
   void startTimer() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (secondsRemaining > 0) {
         setState(() {
           secondsRemaining--;
@@ -212,7 +254,7 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
         setState(() {
           canResend = true;
         });
-        timer.cancel(); // Stop the timer when it reaches 0
+        timer.cancel();
       }
     });
   }

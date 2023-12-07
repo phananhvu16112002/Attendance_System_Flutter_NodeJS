@@ -5,6 +5,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
@@ -24,18 +25,20 @@ class _OTPPageState extends State<OTPPage> {
       "Please enter the verification code we just sent on your email address.";
   int secondsRemaining = 60; // Initial value for 1 minute
   bool canResend = false;
+  late Timer _timer;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     startTimer();
-
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
+    print('OTP dispose');
+    _timer.cancel();
     super.dispose();
   }
 
@@ -105,7 +108,32 @@ class _OTPPageState extends State<OTPPage> {
                                 studentDataProvider.userData.studentEmail,
                                 studentDataProvider.userData.hashedOTP);
                             if (checkLogin == true) {
-                              Navigator.pushNamed(context, '/Login');
+                              // ignore: use_build_context_synchronously
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      const SignInPage(),
+                                  transitionDuration:
+                                      const Duration(milliseconds: 1000),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    var curve = Curves.easeInOutCubic;
+                                    var tween = Tween(
+                                            begin: const Offset(1.0, 0.0),
+                                            end: Offset.zero)
+                                        .chain(CurveTween(curve: curve));
+                                    var offsetAnimation =
+                                        animation.drive(tween);
+                                    return SlideTransition(
+                                      position: offsetAnimation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                                (route) => false,
+                              );
                               Flushbar(
                                 title: "Successfully",
                                 message: "Login to use the app",
@@ -196,8 +224,23 @@ class _OTPPageState extends State<OTPPage> {
   //   });
   // }
 
+  // void startTimer() {
+  //   Timer.periodic(const Duration(seconds: 1), (timer) {
+  //     if (secondsRemaining > 0) {
+  //       setState(() {
+  //         secondsRemaining--;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         canResend = true;
+  //       });
+  //       timer.cancel(); // Stop the timer when it reaches 0
+  //     }
+  //   });
+  // }
+
   void startTimer() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (secondsRemaining > 0) {
         setState(() {
           secondsRemaining--;
@@ -206,7 +249,7 @@ class _OTPPageState extends State<OTPPage> {
         setState(() {
           canResend = true;
         });
-        timer.cancel(); // Stop the timer when it reaches 0
+        timer.cancel();
       }
     });
   }

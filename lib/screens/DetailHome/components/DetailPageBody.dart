@@ -2,7 +2,6 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
-import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -24,8 +23,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   Widget build(BuildContext context) {
     final attendanceDetailDataProvider =
         Provider.of<AttendanceDetailDataProvider>(context, listen: false);
-    final studentClassesDataProvider =
-        Provider.of<StudentClassesDataProvider>(context);
+
+
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -67,7 +66,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               : Colors.white,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10))),
-                      child: const Center(
+                      child:  Center(
                         child: CustomText(
                             message: 'Total: 10',
                             fontSize: 15,
@@ -93,9 +92,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               : Colors.white,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10))),
-                      child: const Center(
+                      child: Center(
                         child: CustomText(
-                            message: 'Present: 4',
+                            message: 'Present: 5',
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: AppColors.primaryText),
@@ -119,7 +118,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               : Colors.white,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10))),
-                      child: const Center(
+                      child: Center(
                         child: CustomText(
                             message: 'Absent: 3',
                             fontSize: 15,
@@ -145,7 +144,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               : Colors.white,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10))),
-                      child: const Center(
+                      child: Center(
                         child: CustomText(
                             message: 'Late: 2',
                             fontSize: 15,

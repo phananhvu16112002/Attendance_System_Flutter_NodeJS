@@ -1,8 +1,12 @@
+import 'package:animations/animations.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -65,35 +69,77 @@ class _WelcomePageState extends State<WelcomePage> {
                         height: 20,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(right: 15),
-                        child: CustomButton(
-                            fontSize: 20,
-                            height: 60,
-                            width: 400,
-                            buttonName: 'Login',
-                            backgroundColorButton: AppColors.primaryButton,
-                            borderColor: Colors.white,
-                            textColor: Colors.white,
-                            function: () =>
-                                Navigator.of(context).pushNamed('/Login')),
-                      ),
+                          padding: const EdgeInsets.only(right: 15),
+                          child: CustomButton(
+                              fontSize: 20,
+                              height: 60,
+                              width: 400,
+                              buttonName: 'Login',
+                              backgroundColorButton: AppColors.primaryButton,
+                              borderColor: Colors.white,
+                              textColor: Colors.white,
+                              function: () => Navigator.pushReplacement(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          SignInPage(),
+                                      transitionDuration:
+                                          const Duration(milliseconds: 1000),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        var curve = Curves.easeInOutCubic;
+                                        var tween = Tween(
+                                                begin: const Offset(1.0, 0.0),
+                                                end: Offset.zero)
+                                            .chain(CurveTween(curve: curve));
+                                        var offsetAnimation =
+                                            animation.drive(tween);
+
+                                        return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                  ))),
                       const SizedBox(
                         height: 20,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(right: 15),
                         child: CustomButton(
-                          fontSize: 20,
-                          height: 60,
-                          width: 400,
-                          buttonName: 'Register',
-                          backgroundColorButton: Colors.white,
-                          borderColor: AppColors.primaryText,
-                          textColor: AppColors.primaryText,
-                          function: () =>
-                              Navigator.of(context, rootNavigator: true)
-                                  .pushNamed('/Register'),
-                        ),
+                            fontSize: 20,
+                            height: 60,
+                            width: 400,
+                            buttonName: 'Register',
+                            backgroundColorButton: Colors.white,
+                            borderColor: AppColors.primaryText,
+                            textColor: AppColors.primaryText,
+                            function: () => Navigator.pushReplacement(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        RegisterPage(),
+                                    transitionDuration:
+                                        const Duration(milliseconds: 1000),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      var curve = Curves.easeInOutCubic;
+                                      var tween = Tween(
+                                              begin: const Offset(1.0, 0.0),
+                                              end: Offset.zero)
+                                          .chain(CurveTween(curve: curve));
+                                      var offsetAnimation =
+                                          animation.drive(tween);
+                                      return SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                )),
                       )
                     ],
                   ),

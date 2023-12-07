@@ -4,6 +4,9 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
+import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 
@@ -141,7 +144,29 @@ class _SignInPageState extends State<SignInPage> {
                       padding: const EdgeInsets.only(left: 250),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, ('/ForgotPassword'));
+                          Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const ForgotPassword(),
+                              transitionDuration:
+                                  const Duration(milliseconds: 300),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                var curve = Curves.easeInOutCubic;
+                                var tween = Tween(
+                                        begin: const Offset(1.0, 0.0),
+                                        end: Offset.zero)
+                                    .chain(CurveTween(curve: curve));
+                                var offsetAnimation = animation.drive(tween);
+                                return ScaleTransition(
+                                  scale: animation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
                         },
                         child: const CustomText(
                           message: 'Forgot Password?',
@@ -179,8 +204,32 @@ class _SignInPageState extends State<SignInPage> {
                                 //     .setRefreshToken(refreshToken);
                                 if (check) {
                                   // ignore: use_build_context_synchronously
-                                  Navigator.pushNamedAndRemoveUntil(
-                                      context, ('/HomePage'), (route) => false);
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          HomePage(),
+                                      transitionDuration:
+                                          const Duration(milliseconds: 1000),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        var curve = Curves.easeInOutCubic;
+                                        var tween = Tween(
+                                                begin: const Offset(1.0, 0.0),
+                                                end: Offset.zero)
+                                            .chain(CurveTween(curve: curve));
+                                        var offsetAnimation =
+                                            animation.drive(tween);
+                                        return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                    (route) => false,
+                                  );
+
                                   // ignore: use_build_context_synchronously
                                   Flushbar(
                                     title: "Successfully",
@@ -211,59 +260,6 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     //Build third login
-                    Padding(
-                      padding: const EdgeInsets.only(right: 18),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 0.8,
-                            width: 120,
-                            color: AppColors.secondaryText,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const CustomText(
-                            message: 'Or Login With',
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: AppColors.primaryText,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            height: 0.8,
-                            width: 120,
-                            color: AppColors.secondaryText,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 25),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          buildIcon('assets/icons/google.png'),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          buildIcon('assets/icons/google.png'),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          buildIcon('assets/icons/google.png'),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -275,8 +271,29 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, ('/Register'), (route) => false);
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const RegisterPage(),
+                                transitionDuration:
+                                    const Duration(milliseconds: 500),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  var curve = Curves.easeInOutCubic;
+                                  var tween = Tween(
+                                          begin: const Offset(1.0, 0.0),
+                                          end: Offset.zero)
+                                      .chain(CurveTween(curve: curve));
+                                  var offsetAnimation = animation.drive(tween);
+                                  return SlideTransition(
+                                    position: offsetAnimation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
                           },
                           child: const CustomText(
                             message: 'Register',

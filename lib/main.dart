@@ -9,7 +9,6 @@ import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dar
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
@@ -64,7 +63,7 @@ class _MyAppState extends State<MyApp> {
         '/DetailReport': (context) => const DetailReport(),
         '/DetailPage': (context) => const DetailPage()
       },
-      home: const DetailPage(),
+      home: const WelcomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

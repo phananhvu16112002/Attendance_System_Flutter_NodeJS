@@ -20,6 +20,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       "Don’t worry! If occurs. Please enter your email address or mobile number linked with your account!";
   TextEditingController emailAddress = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+    
 
   @override
   Widget build(BuildContext context) {

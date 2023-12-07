@@ -5,6 +5,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/OTPPage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -246,7 +247,34 @@ class _RegisterPageState extends State<RegisterPage> {
                                               emailAddress.text, password.text);
                                       if (check) {
                                         // ignore: use_build_context_synchronously
-                                        Navigator.pushNamed(context, '/OTP');
+                                        Navigator.pushReplacement(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                    secondaryAnimation) =>
+                                                const OTPPage(),
+                                            transitionDuration: const Duration(
+                                                milliseconds: 1000),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              var curve = Curves.easeInOutCubic;
+                                              var tween = Tween(
+                                                      begin: const Offset(
+                                                          1.0, 0.0),
+                                                      end: Offset.zero)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+                                        );
                                         // ignore: use_build_context_synchronously
                                         showFlushBarNotification(
                                             context,

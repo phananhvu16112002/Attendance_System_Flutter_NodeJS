@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/components/HomePageBody.dart';
@@ -92,20 +93,36 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _bottomNavIndex = index;
     });
+
+    
   }
 
   Widget _buildBody() {
     switch (_bottomNavIndex) {
       case 0:
-        return const HomePageBody();
+        return _buildPage(const HomePageBody());
       case 1:
-        return const ReportPage();
+        return _buildPage(const ReportPage());
       case 2:
-        return const NotificationsPage();
+        return _buildPage(const NotificationsPage());
       case 3:
-        return const ProfilePage();
+        return _buildPage(const ProfilePage());
       default:
-        return const HomePageBody();
+        return _buildPage(const HomePageBody());
     }
+  }
+
+  Widget _buildPage(Widget page) {
+    return PageTransitionSwitcher(
+      duration: const Duration(milliseconds: 500),
+      transitionBuilder: (child, animation, secondaryAnimation) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+      child: page,
+    );
   }
 }
