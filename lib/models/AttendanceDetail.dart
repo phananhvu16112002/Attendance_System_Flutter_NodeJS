@@ -3,7 +3,7 @@ import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 class AttendanceDetail {
   StudentClasses studentClassesDetail;
   String classes;
-  String attendanceForm;
+  String attendanceForm; //FormID
   bool present;
   bool late;
   bool absence;
@@ -29,22 +29,28 @@ class AttendanceDetail {
     required this.altitude,
   });
 
-factory AttendanceDetail.fromJson(Map<String, dynamic> json) {
-  print('AttendanceDetail.fromJson: $json');
+  factory AttendanceDetail.fromJson(Map<String, dynamic> json) {
+    print('AttendanceDetail.fromJson: $json');
 
-  return AttendanceDetail(
-    studentClassesDetail: StudentClasses.fromJson(json['studentDetail'] ?? {}),
-    classes: json['classes'] ?? "",
-    attendanceForm: json['attendanceForm'] ?? "",
-    present: json['present'] ?? false,
-    late: json['late'] ?? false,
-    absence: json['absence'] ?? false,
-    dateAttendanced: json['dateAttendanced'] != null ? DateTime.tryParse(json['dateAttendanced']) : null,
-    location: json['location'] ?? "",
-    note: json['note'] ?? "",
-    latitude: json['latitude'] != null ? int.tryParse(json['latitude']) ?? 0 : 0,
-    longitude: json['longitude'] != null ? int.tryParse(json['longitude']) ?? 0 : 0,
-    altitude: json['altitude'] != null ? int.tryParse(json['altitude']) ?? 0 : 0,
-  );
-}
+    return AttendanceDetail(
+      studentClassesDetail:
+          StudentClasses.fromJson(json['studentDetail'] ?? {}),
+      classes: json['classes'] ?? "",
+      attendanceForm: json['attendanceForm'] ?? "",
+      present: json['present'] ?? false,
+      late: json['late'] ?? false,
+      absence: json['absence'] ?? false,
+      dateAttendanced: json['dateAttendanced'] != null
+          ? DateTime.tryParse(json['dateAttendanced'])
+          : null,
+      location: json['location'] ?? "",
+      note: json['note'] ?? "",
+      latitude:
+          json['latitude'] != null ? int.tryParse(json['latitude']) ?? 0 : 0,
+      longitude:
+          json['longitude'] != null ? int.tryParse(json['longitude']) ?? 0 : 0,
+      altitude:
+          json['altitude'] != null ? int.tryParse(json['altitude']) ?? 0 : 0,
+    );
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/Classroom.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/components/DetailPageBody.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/NotificationClass.dart';

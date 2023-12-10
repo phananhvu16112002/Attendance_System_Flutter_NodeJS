@@ -4,11 +4,14 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -37,6 +40,7 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return Scaffold(
         body: SingleChildScrollView(
       child: Column(
@@ -154,12 +158,6 @@ class _SignInPageState extends State<SignInPage> {
                                   const Duration(milliseconds: 300),
                               transitionsBuilder: (context, animation,
                                   secondaryAnimation, child) {
-                                var curve = Curves.easeInOutCubic;
-                                var tween = Tween(
-                                        begin: const Offset(1.0, 0.0),
-                                        end: Offset.zero)
-                                    .chain(CurveTween(curve: curve));
-                                var offsetAnimation = animation.drive(tween);
                                 return ScaleTransition(
                                   scale: animation,
                                   child: child,
@@ -187,6 +185,7 @@ class _SignInPageState extends State<SignInPage> {
                           height: 60,
                           width: 400,
                           buttonName: 'Login',
+                          colorShadow: AppColors.colorShadow,
                           backgroundColorButton: AppColors.primaryButton,
                           borderColor: Colors.white,
                           textColor: Colors.white,
@@ -202,6 +201,16 @@ class _SignInPageState extends State<SignInPage> {
                                 // studentDataProvider.setAccessToken(accessToken);
                                 // studentDataProvider
                                 //     .setRefreshToken(refreshToken);
+                                var studentID = await SecureStorage()
+                                    .readSecureData('studentID');
+                                var studentEmail = await SecureStorage()
+                                    .readSecureData('studentEmail');
+                                var studentName = await SecureStorage()
+                                    .readSecureData('studentName');
+                                studentDataProvider.setStudentID(studentID);
+                                studentDataProvider
+                                    .setStudentEmail(studentEmail);
+                                studentDataProvider.setStudentName(studentName);
                                 if (check) {
                                   // ignore: use_build_context_synchronously
                                   Navigator.pushAndRemoveUntil(

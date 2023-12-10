@@ -49,13 +49,25 @@ class _WelcomePageState extends State<WelcomePage> {
                           const SizedBox(
                             width: 20,
                           ),
+                          // Expanded(
+                          //     child: CustomText(
+                          //   message: schoolName,
+                          //   fontSize: 40,
+                          //   fontWeight: FontWeight.w800,
+                          //   color: AppColors.primaryText,
+                          // )),
                           Expanded(
-                              child: CustomText(
-                            message: schoolName,
-                            fontSize: 40,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primaryText,
-                          )),
+                              child: customRichText(
+                                  'TON ',
+                                  'DUC ',
+                                  'THANG ',
+                                  'UNIVERISTY',
+                                  FontWeight.w800,
+                                  40,
+                                  const Color(0xff0364A9),
+                                  const Color(0xff0364A9),
+                                  const Color(0xff0364A9),
+                                  AppColors.primaryText))
                         ],
                       ),
                       CustomText(
@@ -73,6 +85,7 @@ class _WelcomePageState extends State<WelcomePage> {
                               height: 60,
                               width: 400,
                               buttonName: 'Login',
+                              colorShadow: AppColors.colorShadow,
                               backgroundColorButton: AppColors.primaryButton,
                               borderColor: Colors.white,
                               textColor: Colors.white,
@@ -111,6 +124,7 @@ class _WelcomePageState extends State<WelcomePage> {
                             height: 60,
                             width: 400,
                             buttonName: 'Register',
+                            colorShadow: Colors.transparent,
                             backgroundColorButton: Colors.white,
                             borderColor: AppColors.primaryText,
                             textColor: AppColors.primaryText,
@@ -146,5 +160,54 @@ class _WelcomePageState extends State<WelcomePage> {
             ],
           ),
         ));
+  }
+
+  RichText customRichText(
+    String title,
+    String title2,
+    String title3,
+    String title4,
+    FontWeight fontWeightTitle,
+    double fontSize,
+    Color colorTextTitle,
+    Color colorTextTitle2,
+    Color colorTextTitle3,
+    Color colorTextTitle4,
+  ) {
+    return RichText(
+        text: TextSpan(children: [
+      TextSpan(
+        text: title,
+        style: TextStyle(
+          fontWeight: fontWeightTitle,
+          fontSize: fontSize,
+          color: colorTextTitle,
+        ),
+      ),
+      TextSpan(
+        text: title2,
+        style: TextStyle(
+          fontWeight: fontWeightTitle,
+          fontSize: fontSize,
+          color: colorTextTitle2,
+        ),
+      ),
+      TextSpan(
+        text: title3,
+        style: TextStyle(
+          fontWeight: fontWeightTitle,
+          fontSize: fontSize,
+          color: colorTextTitle3,
+        ),
+      ),
+      TextSpan(
+        text: title4,
+        style: TextStyle(
+          fontWeight: fontWeightTitle,
+          fontSize: fontSize,
+          color: colorTextTitle4,
+        ),
+      ),
+    ]));
   }
 }

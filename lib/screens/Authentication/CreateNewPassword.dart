@@ -147,6 +147,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                           width: 400,
                           buttonName: "Reset Password",
                           backgroundColorButton: AppColors.primaryButton,
+                          colorShadow: AppColors.colorShadow,
                           borderColor: Colors.white,
                           textColor: Colors.white,
                           function: () async {

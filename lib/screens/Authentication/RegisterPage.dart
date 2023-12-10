@@ -235,6 +235,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               height: 60,
                               width: 400,
                               buttonName: 'Register',
+                              colorShadow: AppColors.colorShadow,
                               backgroundColorButton: AppColors.primaryButton,
                               borderColor: Colors.white,
                               textColor: Colors.white,

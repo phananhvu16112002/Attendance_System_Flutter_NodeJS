@@ -12,6 +12,7 @@ class CustomButton extends StatelessWidget {
     required this.height,
     required this.width,
     required this.fontSize,
+    required this.colorShadow,
   });
 
   final String buttonName;
@@ -22,6 +23,7 @@ class CustomButton extends StatelessWidget {
   final double height;
   final double width;
   final double fontSize;
+  final Color colorShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,11 @@ class CustomButton extends StatelessWidget {
         decoration: BoxDecoration(
             color: backgroundColorButton,
             borderRadius: const BorderRadius.all(Radius.circular(15)),
-            border: Border.all(width: 1, color: borderColor)),
+            border: Border.all(width: 1, color: borderColor),
+            boxShadow: [
+              BoxShadow(
+                  color: colorShadow, blurRadius: 6, offset: const Offset(0, 5))
+            ]),
         child: Center(
           child: Text(
             buttonName,

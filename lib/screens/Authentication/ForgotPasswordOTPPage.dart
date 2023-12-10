@@ -99,6 +99,7 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                         height: 60,
                         width: 400,
                         buttonName: "Verify",
+                        colorShadow: AppColors.colorShadow,
                         backgroundColorButton: AppColors.primaryButton,
                         borderColor: Colors.white,
                         textColor: Colors.white,

@@ -1,13 +1,12 @@
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class customAppBar extends StatelessWidget {
-  const customAppBar({
+class CustomAppBar extends StatelessWidget {
+  const CustomAppBar({
     super.key,
     required this.context,
   });
@@ -16,6 +15,7 @@ class customAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return Container(
       height: 320,
       width: MediaQuery.of(context).size.width,
@@ -35,15 +35,16 @@ class customAppBar extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        CustomText(
+                        const CustomText(
                             message: 'Hi, ',
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                             color: AppColors.thirdText),
                         CustomText(
-                            message: 'Anh Vu',
+                            message:
+                                studentDataProvider.userData.studentName,
                             fontSize: 23,
                             fontWeight: FontWeight.w600,
                             color: Colors.white),
@@ -57,19 +58,20 @@ class customAppBar extends StatelessWidget {
                     const SizedBox(
                       height: 10,
                     ),
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.person_3_outlined,
+                            const Icon(Icons.person_3_outlined,
                                 size: 11, color: AppColors.thirdText),
                             CustomText(
-                                message: '520H0696 | ',
+                                message:
+                                    '${studentDataProvider.userData.studentID} | ',
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.thirdText),
-                            CustomText(
+                            const CustomText(
                                 message: 'Student',
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,

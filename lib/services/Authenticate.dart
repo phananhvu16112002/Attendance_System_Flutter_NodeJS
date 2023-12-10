@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:attendance_system_nodejs/models/Student.dart';
 import 'package:http/http.dart' as http;
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 
@@ -57,9 +58,19 @@ class Authenticate {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       var accessToken = responseData['refreshToken'];
       var refreshToken = responseData['accessToken'];
+      var studentID = responseData['studentID'];
+      var studentEmail = responseData['studentEmail'];
+      var studentName = responseData['studentName'];
+
+
+      print('--Response Data: $responseData');
 
       await SecureStorage().writeSecureData('accessToken', accessToken);
       await SecureStorage().writeSecureData('refreshToken', refreshToken);
+      await SecureStorage().writeSecureData('studentID', studentID);
+      await SecureStorage().writeSecureData('studentEmail', studentEmail);
+      await SecureStorage().writeSecureData('studentName', studentName);
+
       return true;
     } else {
       // ignore: avoid_print

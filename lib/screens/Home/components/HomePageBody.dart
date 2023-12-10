@@ -7,6 +7,7 @@ import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -53,7 +54,7 @@ class _HomePageBodyState extends State<HomePageBody> {
         child: Column(
       children: [
         Stack(children: [
-          customAppBar(context: context),
+          CustomAppBar(context: context),
           //Search Bar
           Positioned(
             top: 285,
@@ -207,7 +208,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                                     data.presenceTotal,
                                     data.lateTotal,
                                     data.absenceTotal,
-                                    activeForm, // Chỉnh thành status Form
+                                    true, // Chỉnh thành status Form
                                   ),
                                 ),
                               );
@@ -325,7 +326,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
-                      fontSize: 12,
+                      fontSize: 13,
                     ),
                     const SizedBox(
                       height: 5,
@@ -336,7 +337,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
-                      fontSize: 12,
+                      fontSize: 13,
                     ),
                     const SizedBox(
                       height: 5,
@@ -347,7 +348,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
-                      fontSize: 12,
+                      fontSize: 13,
                     ),
                     const SizedBox(
                       height: 5,
@@ -360,7 +361,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                           fontWeightTitle: FontWeight.bold,
                           fontWeightMessage: FontWeight.w400,
                           colorText: AppColors.primaryText,
-                          fontSize: 12,
+                          fontSize: 13,
                         ),
                         const SizedBox(
                           width: 10,
@@ -371,7 +372,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                           fontWeightTitle: FontWeight.bold,
                           fontWeightMessage: FontWeight.w400,
                           colorText: AppColors.primaryText,
-                          fontSize: 12,
+                          fontSize: 13,
                         ),
                       ],
                     ),
@@ -386,57 +387,82 @@ class _HomePageBodyState extends State<HomePageBody> {
               const SizedBox(
                 width: 10,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  customRichText(
-                    title: 'Total Attendance: ',
-                    message: '$presenceTotal',
-                    fontWeightTitle: FontWeight.bold,
-                    fontWeightMessage: FontWeight.w400,
-                    colorText: AppColors.primaryText,
-                    fontSize: 12,
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  customRichText(
-                    title: 'Total Late: ',
-                    message: '$lateTotal',
-                    fontWeightTitle: FontWeight.bold,
-                    fontWeightMessage: FontWeight.w400,
-                    colorText: AppColors.primaryText,
-                    fontSize: 12,
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  customRichText(
-                    title: 'Total Absent: ',
-                    message: '$absenceTotal',
-                    fontWeightTitle: FontWeight.bold,
-                    fontWeightMessage: FontWeight.w400,
-                    colorText: AppColors.primaryText,
-                    fontSize: 12,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 50),
-                    child: CustomButton(
-                        buttonName: 'Attendance',
-                        backgroundColorButton: !activeForm
-                            ? AppColors.primaryButton
-                            : Colors.green,
-                        borderColor: Colors.transparent,
-                        textColor: Colors.white,
-                        function: () {},
-                        height: 20,
-                        width: 80,
-                        fontSize: 11),
-                  )
-                ],
+              Padding(
+                padding:
+                    !activeForm ? EdgeInsets.only(top: 20) : EdgeInsets.all(0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    customRichText(
+                      title: 'Total Attendance: ',
+                      message: '$presenceTotal',
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    customRichText(
+                      title: 'Total Late: ',
+                      message: '$lateTotal',
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    customRichText(
+                      title: 'Total Absent: ',
+                      message: '$absenceTotal',
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 50),
+                      child: !activeForm
+                          ? Container()
+                          : CustomButton(
+                              buttonName: 'Attendance',
+                              colorShadow: Colors.transparent,
+                              backgroundColorButton: !activeForm
+                                  ? AppColors.primaryButton
+                                  : Colors.green,
+                              borderColor: Colors.transparent,
+                              textColor: Colors.white,
+                              function: () {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        const AttendanceForm(),
+                                    transitionDuration:
+                                        const Duration(milliseconds: 300),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      return ScaleTransition(
+                                        scale: animation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                              height: 30,
+                              width: 90,
+                              fontSize: 13),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

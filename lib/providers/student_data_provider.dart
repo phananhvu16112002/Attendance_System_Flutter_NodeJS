@@ -14,6 +14,11 @@ class StudentDataProvider with ChangeNotifier {
 
   Student get userData => _student;
 
+  void setStudent(Student student) {
+    _student = student;
+    notifyListeners();
+  }
+
   void setStudentName(String userName) {
     _student.studentName = userName;
     notifyListeners();

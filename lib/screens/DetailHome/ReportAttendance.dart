@@ -221,6 +221,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                           AppColors.cardAttendance,
                                       borderColor: AppColors.secondaryText,
                                       textColor: AppColors.primaryButton,
+                                      colorShadow: Colors.transparent,
                                       function: () {},
                                       height: 35,
                                       width: 100,
@@ -251,6 +252,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                     buttonName: 'Send',
                                     backgroundColorButton:
                                         AppColors.primaryButton,
+                                    colorShadow: AppColors.colorShadow,
                                     borderColor: Colors.transparent,
                                     textColor: Colors.white,
                                     function: () {},
