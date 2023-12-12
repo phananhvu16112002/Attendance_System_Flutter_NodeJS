@@ -6,12 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({
-    super.key,
-    required this.context,
-  });
+  const CustomAppBar({super.key, required this.context, required this.address});
 
   final BuildContext context;
+  final String address;
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +41,7 @@ class CustomAppBar extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: AppColors.thirdText),
                         CustomText(
-                            message:
-                                studentDataProvider.userData.studentName,
+                            message: studentDataProvider.userData.studentName,
                             fontSize: 23,
                             fontWeight: FontWeight.w600,
                             color: Colors.white),
@@ -83,17 +80,27 @@ class CustomAppBar extends StatelessWidget {
                     const SizedBox(
                       height: 8,
                     ),
-                    const Row(
-                      children: [
-                        Icon(Icons.location_on_outlined,
-                            size: 11, color: Colors.white),
-                        CustomText(
-                            message:
-                                'Adress: 19 Nguyen Huu Tho, District 7, HCMC ',
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ],
+                    Container(
+                      width: 340,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.location_on_outlined,
+                              size: 11, color: Colors.white),
+                          Expanded(
+                            child: Text(
+                              '$address',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
@@ -101,35 +108,17 @@ class CustomAppBar extends StatelessWidget {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 30),
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                          width: 50,
-                          height: 50,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: const Center(
-                              child: Icon(Icons.grid_view_outlined))),
-                      const SizedBox(
-                        width: 5,
+                    padding: const EdgeInsets.only(top: 30, right: 5),
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(50))),
+                      child: Image.asset(
+                        'assets/images/logo.png',
                       ),
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(50))),
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                    )),
               ],
             ),
           ),

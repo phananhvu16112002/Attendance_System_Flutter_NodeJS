@@ -3,7 +3,6 @@ import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:http/http.dart' as http;
 
-
 class API {
   Future<List<StudentClasses>> getStudentClass() async {
     final URL = 'http://10.0.2.2:8080/test/getStudentClass';
@@ -41,7 +40,7 @@ class API {
     }
   }
 
-  Future<List<AttendanceDetail>> getAttendanceDetail() async {
+  Future<List<AttendanceDetail>> getAttendanceDetail(String classesID) async {
     final URL = 'http://10.0.2.2:8080/test/getAttendanceDetail';
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
@@ -56,10 +55,12 @@ class API {
         List<AttendanceDetail> data = [];
         for (var temp in attendanceDetailList) {
           if (temp is Map<String, dynamic>) {
-            try {
-              data.add(AttendanceDetail.fromJson(temp));
-            } catch (e) {
-              print('Error parsing data123: $e');
+            if (temp['classes'] == classesID) {
+              try {
+                data.add(AttendanceDetail.fromJson(temp));
+              } catch (e) {
+                print('Error parsing data: $e');
+              }
             }
           } else {
             print('Invalid data type: $temp');
@@ -75,4 +76,7 @@ class API {
       return [];
     }
   }
+
+  Future<void> takeAttendance(String studentID, String classID, String formID,
+      String imagePath) async {}
 }

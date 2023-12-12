@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:attendance_system_nodejs/services/NotificationService.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
-import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -69,7 +68,7 @@ class _TestState extends State<Test> {
     return Container(
       height: 100,
       width: MediaQuery.of(context).size.width,
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         children: <Widget>[
           const Text(

@@ -1,6 +1,7 @@
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
+import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class DetailPageBody extends StatefulWidget {
-  const DetailPageBody({super.key});
+  const DetailPageBody({super.key, required this.studentClasses});
+  final StudentClasses studentClasses;
 
   @override
   State<DetailPageBody> createState() => _DetailPageBodyState();
@@ -19,6 +21,15 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   bool activePresent = false;
   bool activeAbsent = false;
   bool activeLate = false;
+  late StudentClasses studentClasses;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    studentClasses = widget.studentClasses;
+  }
+
   @override
   Widget build(BuildContext context) {
     final attendanceDetailDataProvider =
@@ -158,7 +169,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             ),
             const SizedBox(height: 10),
             FutureBuilder(
-                future: API().getAttendanceDetail(),
+                future:
+                    API().getAttendanceDetail(studentClasses.classes.classID),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
@@ -182,7 +194,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               child: customCard(
                                   formatDate(data.dateAttendanced.toString()),
                                   formatTime(data.dateAttendanced.toString()),
-                                  'Successfully'),
+                                  getStatusText(
+                                      data.present, data.late, data.absence),
+                                  data.location),
                             );
                           });
                     }
@@ -195,7 +209,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     );
   }
 
-  Container customCard(String date, String timeAttendance, String status) {
+  Container customCard(
+      String date, String timeAttendance, String status, String location) {
     return Container(
       width: 405,
       height: 220,
@@ -239,7 +254,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                     children: [
                       customRichText(
                           'Location: ',
-                          'Ton Duc Thang University, District 7, Ho Chi Minh City',
+                          location,
                           FontWeight.bold,
                           FontWeight.w500,
                           AppColors.primaryText,
@@ -258,7 +273,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                         height: 10,
                       ),
                       customRichText(
-                          'Staus: ',
+                          'Status: ',
                           status,
                           FontWeight.bold,
                           FontWeight.w500,
@@ -336,8 +351,20 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     } else if (status.contains('Absent')) {
       return AppColors.importantText;
     } else {
-      // Mặc định hoặc trường hợp khác
       return AppColors.primaryText;
+    }
+  }
+
+  String getStatusText(bool present, bool late, bool absence) {
+    if (present) {
+      return 'Successfully';
+    } else if (late) {
+      return 'Late';
+    } else if (absence) {
+      return 'Absent';
+    } else {
+      // Nếu cả ba giá trị đều là false, trả về chuỗi "Absent"
+      return 'Absent';
     }
   }
 

@@ -9,7 +9,9 @@ import 'package:attendance_system_nodejs/providers/studentClass_data_provider.da
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
+import 'package:attendance_system_nodejs/services/GetLocation.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -28,6 +30,7 @@ class _HomePageBodyState extends State<HomePageBody> {
   bool activeQR = false;
   bool activeForm = false;
   Barcode? result;
+  String? address;
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
@@ -42,7 +45,15 @@ class _HomePageBodyState extends State<HomePageBody> {
 
   @override
   void initState() {
+    getLocation();
     super.initState();
+  }
+
+  Future<String?> getLocation() async {
+    Position position = await GetLocation().determinePosition();
+    address = await GetLocation().getAddressFromLatLong(position);
+    setState(() {});
+    return address;
   }
 
   @override
@@ -54,7 +65,10 @@ class _HomePageBodyState extends State<HomePageBody> {
         child: Column(
       children: [
         Stack(children: [
-          CustomAppBar(context: context),
+          CustomAppBar(
+            context: context,
+            address: '$address',
+          ),
           //Search Bar
           Positioned(
             top: 285,
@@ -185,7 +199,9 @@ class _HomePageBodyState extends State<HomePageBody> {
                                       PageRouteBuilder(
                                         pageBuilder: (context, animation,
                                                 secondaryAnimation) =>
-                                            const DetailPage(),
+                                            DetailPage(
+                                          studentClasses: data,
+                                        ),
                                         transitionDuration:
                                             const Duration(milliseconds: 200),
                                         transitionsBuilder: (context, animation,
@@ -208,7 +224,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                                     data.presenceTotal,
                                     data.lateTotal,
                                     data.absenceTotal,
-                                    true, // Chỉnh thành status Form
+                                    activeForm, // Chỉnh thành status Form
                                   ),
                                 ),
                               );
