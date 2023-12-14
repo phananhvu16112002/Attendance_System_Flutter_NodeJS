@@ -8,7 +8,8 @@
         android:label="attendance_system_nodejs"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBjNtm44putfr6AbU0N9GvBbXx3Y9HbxNY"/> 
+        
+        <!-- <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBjNtm44putfr6AbU0N9GvBbXx3Y9HbxNY"/>  -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

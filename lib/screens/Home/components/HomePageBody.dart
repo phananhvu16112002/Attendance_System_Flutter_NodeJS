@@ -5,11 +5,14 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
+import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
-import 'package:attendance_system_nodejs/screens/Home/AttendanceForm.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:attendance_system_nodejs/services/GetLocation.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -45,21 +48,63 @@ class _HomePageBodyState extends State<HomePageBody> {
 
   @override
   void initState() {
-    getLocation();
     super.initState();
+    checkLocationService();
   }
 
-  Future<String?> getLocation() async {
-    Position position = await GetLocation().determinePosition();
-    address = await GetLocation().getAddressFromLatLong(position);
-    setState(() {});
-    return address;
+  // Future<void> getLocation() async {
+  //   try {
+  //     Position position = await GetLocation().determinePosition();
+  //     var newAddress = await GetLocation().getAddressFromLatLong(position);
+
+  //     setState(() {
+  //       address = newAddress;
+  //     }); // Đưa vào Provider
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  Future<void> checkLocationService() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+    } else {
+      getLocation();
+    }
+  }
+
+  Future<void> getLocation() async {
+    try {
+      Position position = await GetLocation().determinePosition();
+      var newAddress = await GetLocation().getAddressFromLatLong(position);
+
+      // Check if the widget is still mounted before calling setState
+      if (mounted) {
+        var readLat = await SecureStorage().readSecureData('latitude');
+        var readLong = await SecureStorage().readSecureData('longtitude');
+        setState(() {
+          address = newAddress;
+
+          Provider.of<StudentDataProvider>(context, listen: false)
+              .setLocation(newAddress!);
+          Provider.of<StudentDataProvider>(context, listen: false)
+              .setLatitude(double.parse(readLat));
+          Provider.of<StudentDataProvider>(context, listen: false)
+              .setLatitude(double.parse(readLong));
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final classDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
+    final studentDataProvider =
+        Provider.of<StudentDataProvider>(context, listen: false);
     return SingleChildScrollView(
         //Column Tổng body
         child: Column(
@@ -67,12 +112,13 @@ class _HomePageBodyState extends State<HomePageBody> {
         Stack(children: [
           CustomAppBar(
             context: context,
-            address: '$address',
+            address: 'Address: ${studentDataProvider.userData.location}',
           ),
           //Search Bar
           Positioned(
             top: 285,
             left: 25,
+            right: 25,
             child: Container(
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -89,8 +135,8 @@ class _HomePageBodyState extends State<HomePageBody> {
                   controller: searchController,
                   textInputType: TextInputType.text,
                   obscureText: false,
-                  suffixIcon:
-                      IconButton(onPressed: () {}, icon: const Icon(null)),
+                  suffixIcon: IconButton(
+                      onPressed: () {}, icon: const Icon(Icons.search)),
                   prefixIcon: const Icon(Icons.search),
                   hintText: 'Search class | Example: CourseID,..',
                 )),
@@ -100,7 +146,6 @@ class _HomePageBodyState extends State<HomePageBody> {
 
           Container(
             color: AppColors.cardAttendance,
-            height: MediaQuery.of(context).size.height,
             margin: const EdgeInsets.only(top: 350),
             child: Column(
               children: [
@@ -214,17 +259,21 @@ class _HomePageBodyState extends State<HomePageBody> {
                                       ),
                                     );
                                   },
-                                  child: classInformation(
-                                    data.classes.course.totalWeeks,
-                                    data.classes.course.courseName,
-                                    data.classes.teacher.teacherName,
-                                    data.classes.course.courseID,
-                                    data.classes.shiftNumber,
-                                    data.classes.roomNumber,
-                                    data.presenceTotal,
-                                    data.lateTotal,
-                                    data.absenceTotal,
-                                    activeForm, // Chỉnh thành status Form
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 5, right: 5),
+                                    child: classInformation(
+                                      data.classes.course.totalWeeks,
+                                      data.classes.course.courseName,
+                                      data.classes.teacher.teacherName,
+                                      data.classes.course.courseID,
+                                      data.classes.shiftNumber,
+                                      data.classes.roomNumber,
+                                      data.presenceTotal,
+                                      data.lateTotal,
+                                      data.absenceTotal,
+                                      true, // Chỉnh thành status Form
+                                    ),
                                   ),
                                 ),
                               );
@@ -332,7 +381,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                 width: 25,
               ),
               Container(
-                width: 155,
+                width: 140,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -397,15 +446,16 @@ class _HomePageBodyState extends State<HomePageBody> {
               ),
               Container(
                   margin: const EdgeInsets.only(bottom: 25),
-                  height: 75,
+                  height: 90,
                   width: 2,
                   color: const Color.fromARGB(96, 190, 188, 188)),
               const SizedBox(
                 width: 10,
               ),
               Padding(
-                padding:
-                    !activeForm ? EdgeInsets.only(top: 20) : EdgeInsets.all(0),
+                padding: !activeForm
+                    ? const EdgeInsets.only(top: 20, bottom: 20)
+                    : const EdgeInsets.all(0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -443,7 +493,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                       height: 15,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 50),
+                      padding: const EdgeInsets.only(left: 20),
                       child: !activeForm
                           ? Container()
                           : CustomButton(
@@ -460,7 +510,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                                   PageRouteBuilder(
                                     pageBuilder: (context, animation,
                                             secondaryAnimation) =>
-                                        const AttendanceForm(),
+                                        const AttendanceFormPage(),
                                     transitionDuration:
                                         const Duration(milliseconds: 300),
                                     transitionsBuilder: (context, animation,

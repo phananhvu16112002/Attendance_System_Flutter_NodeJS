@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:attendance_system_nodejs/models/Student.dart';
 import 'package:http/http.dart' as http;
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 
@@ -61,7 +60,6 @@ class Authenticate {
       var studentID = responseData['studentID'];
       var studentEmail = responseData['studentEmail'];
       var studentName = responseData['studentName'];
-
 
       print('--Response Data: $responseData');
 

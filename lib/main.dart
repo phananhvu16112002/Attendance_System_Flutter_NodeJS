@@ -9,13 +9,11 @@ import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dar
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/screens/Home/AfterAttendance.dart';
-import 'package:attendance_system_nodejs/screens/Home/AttendanceForm.dart';
-import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
-import 'package:attendance_system_nodejs/screens/Home/TestMap.dart';
+import 'package:attendance_system_nodejs/screens/Test.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -62,11 +60,11 @@ class _MyAppState extends State<MyApp> {
         '/CreateNewPassword': (context) => const CreateNewPassword(),
         '/OTP': (context) => const OTPPage(),
         '/HomePage': (context) => const HomePage(),
-        '/AttendanceForm': (context) => const AttendanceForm(),
+        '/AttendanceForm': (context) => const AttendanceFormPage(),
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },
-      home: HomePage(),
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

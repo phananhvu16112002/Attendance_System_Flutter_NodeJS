@@ -25,7 +25,7 @@ class CustomAppBar extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 15, top: 25),
+            padding: const EdgeInsets.only(left: 15, top: 25, right: 10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -81,7 +81,7 @@ class CustomAppBar extends StatelessWidget {
                       height: 8,
                     ),
                     Container(
-                      width: 340,
+                      width: 290,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -89,8 +89,8 @@ class CustomAppBar extends StatelessWidget {
                               size: 11, color: Colors.white),
                           Expanded(
                             child: Text(
-                              '$address',
-                              style: TextStyle(
+                              address,
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,

@@ -31,7 +31,7 @@ class _ReportPageState extends State<ReportPage> {
           ]),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 13),
+          padding: const EdgeInsets.only(left: 13,right: 13),
           child: Column(
             children: [
               const SizedBox(
@@ -123,7 +123,7 @@ class _ReportPageState extends State<ReportPage> {
       child: Row(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 10),
+            padding: const EdgeInsets.only(left: 10, right: 10),
             child: Image.asset(
               pathStatus,
               width: 35,
@@ -134,7 +134,7 @@ class _ReportPageState extends State<ReportPage> {
             width: 15,
           ),
           Container(
-            width: 240,
+            width: 220,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -248,7 +248,7 @@ class _ReportPageState extends State<ReportPage> {
                 color: AppColors.primaryText),
           ),
           const SizedBox(
-            width: 30,
+            width: 15,
           ),
           const CustomText(
               message: 'Detail',

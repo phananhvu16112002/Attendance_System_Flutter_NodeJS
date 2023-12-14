@@ -5,18 +5,18 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/services/SmartCamera.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
-import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
-class AttendanceForm extends StatefulWidget {
-  const AttendanceForm({super.key});
+class AttendanceFormPage extends StatefulWidget {
+  const AttendanceFormPage({super.key});
 
   @override
-  State<AttendanceForm> createState() => _AttendancePageState();
+  State<AttendanceFormPage> createState() => _AttendancePageState();
 }
 
-class _AttendancePageState extends State<AttendanceForm> {
+class _AttendancePageState extends State<AttendanceFormPage> {
   XFile? file;
 
   @override
@@ -28,10 +28,17 @@ class _AttendancePageState extends State<AttendanceForm> {
 
   Future<void> getImage() async {
     var value = await SecureStorage().readSecureData('image');
-    print(value);
-    setState(() {
-      file = XFile(value);
-    });
+    if (value.isNotEmpty && value != 'No Data Found') {
+      print(value);
+      setState(() {
+        file = XFile(value);
+      });
+    } else {
+      // Handle the case where the file path is empty or invalid
+      setState(() {
+        file = null;
+      });
+    }
   }
 
   @override
@@ -63,7 +70,7 @@ class _AttendancePageState extends State<AttendanceForm> {
   SingleChildScrollView bodyAttendance() {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.only(left: 14),
+        padding: const EdgeInsets.only(left: 15, right: 15),
         // Column Tổng
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,7 +133,7 @@ class _AttendancePageState extends State<AttendanceForm> {
               height: 10,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 15),
+              padding: const EdgeInsets.only(left: 0),
               child: CustomButton(
                   buttonName: 'Attendance',
                   colorShadow: AppColors.colorShadow,
@@ -149,7 +156,7 @@ class _AttendancePageState extends State<AttendanceForm> {
   Container infoLocation() {
     return Container(
       width: 405,
-      height: 50,
+      height: 70,
       decoration: const BoxDecoration(
           color: AppColors.cardAttendance,
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -160,7 +167,7 @@ class _AttendancePageState extends State<AttendanceForm> {
                 offset: Offset(0.0, 0.0))
           ]),
       child: Padding(
-        padding: const EdgeInsets.only(left: 12, top: 15),
+        padding: const EdgeInsets.only(left: 12, top: 15, bottom: 15),
         child: customRichText(
             'Location: ',
             '19 Nguyen Huu Tho, District 7, Ho Chi Minh City',
@@ -206,7 +213,7 @@ class _AttendancePageState extends State<AttendanceForm> {
               Container(
                 margin: const EdgeInsets.only(left: 15, top: 10),
                 child: Container(
-                  width: 220,
+                  width: 190,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -314,5 +321,17 @@ class _AttendancePageState extends State<AttendanceForm> {
         ),
       ),
     ]));
+  }
+
+  String formatDate(String date) {
+    DateTime serverDateTime = DateTime.parse(date);
+    String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+    return formattedDate;
+  }
+
+  String formatTime(String time) {
+    DateTime serverDateTime = DateTime.parse(time);
+    String formattedTime = DateFormat('HH:mm:ss').format(serverDateTime);
+    return formattedTime;
   }
 }

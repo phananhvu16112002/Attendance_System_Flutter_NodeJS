@@ -82,7 +82,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
           ),
         ),
         body: Padding(
-          padding: const EdgeInsets.only(top: 10, left: 15),
+          padding: const EdgeInsets.only(top: 10, left: 15,right: 15),
           child: Container(
             width: 400,
             height: 700,
@@ -117,7 +117,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 15),
+                        padding: const EdgeInsets.only(left: 15,right: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -215,6 +215,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                 ),
                                 Row(
                                   children: [
+                                    //Call bottom modal imagepicker gallery or camera
                                     CustomButton(
                                       buttonName: 'Upload File',
                                       backgroundColorButton:

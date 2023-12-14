@@ -1,7 +1,6 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/Classroom.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/components/DetailPageBody.dart';
@@ -89,7 +88,7 @@ class _DetailPageState extends State<DetailPage> {
               CustomText(
                   message: studentClasses.classes.course.courseName,
                   fontSize: 25,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                   color: Colors.white),
               Row(
                 children: [

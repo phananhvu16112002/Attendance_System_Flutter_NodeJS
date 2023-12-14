@@ -47,7 +47,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             ),
             Container(
               width: MediaQuery.of(context).size.width,
-              height: 50,
+              height: 45,
               decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -70,7 +70,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       });
                     },
                     child: Container(
-                      width: 100,
+                      width: 95,
                       decoration: BoxDecoration(
                           color: activeTotal
                               ? AppColors.cardAttendance
@@ -81,7 +81,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                         child: CustomText(
                             message: 'Total: 10',
                             fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.primaryText),
                       ),
                     ),
@@ -96,7 +96,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       });
                     },
                     child: Container(
-                      width: 100,
+                      width: 95,
                       decoration: BoxDecoration(
                           color: activePresent
                               ? const Color.fromARGB(94, 137, 210, 64)
@@ -107,7 +107,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                         child: CustomText(
                             message: 'Present: 5',
                             fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.primaryText),
                       ),
                     ),
@@ -122,7 +122,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       });
                     },
                     child: Container(
-                      width: 100,
+                      width: 95,
                       decoration: BoxDecoration(
                           color: activeAbsent
                               ? const Color.fromARGB(216, 219, 87, 87)
@@ -133,7 +133,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                         child: CustomText(
                             message: 'Absent: 3',
                             fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.primaryText),
                       ),
                     ),
@@ -148,7 +148,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       });
                     },
                     child: Container(
-                      width: 100,
+                      width: 95,
                       decoration: BoxDecoration(
                           color: activeLate
                               ? const Color.fromARGB(231, 232, 156, 63)
@@ -157,9 +157,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               const BorderRadius.all(Radius.circular(10))),
                       child: const Center(
                         child: CustomText(
-                            message: 'Late: 2',
+                            message: 'Late: 3',
                             fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.primaryText),
                       ),
                     ),
@@ -228,7 +228,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
           CustomText(
               message: date.toString(),
               fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: AppColors.primaryText),
           const SizedBox(
             height: 2,
@@ -242,11 +242,11 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             height: 5,
           ),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                margin: const EdgeInsets.only(left: 15, top: 10),
+                margin: const EdgeInsets.only(left: 15),
                 child: Container(
                   width: 230,
                   child: Column(
@@ -255,7 +255,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       customRichText(
                           'Location: ',
                           location,
-                          FontWeight.bold,
+                          FontWeight.w600,
                           FontWeight.w500,
                           AppColors.primaryText,
                           AppColors.primaryText),
@@ -265,7 +265,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       customRichText(
                           'Time Attendance: ',
                           timeAttendance.toString(),
-                          FontWeight.bold,
+                          FontWeight.w600,
                           FontWeight.w500,
                           AppColors.primaryText,
                           AppColors.primaryText),
@@ -275,7 +275,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       customRichText(
                           'Status: ',
                           status,
-                          FontWeight.bold,
+                          FontWeight.w600,
                           FontWeight.w500,
                           AppColors.primaryText,
                           getColorBasedOnStatus(status)),
@@ -288,8 +288,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
               ),
               Container(
                 margin: const EdgeInsets.only(right: 10, top: 10),
-                height: 140,
-                width: 140,
+                height: 130,
+                width: 130,
                 child: Image.asset('assets/images/logo.png'),
               ),
             ],

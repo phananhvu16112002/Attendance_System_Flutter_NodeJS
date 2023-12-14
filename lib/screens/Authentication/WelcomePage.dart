@@ -32,10 +32,10 @@ class _WelcomePageState extends State<WelcomePage> {
             children: [
               const ImageSlider(),
               Container(
-                height: MediaQuery.of(context).size.height,
+                
                 color: Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 10, left: 15),
+                  padding: const EdgeInsets.only(top: 10, left: 15,right: 15),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -62,14 +62,15 @@ class _WelcomePageState extends State<WelcomePage> {
                                   'DUC ',
                                   'THANG ',
                                   'UNIVERISTY',
-                                  FontWeight.w800,
-                                  40,
+                                  FontWeight.w700,
+                                  30,
                                   const Color(0xff0364A9),
                                   const Color(0xff0364A9),
                                   const Color(0xff0364A9),
                                   AppColors.primaryText))
                         ],
                       ),
+                      const SizedBox(height: 5,),
                       CustomText(
                           message: descriptionSchool,
                           fontSize: 15,
@@ -79,7 +80,7 @@ class _WelcomePageState extends State<WelcomePage> {
                         height: 20,
                       ),
                       Padding(
-                          padding: const EdgeInsets.only(right: 15),
+                          padding: const EdgeInsets.only(right: 0),
                           child: CustomButton(
                               fontSize: 20,
                               height: 60,
@@ -87,7 +88,7 @@ class _WelcomePageState extends State<WelcomePage> {
                               buttonName: 'Login',
                               colorShadow: AppColors.colorShadow,
                               backgroundColorButton: AppColors.primaryButton,
-                              borderColor: Colors.white,
+                              borderColor: Colors.transparent,
                               textColor: Colors.white,
                               function: () => Navigator.pushReplacement(
                                     context,
@@ -118,7 +119,7 @@ class _WelcomePageState extends State<WelcomePage> {
                         height: 20,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 0),
                         child: CustomButton(
                             fontSize: 20,
                             height: 60,
@@ -126,8 +127,8 @@ class _WelcomePageState extends State<WelcomePage> {
                             buttonName: 'Register',
                             colorShadow: Colors.transparent,
                             backgroundColorButton: Colors.white,
-                            borderColor: AppColors.primaryText,
-                            textColor: AppColors.primaryText,
+                            borderColor: AppColors.primaryButton,
+                            textColor: AppColors.primaryButton,
                             function: () => Navigator.pushReplacement(
                                   context,
                                   PageRouteBuilder(

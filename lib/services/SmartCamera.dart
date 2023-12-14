@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:attendance_system_nodejs/screens/Home/AttendanceForm.dart';
-import 'package:attendance_system_nodejs/screens/Test.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
@@ -30,10 +29,13 @@ class _SmartCameraState extends State<SmartCamera> {
             print('Successfully: ${a}');
             Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (builder) => AttendanceForm()),
+                MaterialPageRoute(
+                    builder: (builder) => const AttendanceFormPage()),
                 (route) => false);
           }
         },
+        showFlashControl: false,
+        showCameraLensControl: false,
         autoCapture: true,
         defaultCameraLens: CameraLens.front,
       ),

@@ -37,9 +37,8 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
           children: [
             Image.asset('assets/images/forgot.png'),
             Container(
-              height: MediaQuery.of(context).size.height,
               child: Padding(
-                padding: const EdgeInsets.only(left: 20, top: 15),
+                padding: const EdgeInsets.only(left: 15, top: 15, right: 15),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -140,7 +139,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                         height: 15,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(right: 20),
+                        padding: const EdgeInsets.only(right: 0),
                         child: CustomButton(
                           fontSize: 20,
                           height: 60,

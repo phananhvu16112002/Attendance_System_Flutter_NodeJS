@@ -1,13 +1,15 @@
 import 'dart:io';
 
+import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
+import 'package:attendance_system_nodejs/screens/Home/AfterAttendance.dart';
+import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:attendance_system_nodejs/services/NotificationService.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Test extends StatefulWidget {
-  const Test({Key? key, required this.payload}) : super(key: key);
-  final String payload;
+  const Test({Key? key}) : super(key: key);
 
   @override
   State<Test> createState() => _TestState();
@@ -18,11 +20,14 @@ class _TestState extends State<Test> {
   XFile? _imageFile; // Change type to XFile
   final ImagePicker _picker = ImagePicker();
   XFile? file;
+  TextEditingController studentID = TextEditingController();
+  TextEditingController classID = TextEditingController();
+  TextEditingController formID = TextEditingController();
+  XFile? image;
 
   @override
   void initState() {
     super.initState();
-    getValue();
   }
 
   Future<void> getValue() async {
@@ -35,9 +40,11 @@ class _TestState extends State<Test> {
 
   @override
   void dispose() {
+    studentID.dispose();
+    classID.dispose();
+    formID.dispose();
+    super.dispose();
     // TODO: implement dispose
-    file;
-    _imageFile;
   }
 
   @override
@@ -45,7 +52,33 @@ class _TestState extends State<Test> {
     return Scaffold(
       body: Center(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            CustomTextField(
+                controller: studentID,
+                textInputType: TextInputType.text,
+                obscureText: false,
+                suffixIcon: IconButton(onPressed: () {}, icon: Icon(null)),
+                hintText: 'Student',
+                prefixIcon: Icon(null),
+                readOnly: false),
+            CustomTextField(
+                controller: classID,
+                textInputType: TextInputType.text,
+                obscureText: false,
+                suffixIcon: IconButton(onPressed: () {}, icon: Icon(null)),
+                hintText: 'Class',
+                prefixIcon: Icon(null),
+                readOnly: false),
+            CustomTextField(
+                controller: formID,
+                textInputType: TextInputType.text,
+                obscureText: false,
+                suffixIcon: IconButton(onPressed: () {}, icon: Icon(null)),
+                hintText: 'Form',
+                prefixIcon: Icon(null),
+                readOnly: false),
             ElevatedButton(
               onPressed: () {
                 showModalBottomSheet(
@@ -55,9 +88,29 @@ class _TestState extends State<Test> {
               },
               child: const Text('Click'),
             ),
-            file != null
-                ? Image.file(File(file!.path))
-                : Image.asset('assets/images/logo.png'),
+            _imageFile != null
+                ? Image.file(
+                    File(_imageFile!.path),
+                    width: 100,
+                    height: 100,
+                  )
+                : Container(),
+            ElevatedButton(
+                onPressed: () async {
+                  final check = await API().takeAttendance(
+                      studentID.text, classID.text, formID.text, image!);
+                  if (check) {
+                    print('image $image');
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (builder) => AfterAttendance()));
+                  } else {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('Failed')));
+                  }
+                },
+                child: Text('Post'))
           ],
         ),
       ),
@@ -100,6 +153,7 @@ class _TestState extends State<Test> {
     if (pickedFile != null) {
       setState(() {
         _imageFile = pickedFile;
+        image = pickedFile;
       });
       print('ImageFile: $_imageFile');
       print('ImageFile Path: ${_imageFile!.path}');

@@ -29,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       bottomLeft: Radius.circular(15),
                       bottomRight: Radius.circular(15))),
               child: Padding(
-                padding: const EdgeInsets.only(top: 0, left: 10),
+                padding: const EdgeInsets.only(top: 0, left: 10, right: 10),
                 child: Row(
                   children: [
                     Container(
@@ -116,43 +116,46 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Container customOptions(
+  Padding customOptions(
     BuildContext context,
     String pathImage,
     String title,
   ) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 50,
-      color: Color.fromARGB(94, 237, 235, 235),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              const SizedBox(
-                width: 20,
-              ),
-              Image.asset(
-                pathImage,
-                width: 25,
-                height: 25,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              CustomText(
-                  message: title,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryText)
-            ],
-          ),
-          const Icon(
-            Icons.arrow_forward_ios_outlined,
-            size: 15,
-          )
-        ],
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 50,
+        color: Color.fromARGB(94, 237, 235, 235),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                const SizedBox(
+                  width: 20,
+                ),
+                Image.asset(
+                  pathImage,
+                  width: 25,
+                  height: 25,
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                CustomText(
+                    message: title,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryText)
+              ],
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_outlined,
+              size: 15,
+            )
+          ],
+        ),
       ),
     );
   }

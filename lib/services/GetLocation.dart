@@ -1,4 +1,4 @@
-import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -32,6 +32,9 @@ class GetLocation {
         forceAndroidLocationManager: true);
     latitude = position.latitude;
     longtitude = position.longitude;
+    await SecureStorage().writeSecureData('latitude', latitude.toString());
+    await SecureStorage().writeSecureData('longtitude', longtitude.toString());
+
     positionMain = position;
     return position;
   }
@@ -41,11 +44,7 @@ class GetLocation {
         await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark place = placemark[0];
     address =
-        '${place.street},${place.locality},${place.administrativeArea},${place.country}';
-    await SecureStorage().writeSecureData('location', address!);
-
-    print('Successfully');
-
+        '${place.street},${place.locality},${place.subAdministrativeArea},${place.administrativeArea},${place.country}';
     return address;
   }
 }

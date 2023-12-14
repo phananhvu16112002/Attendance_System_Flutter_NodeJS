@@ -54,7 +54,7 @@ class _OTPPageState extends State<OTPPage> {
             Container(
               height: MediaQuery.of(context).size.height,
               child: Padding(
-                padding: const EdgeInsets.only(top: 15, left: 20),
+                padding: const EdgeInsets.only(top: 15, left: 15,right: 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -75,7 +75,7 @@ class _OTPPageState extends State<OTPPage> {
                       height: 20,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 20),
+                      padding: const EdgeInsets.only(right: 0),
                       child: OTPTextField(
                         controller: otpController,
                         textFieldAlignment: MainAxisAlignment.spaceEvenly,
@@ -155,7 +155,7 @@ class _OTPPageState extends State<OTPPage> {
                       height: 15,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 20),
+                      padding: const EdgeInsets.only(right: 0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

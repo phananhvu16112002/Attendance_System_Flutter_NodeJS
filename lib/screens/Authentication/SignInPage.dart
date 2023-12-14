@@ -48,9 +48,8 @@ class _SignInPageState extends State<SignInPage> {
         children: [
           const ImageSlider(),
           Container(
-            height: MediaQuery.of(context).size.height,
             child: Padding(
-              padding: const EdgeInsets.only(top: 15, left: 20),
+              padding: const EdgeInsets.only(top: 15, left: 20, right: 20),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -145,41 +144,39 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 250),
+                      padding: const EdgeInsets.only(left: 230),
                       child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const ForgotPassword(),
-                              transitionDuration:
-                                  const Duration(milliseconds: 300),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                return ScaleTransition(
-                                  scale: animation,
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        child: const CustomText(
-                          message: 'Forgot Password?',
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.importantText,
-                        ),
-                      ),
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const ForgotPassword(),
+                                transitionDuration:
+                                    const Duration(milliseconds: 300),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return ScaleTransition(
+                                    scale: animation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                          child: CustomText(
+                              message: 'Forgot Password?',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.importantText)),
                     ),
 
                     const SizedBox(
                       height: 20,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 20),
+                      padding: const EdgeInsets.only(right: 0, left: 0),
                       child: CustomButton(
                           fontSize: 20,
                           height: 60,

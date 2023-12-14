@@ -10,7 +10,10 @@ class StudentDataProvider with ChangeNotifier {
       hashedOTP: '',
       accessToken: '',
       refreshToken: '',
-      active: false);
+      active: false,
+      latitude: 0,
+      longtitude: 0,
+      location: '');
 
   Student get userData => _student;
 
@@ -56,6 +59,21 @@ class StudentDataProvider with ChangeNotifier {
 
   void setActive(bool active) {
     _student.active = active;
+    notifyListeners();
+  }
+
+  void setLatitude(double latitude) {
+    _student.latitude = latitude;
+    notifyListeners();
+  }
+
+  void setLongtitude(double longtitude) {
+    _student.longtitude = longtitude;
+    notifyListeners();
+  }
+
+  void setLocation(String location) {
+    _student.location = location;
     notifyListeners();
   }
 
