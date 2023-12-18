@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
+import 'package:attendance_system_nodejs/screens/Home/FloatingButtonMap.dart';
 import 'package:attendance_system_nodejs/screens/Home/components/HomePageBody.dart';
 import 'package:attendance_system_nodejs/screens/Home/NotificationsPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
@@ -70,7 +71,23 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: AppColors.primaryButton,
           foregroundColor: Colors.white,
           elevation: 2,
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const FloatingButtonMap(),
+                transitionDuration: const Duration(milliseconds: 300),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  );
+                },
+              ),
+            );
+          },
           child: const Icon(
             Icons.location_on_outlined,
             size: 30,

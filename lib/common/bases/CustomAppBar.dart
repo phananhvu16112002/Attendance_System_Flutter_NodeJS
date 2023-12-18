@@ -107,18 +107,14 @@ class CustomAppBar extends StatelessWidget {
                     ),
                   ],
                 ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 30, right: 5),
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(50))),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                      ),
-                    )),
+                const Padding(
+                  padding: EdgeInsets.only(top: 30, right: 5),
+                  child: CircleAvatar(
+                    radius: 30,
+                    backgroundImage: AssetImage('assets/images/logo.png'),
+                    backgroundColor: Colors.white,
+                  ),
+                ),
               ],
             ),
           ),

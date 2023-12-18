@@ -1,3 +1,4 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomAppBar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomRichText.dart';
@@ -5,7 +6,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
-import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
@@ -52,25 +53,12 @@ class _HomePageBodyState extends State<HomePageBody> {
     checkLocationService();
   }
 
-  // Future<void> getLocation() async {
-  //   try {
-  //     Position position = await GetLocation().determinePosition();
-  //     var newAddress = await GetLocation().getAddressFromLatLong(position);
-
-  //     setState(() {
-  //       address = newAddress;
-  //     }); // Đưa vào Provider
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
-
   Future<void> checkLocationService() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
+      showSettingsAlert();
     } else {
-      getLocation();
+      await getLocation(); // Wait for the asynchronous work to complete
     }
   }
 
@@ -79,19 +67,22 @@ class _HomePageBodyState extends State<HomePageBody> {
       Position position = await GetLocation().determinePosition();
       var newAddress = await GetLocation().getAddressFromLatLong(position);
 
-      // Check if the widget is still mounted before calling setState
       if (mounted) {
         var readLat = await SecureStorage().readSecureData('latitude');
-        var readLong = await SecureStorage().readSecureData('longtitude');
+        var readLong = await SecureStorage().readSecureData('longitude');
+
+        // Perform the asynchronous work outside of setState
+        address = newAddress ?? 'Default Address'; // Thêm kiểm tra null
+        Provider.of<StudentDataProvider>(context, listen: false)
+            .setLocation(address!);
+        Provider.of<StudentDataProvider>(context, listen: false)
+            .setLatitude(double.parse(readLat));
+        Provider.of<StudentDataProvider>(context, listen: false)
+            .setLongtitude(double.parse(readLong));
+
+        // Update the state synchronously after the asynchronous work is done
         setState(() {
           address = newAddress;
-
-          Provider.of<StudentDataProvider>(context, listen: false)
-              .setLocation(newAddress!);
-          Provider.of<StudentDataProvider>(context, listen: false)
-              .setLatitude(double.parse(readLat));
-          Provider.of<StudentDataProvider>(context, listen: false)
-              .setLatitude(double.parse(readLong));
         });
       }
     } catch (e) {
@@ -99,12 +90,37 @@ class _HomePageBodyState extends State<HomePageBody> {
     }
   }
 
+  void showSettingsAlert() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Location Permission'),
+        content: const Text('Please grant permission to get your location.'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Đóng hộp thoại
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await Geolocator.openLocationSettings();
+            },
+            child: const Text(
+              'Open Settings',
+              style: TextStyle(color: AppColors.primaryButton),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final classDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
-    final studentDataProvider =
-        Provider.of<StudentDataProvider>(context, listen: false);
     return SingleChildScrollView(
         //Column Tổng body
         child: Column(
@@ -112,7 +128,7 @@ class _HomePageBodyState extends State<HomePageBody> {
         Stack(children: [
           CustomAppBar(
             context: context,
-            address: 'Address: ${studentDataProvider.userData.location}',
+            address: 'Address: $address',
           ),
           //Search Bar
           Positioned(
@@ -145,73 +161,74 @@ class _HomePageBodyState extends State<HomePageBody> {
           //Body 2
 
           Container(
-            color: AppColors.cardAttendance,
             margin: const EdgeInsets.only(top: 350),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          activeQR = false;
-                        });
-                      },
-                      child: Container(
-                        width: 142,
-                        height: 30,
-                        margin: const EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                            color: activeQR
-                                ? Colors.white
-                                : AppColors.primaryButton,
-                            border: Border.all(
-                                color: AppColors.secondaryText, width: 1),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(5))),
-                        child: Center(
-                            child: CustomText(
-                                message: 'Take Attendance',
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: activeQR
-                                    ? AppColors.primaryText
-                                    : Colors.white)),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            activeQR = false;
+                          });
+                        },
+                        child: Container(
+                          width: 142,
+                          height: 30,
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                              color: activeQR
+                                  ? Colors.white
+                                  : AppColors.primaryButton,
+                              border: Border.all(
+                                  color: AppColors.secondaryText, width: 1),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5))),
+                          child: Center(
+                              child: CustomText(
+                                  message: 'Take Attendance',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: activeQR
+                                      ? AppColors.primaryText
+                                      : Colors.white)),
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          activeQR = true;
-                        });
-                      },
-                      child: Container(
-                        width: 142,
-                        height: 26,
-                        margin: const EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                            color: activeQR
-                                ? AppColors.primaryButton
-                                : Colors.white,
-                            border: Border.all(
-                                color: AppColors.secondaryText, width: 1),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(5))),
-                        child: Center(
-                            child: CustomText(
-                                message: 'Scan QR',
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: activeQR
-                                    ? Colors.white
-                                    : AppColors.primaryText)),
+                      const SizedBox(
+                        width: 10,
                       ),
-                    )
-                  ],
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            activeQR = true;
+                          });
+                        },
+                        child: Container(
+                          width: 142,
+                          height: 26,
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                              color: activeQR
+                                  ? AppColors.primaryButton
+                                  : Colors.white,
+                              border: Border.all(
+                                  color: AppColors.secondaryText, width: 1),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5))),
+                          child: Center(
+                              child: CustomText(
+                                  message: 'Scan QR',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: activeQR
+                                      ? Colors.white
+                                      : AppColors.primaryText)),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 if (!activeQR)
                   FutureBuilder(
