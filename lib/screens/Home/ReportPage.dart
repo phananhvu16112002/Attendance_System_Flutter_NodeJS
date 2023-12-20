@@ -31,7 +31,7 @@ class _ReportPageState extends State<ReportPage> {
           ]),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 13,right: 13),
+          padding: const EdgeInsets.only(left: 13, right: 13),
           child: Column(
             children: [
               const SizedBox(
@@ -240,7 +240,7 @@ class _ReportPageState extends State<ReportPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 20),
+            padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
             child: Container(
                 margin: const EdgeInsets.only(bottom: 25),
                 height: 180,

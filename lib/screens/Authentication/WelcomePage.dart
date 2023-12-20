@@ -32,10 +32,10 @@ class _WelcomePageState extends State<WelcomePage> {
             children: [
               const ImageSlider(),
               Container(
-                
                 color: Colors.white,
+                height: MediaQuery.of(context).size.height,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 10, left: 15,right: 15),
+                  padding: const EdgeInsets.only(top: 10, left: 15, right: 15),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -70,7 +70,9 @@ class _WelcomePageState extends State<WelcomePage> {
                                   AppColors.primaryText))
                         ],
                       ),
-                      const SizedBox(height: 5,),
+                      const SizedBox(
+                        height: 5,
+                      ),
                       CustomText(
                           message: descriptionSchool,
                           fontSize: 15,

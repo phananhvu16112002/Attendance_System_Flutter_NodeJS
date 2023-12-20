@@ -1,3 +1,4 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomAppBar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomRichText.dart';
@@ -5,7 +6,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
-import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
@@ -52,46 +53,39 @@ class _HomePageBodyState extends State<HomePageBody> {
     checkLocationService();
   }
 
-  // Future<void> getLocation() async {
-  //   try {
-  //     Position position = await GetLocation().determinePosition();
-  //     var newAddress = await GetLocation().getAddressFromLatLong(position);
-
-  //     setState(() {
-  //       address = newAddress;
-  //     }); // Đưa vào Provider
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
-
   Future<void> checkLocationService() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
+      showSettingsAlert();
     } else {
-      getLocation();
+      await getLocation(); // Wait for the asynchronous work to complete
     }
   }
 
   Future<void> getLocation() async {
     try {
+      // Capture the context before entering the asynchronous block
+      var currentContext = context;
+
       Position position = await GetLocation().determinePosition();
       var newAddress = await GetLocation().getAddressFromLatLong(position);
 
-      // Check if the widget is still mounted before calling setState
       if (mounted) {
         var readLat = await SecureStorage().readSecureData('latitude');
-        var readLong = await SecureStorage().readSecureData('longtitude');
+        var readLong = await SecureStorage().readSecureData('longitude');
+
+        // Perform the asynchronous work outside of setState
+        address = newAddress ?? 'Default Address';
+        Provider.of<StudentDataProvider>(currentContext, listen: false)
+            .setLocation(address!);
+        Provider.of<StudentDataProvider>(currentContext, listen: false)
+            .setLatitude(double.parse(readLat));
+        Provider.of<StudentDataProvider>(currentContext, listen: false)
+            .setLongtitude(double.parse(readLong));
+
+        // Update the state synchronously after the asynchronous work is done
         setState(() {
           address = newAddress;
-
-          Provider.of<StudentDataProvider>(context, listen: false)
-              .setLocation(newAddress!);
-          Provider.of<StudentDataProvider>(context, listen: false)
-              .setLatitude(double.parse(readLat));
-          Provider.of<StudentDataProvider>(context, listen: false)
-              .setLatitude(double.parse(readLong));
         });
       }
     } catch (e) {
@@ -99,12 +93,38 @@ class _HomePageBodyState extends State<HomePageBody> {
     }
   }
 
+  void showSettingsAlert() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Location Permission'),
+        content: const Text('Please grant permission to get your location.'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Đóng hộp thoại
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await Geolocator.openLocationSettings();
+            },
+            child: const Text(
+              'Open Settings',
+              style: TextStyle(color: AppColors.primaryButton),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final classDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
-    final studentDataProvider =
-        Provider.of<StudentDataProvider>(context, listen: false);
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return SingleChildScrollView(
         //Column Tổng body
         child: Column(
@@ -145,144 +165,154 @@ class _HomePageBodyState extends State<HomePageBody> {
           //Body 2
 
           Container(
-            color: AppColors.cardAttendance,
             margin: const EdgeInsets.only(top: 350),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          activeQR = false;
-                        });
-                      },
-                      child: Container(
-                        width: 142,
-                        height: 30,
-                        margin: const EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                            color: activeQR
-                                ? Colors.white
-                                : AppColors.primaryButton,
-                            border: Border.all(
-                                color: AppColors.secondaryText, width: 1),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(5))),
-                        child: Center(
-                            child: CustomText(
-                                message: 'Take Attendance',
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: activeQR
-                                    ? AppColors.primaryText
-                                    : Colors.white)),
+                Container(
+                  color: Colors.amber,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            activeQR = false;
+                          });
+                        },
+                        child: Container(
+                          width: 142,
+                          height: 30,
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                              color: activeQR
+                                  ? Colors.white
+                                  : AppColors.primaryButton,
+                              border: Border.all(
+                                  color: AppColors.secondaryText, width: 1),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5))),
+                          child: Center(
+                              child: CustomText(
+                                  message: 'Take Attendance',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: activeQR
+                                      ? AppColors.primaryText
+                                      : Colors.white)),
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          activeQR = true;
-                        });
-                      },
-                      child: Container(
-                        width: 142,
-                        height: 26,
-                        margin: const EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                            color: activeQR
-                                ? AppColors.primaryButton
-                                : Colors.white,
-                            border: Border.all(
-                                color: AppColors.secondaryText, width: 1),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(5))),
-                        child: Center(
-                            child: CustomText(
-                                message: 'Scan QR',
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: activeQR
-                                    ? Colors.white
-                                    : AppColors.primaryText)),
+                      const SizedBox(
+                        width: 10,
                       ),
-                    )
-                  ],
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            activeQR = true;
+                          });
+                        },
+                        child: Container(
+                          width: 142,
+                          height: 26,
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                              color: activeQR
+                                  ? AppColors.primaryButton
+                                  : Colors.white,
+                              border: Border.all(
+                                  color: AppColors.secondaryText, width: 1),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5))),
+                          child: Center(
+                              child: CustomText(
+                                  message: 'Scan QR',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: activeQR
+                                      ? Colors.white
+                                      : AppColors.primaryText)),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 if (!activeQR)
-                  FutureBuilder(
-                    future: API().getStudentClass(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (snapshot.hasData) {
-                        if (snapshot.data != null) {
-                          List<StudentClasses> studentClasses = snapshot.data!;
-                          // Cập nhật dữ liệu vào Provider
-                          Future.delayed(Duration.zero, () {
-                            classDataProvider
-                                .setStudentClassesList(studentClasses);
-                          });
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: studentClasses.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              var data = studentClasses[index];
-                              return Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 5, right: 5, bottom: 10),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation,
-                                                secondaryAnimation) =>
-                                            DetailPage(
-                                          studentClasses: data,
+                  Container(
+                    child: FutureBuilder(
+                      future: API().getStudentClass(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else if (snapshot.hasData) {
+                          if (snapshot.data != null) {
+                            List<StudentClasses> studentClasses =
+                                snapshot.data!;
+                            // Cập nhật dữ liệu vào Provider
+                            Future.delayed(Duration.zero, () {
+                              classDataProvider
+                                  .setStudentClassesList(studentClasses);
+                            });
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: studentClasses.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                var data = studentClasses[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 5, right: 5, bottom: 10),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation,
+                                                  secondaryAnimation) =>
+                                              DetailPage(
+                                            studentClasses: data,
+                                          ),
+                                          transitionDuration:
+                                              const Duration(milliseconds: 200),
+                                          transitionsBuilder: (context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child) {
+                                            return ScaleTransition(
+                                              scale: animation,
+                                              child: child,
+                                            );
+                                          },
                                         ),
-                                        transitionDuration:
-                                            const Duration(milliseconds: 200),
-                                        transitionsBuilder: (context, animation,
-                                            secondaryAnimation, child) {
-                                          return ScaleTransition(
-                                            scale: animation,
-                                            child: child,
-                                          );
-                                        },
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 5,
+                                        right: 5,
                                       ),
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 5, right: 5),
-                                    child: classInformation(
-                                      data.classes.course.totalWeeks,
-                                      data.classes.course.courseName,
-                                      data.classes.teacher.teacherName,
-                                      data.classes.course.courseID,
-                                      data.classes.shiftNumber,
-                                      data.classes.roomNumber,
-                                      data.presenceTotal,
-                                      data.lateTotal,
-                                      data.absenceTotal,
-                                      true, // Chỉnh thành status Form
+                                      child: classInformation(
+                                        data.classes.course.totalWeeks,
+                                        data.classes.course.courseName,
+                                        data.classes.teacher.teacherName,
+                                        data.classes.course.courseID,
+                                        data.classes.shiftNumber,
+                                        data.classes.roomNumber,
+                                        data.presenceTotal,
+                                        data.lateTotal,
+                                        data.absenceTotal,
+                                        activeForm, // Chỉnh thành status Form
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          );
+                                );
+                              },
+                            );
+                          }
                         }
-                      }
-                      return const Text('null');
-                    },
+                        return const Text('null');
+                      },
+                    ),
                   )
                 else
                   Container(
@@ -314,8 +344,8 @@ class _HomePageBodyState extends State<HomePageBody> {
                           height: 400,
                           width: 400,
                           color: Colors.black,
-                          // child: QRView(
-                          //     key: qrKey, onQRViewCreated: _onQRViewCreated),
+                          child: QRView(
+                              key: qrKey, onQRViewCreated: _onQRViewCreated),
                         )
                       ],
                     ),
@@ -340,8 +370,8 @@ class _HomePageBodyState extends State<HomePageBody> {
       int absenceTotal,
       bool activeForm) {
     return Container(
-        width: 405,
-        height: 120,
+        width: 410,
+        height: 145,
         decoration: BoxDecoration(
             color: !activeForm ? Colors.white : AppColors.cardHome,
             borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -352,11 +382,11 @@ class _HomePageBodyState extends State<HomePageBody> {
                   offset: Offset(3.0, 2.0))
             ]),
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, top: 10),
+          padding: const EdgeInsets.only(left: 20, top: 20),
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.only(bottom: 20, top: 20),
                 child: SizedBox(
                   width: 55,
                   height: 80,
@@ -367,7 +397,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                     center: Text(
                       "$totalWeeks Weeks",
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12),
+                          fontWeight: FontWeight.bold, fontSize: 11),
                     ),
                     backgroundColor:
                         !activeForm ? AppColors.secondaryText : Colors.white,
@@ -381,7 +411,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                 width: 25,
               ),
               Container(
-                width: 140,
+                width: 150,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -493,7 +523,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                       height: 15,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 20),
+                      padding: const EdgeInsets.only(left: 50),
                       child: !activeForm
                           ? Container()
                           : CustomButton(

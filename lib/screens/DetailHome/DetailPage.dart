@@ -66,7 +66,7 @@ class _DetailPageState extends State<DetailPage> {
 
   PreferredSize customAppbar() {
     return PreferredSize(
-      preferredSize: const Size.fromHeight(100.0),
+      preferredSize: const Size.fromHeight(90),
       child: AppBar(
         leading: GestureDetector(
           onTap: () {
@@ -80,7 +80,7 @@ class _DetailPageState extends State<DetailPage> {
         ),
         backgroundColor: AppColors.colorAppbar,
         flexibleSpace: Padding(
-          padding: const EdgeInsets.only(left: 50.0),
+          padding: const EdgeInsets.only(left: 50.0, top: 35, bottom: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
