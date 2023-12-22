@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:http/http.dart' as http;
@@ -7,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 class API {
   Future<List<StudentClasses>> getStudentClass() async {
-    final URL = 'http://10.0.2.2:8080/test/getStudentClass'; //10.0.2.2
+    final URL = 'http://192.168.1.5:8080/test/getStudentClass'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -79,7 +78,7 @@ class API {
 
   Future<bool> takeAttendance(
       String studentID, String classID, String formID, XFile fileImage) async {
-    const URL = 'http://192.168.1.9:8080/api/student/takeAttendance';
+    const URL = 'http://10.0.2.2:8080/api/student/takeAttendance';
     final headers = {
       'Content-type': 'multipart/form-data',
     };

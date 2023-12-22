@@ -15,7 +15,7 @@ class FloatingButtonMap extends StatefulWidget {
 class _MapState extends State<FloatingButtonMap> {
   late GoogleMapController googleMapController;
   static const CameraPosition initialCameraPosition = CameraPosition(
-      target: LatLng(10.732734759792725, 106.69977462350948), zoom: 14);
+      target: LatLng(10.732734759792725, 106.69977462350948), zoom: 18);
 
   Set<Marker> markers = {};
 
@@ -23,6 +23,11 @@ class _MapState extends State<FloatingButtonMap> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back_ios_rounded, color: Colors.white)),
         backgroundColor: AppColors.primaryButton,
         centerTitle: true,
         title: const Text(
@@ -34,6 +39,8 @@ class _MapState extends State<FloatingButtonMap> {
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
         markers: markers,
+        myLocationButtonEnabled: false,
+        myLocationEnabled: true,
         zoomControlsEnabled: false,
         mapType: MapType.normal,
         onMapCreated: (controller) {
@@ -49,9 +56,11 @@ class _MapState extends State<FloatingButtonMap> {
           googleMapController.animateCamera(CameraUpdate.newCameraPosition(
               CameraPosition(
                   target: LatLng(position.latitude, position.longitude),
-                  zoom: 14))); // should pass data from provider
+                  zoom: 18))); // should pass data from provider
           markers.clear();
           markers.add(Marker(
+              icon: BitmapDescriptor.defaultMarker,
+              flat: true,
               visible: false,
               markerId: const MarkerId('CurrentLocation'),
               position: LatLng(position.latitude, position.longitude)));

@@ -1,4 +1,3 @@
-import 'package:app_settings/app_settings.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomAppBar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomRichText.dart';
@@ -19,6 +18,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class HomePageBody extends StatefulWidget {
   const HomePageBody({super.key});
@@ -64,6 +64,9 @@ class _HomePageBodyState extends State<HomePageBody> {
 
   Future<void> getLocation() async {
     try {
+      // Capture the context before entering the asynchronous block
+      var currentContext = context;
+
       Position position = await GetLocation().determinePosition();
       var newAddress = await GetLocation().getAddressFromLatLong(position);
 
@@ -72,12 +75,12 @@ class _HomePageBodyState extends State<HomePageBody> {
         var readLong = await SecureStorage().readSecureData('longitude');
 
         // Perform the asynchronous work outside of setState
-        address = newAddress ?? 'Default Address'; // Thêm kiểm tra null
-        Provider.of<StudentDataProvider>(context, listen: false)
+        address = newAddress ?? 'Default Address';
+        Provider.of<StudentDataProvider>(currentContext, listen: false)
             .setLocation(address!);
-        Provider.of<StudentDataProvider>(context, listen: false)
+        Provider.of<StudentDataProvider>(currentContext, listen: false)
             .setLatitude(double.parse(readLat));
-        Provider.of<StudentDataProvider>(context, listen: false)
+        Provider.of<StudentDataProvider>(currentContext, listen: false)
             .setLongtitude(double.parse(readLong));
 
         // Update the state synchronously after the asynchronous work is done
@@ -121,6 +124,7 @@ class _HomePageBodyState extends State<HomePageBody> {
   Widget build(BuildContext context) {
     final classDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return SingleChildScrollView(
         //Column Tổng body
         child: Column(
@@ -128,7 +132,7 @@ class _HomePageBodyState extends State<HomePageBody> {
         Stack(children: [
           CustomAppBar(
             context: context,
-            address: 'Address: $address',
+            address: 'Address: ${studentDataProvider.userData.location}',
           ),
           //Search Bar
           Positioned(
@@ -231,76 +235,103 @@ class _HomePageBodyState extends State<HomePageBody> {
                   ),
                 ),
                 if (!activeQR)
-                  FutureBuilder(
-                    future: API().getStudentClass(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (snapshot.hasData) {
-                        if (snapshot.data != null) {
-                          List<StudentClasses> studentClasses = snapshot.data!;
-                          // Cập nhật dữ liệu vào Provider
-                          Future.delayed(Duration.zero, () {
-                            classDataProvider
-                                .setStudentClassesList(studentClasses);
-                          });
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: studentClasses.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              var data = studentClasses[index];
-                              return Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 5, right: 5, bottom: 10),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation,
-                                                secondaryAnimation) =>
-                                            DetailPage(
-                                          studentClasses: data,
-                                        ),
-                                        transitionDuration:
-                                            const Duration(milliseconds: 200),
-                                        transitionsBuilder: (context, animation,
-                                            secondaryAnimation, child) {
-                                          return ScaleTransition(
-                                            scale: animation,
-                                            child: child,
-                                          );
-                                        },
-                                      ),
+                  StreamBuilder(
+                      stream: Connectivity().onConnectivityChanged,
+                      builder: (context, snapshot) {
+                        print(snapshot.toString());
+                        if (snapshot.hasData) {
+                          ConnectivityResult? result = snapshot.data;
+                          if (result == ConnectivityResult.wifi ||
+                              result == ConnectivityResult.mobile) {
+                            return FutureBuilder(
+                              future: API().getStudentClass(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else if (snapshot.hasData) {
+                                  if (snapshot.data != null) {
+                                    List<StudentClasses> studentClasses =
+                                        snapshot.data!;
+                                    // Cập nhật dữ liệu vào Provider
+                                    Future.delayed(Duration.zero, () {
+                                      classDataProvider.setStudentClassesList(
+                                          studentClasses);
+                                    });
+                                    return ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: studentClasses.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        var data = studentClasses[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 5, right: 5, bottom: 10),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                PageRouteBuilder(
+                                                  pageBuilder: (context,
+                                                          animation,
+                                                          secondaryAnimation) =>
+                                                      DetailPage(
+                                                    studentClasses: data,
+                                                  ),
+                                                  transitionDuration:
+                                                      const Duration(
+                                                          milliseconds: 200),
+                                                  transitionsBuilder: (context,
+                                                      animation,
+                                                      secondaryAnimation,
+                                                      child) {
+                                                    return ScaleTransition(
+                                                      scale: animation,
+                                                      child: child,
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 5,
+                                                right: 5,
+                                              ),
+                                              child: classInformation(
+                                                data.classes.course.totalWeeks,
+                                                data.classes.course.courseName,
+                                                data.classes.teacher
+                                                    .teacherName,
+                                                data.classes.course.courseID,
+                                                data.classes.classType,
+                                                data.classes.group,
+                                                data.classes.subGroup,
+                                                data.classes.shiftNumber,
+                                                data.classes.roomNumber,
+                                                data.presenceTotal,
+                                                data.lateTotal,
+                                                data.absenceTotal,
+                                                true, // Chỉnh thành status Form
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 5, right: 5),
-                                    child: classInformation(
-                                      data.classes.course.totalWeeks,
-                                      data.classes.course.courseName,
-                                      data.classes.teacher.teacherName,
-                                      data.classes.course.courseID,
-                                      data.classes.shiftNumber,
-                                      data.classes.roomNumber,
-                                      data.presenceTotal,
-                                      data.lateTotal,
-                                      data.absenceTotal,
-                                      true, // Chỉnh thành status Form
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
+                                  }
+                                }
+                                return const Text('null');
+                              },
+                            );
+                          } else {
+                            return const Text('No internet');
+                          }
                         }
-                      }
-                      return const Text('null');
-                    },
-                  )
+                        return const Text('Internet is not available');
+                      })
                 else
                   Container(
                     height: 500,
@@ -327,13 +358,41 @@ class _HomePageBodyState extends State<HomePageBody> {
                         const SizedBox(
                           height: 5,
                         ),
-                        Container(
-                          height: 400,
-                          width: 400,
-                          color: Colors.black,
-                          // child: QRView(
-                          //     key: qrKey, onQRViewCreated: _onQRViewCreated),
-                        )
+                        Stack(children: [
+                          Container(
+                            height: 400,
+                            width: 400,
+                            child: QRView(
+                                overlay: QrScannerOverlayShape(
+                                  borderLength: 30,
+                                  borderColor: AppColors.primaryButton,
+                                  borderWidth: 10,
+                                  borderRadius: 10,
+                                ),
+                                key: qrKey,
+                                onQRViewCreated: _onQRViewCreated),
+                          ),
+                          Positioned(
+                            bottom: 30,
+                            left: 160,
+                            right: 160,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white24,
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Center(
+                                child: Text(
+                                  maxLines: 3,
+                                  result != null
+                                      ? '${result!.code}'
+                                      : 'Scan QR Code',
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          )
+                        ]),
                       ],
                     ),
                   ),
@@ -350,6 +409,9 @@ class _HomePageBodyState extends State<HomePageBody> {
       String courseName,
       String teacherName,
       String courseID,
+      String classType,
+      String group,
+      String subGroup,
       int shift,
       String roomNumber,
       int presenceTotal,
@@ -357,8 +419,8 @@ class _HomePageBodyState extends State<HomePageBody> {
       int absenceTotal,
       bool activeForm) {
     return Container(
-        width: 405,
-        height: 120,
+        width: 410,
+        height: 150,
         decoration: BoxDecoration(
             color: !activeForm ? Colors.white : AppColors.cardHome,
             borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -373,23 +435,22 @@ class _HomePageBodyState extends State<HomePageBody> {
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.only(bottom: 20, top: 20),
                 child: SizedBox(
                   width: 55,
                   height: 80,
                   child: CircularPercentIndicator(
                     radius: 40,
                     lineWidth: 5,
-                    percent: 0.5, // Thay đổi giá trị tại đây
+                    percent: 0.9, // Thay đổi giá trị tại đây
                     center: Text(
                       "$totalWeeks Weeks",
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12),
+                          fontWeight: FontWeight.bold, fontSize: 11),
                     ),
                     backgroundColor:
                         !activeForm ? AppColors.secondaryText : Colors.white,
-                    progressColor:
-                        !activeForm ? AppColors.primaryButton : Colors.green,
+                    progressColor: AppColors.primaryButton,
                     animation: true,
                   ),
                 ),
@@ -398,13 +459,24 @@ class _HomePageBodyState extends State<HomePageBody> {
                 width: 25,
               ),
               Container(
-                width: 140,
+                width: 150,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     customRichText(
                       title: 'Course: ',
                       message: courseName,
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    customRichText(
+                      title: 'Type: ',
+                      message: '$classType',
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
@@ -458,6 +530,32 @@ class _HomePageBodyState extends State<HomePageBody> {
                         ),
                       ],
                     ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      children: [
+                        customRichText(
+                          title: 'Group: ',
+                          message: "$group",
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        customRichText(
+                          title: 'SubGroup: ',
+                          message: '$subGroup',
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -465,14 +563,14 @@ class _HomePageBodyState extends State<HomePageBody> {
                   margin: const EdgeInsets.only(bottom: 25),
                   height: 90,
                   width: 2,
-                  color: const Color.fromARGB(96, 190, 188, 188)),
+                  color: Colors.black),
               const SizedBox(
                 width: 10,
               ),
               Padding(
                 padding: !activeForm
                     ? const EdgeInsets.only(top: 20, bottom: 20)
-                    : const EdgeInsets.all(0),
+                    : const EdgeInsets.only(top: 20, bottom: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -510,15 +608,13 @@ class _HomePageBodyState extends State<HomePageBody> {
                       height: 15,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 20),
+                      padding: const EdgeInsets.only(left: 35, top: 10),
                       child: !activeForm
                           ? Container()
                           : CustomButton(
                               buttonName: 'Attendance',
                               colorShadow: Colors.transparent,
-                              backgroundColorButton: !activeForm
-                                  ? AppColors.primaryButton
-                                  : Colors.green,
+                              backgroundColorButton: AppColors.primaryButton,
                               borderColor: Colors.transparent,
                               textColor: Colors.white,
                               function: () {
