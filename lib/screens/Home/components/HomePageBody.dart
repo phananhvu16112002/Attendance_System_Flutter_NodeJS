@@ -48,50 +48,62 @@ class _HomePageBodyState extends State<HomePageBody> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     checkLocationService();
+    Future.delayed(Duration.zero, () {
+      if (mounted) {
+        var studentDataProvider =
+            Provider.of<StudentDataProvider>(context, listen: false);
+        studentDataProvider.updateLocationData(
+          studentDataProvider.userData.latitude,
+          studentDataProvider.userData.longtitude,
+          studentDataProvider.userData.location,
+        );
+      }
+    });
+  }
+
+  void getAddress() {
+    var studentDataProvider =
+        Provider.of<StudentDataProvider>(context, listen: false);
+    if (studentDataProvider.userData.latitude != 0.0 &&
+        studentDataProvider.userData.longtitude != 0.0 &&
+        studentDataProvider.userData.location.isNotEmpty) {
+      studentDataProvider.updateLocationData(
+        studentDataProvider.userData.latitude,
+        studentDataProvider.userData.longtitude,
+        studentDataProvider.userData.location,
+      );
+    }
   }
 
   Future<void> checkLocationService() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       showSettingsAlert();
-    } else {
-      await getLocation(); // Wait for the asynchronous work to complete
     }
   }
 
-  Future<void> getLocation() async {
-    try {
-      // Capture the context before entering the asynchronous block
-      var currentContext = context;
-
-      Position position = await GetLocation().determinePosition();
-      var newAddress = await GetLocation().getAddressFromLatLong(position);
-
-      if (mounted) {
-        var readLat = await SecureStorage().readSecureData('latitude');
-        var readLong = await SecureStorage().readSecureData('longitude');
-
-        // Perform the asynchronous work outside of setState
-        address = newAddress ?? 'Default Address';
-        Provider.of<StudentDataProvider>(currentContext, listen: false)
-            .setLocation(address!);
-        Provider.of<StudentDataProvider>(currentContext, listen: false)
-            .setLatitude(double.parse(readLat));
-        Provider.of<StudentDataProvider>(currentContext, listen: false)
-            .setLongtitude(double.parse(readLong));
-
-        // Update the state synchronously after the asynchronous work is done
-        setState(() {
-          address = newAddress;
-        });
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+  // Future<void> updateAddress() async {
+  //   Position position = await GetLocation().determinePosition();
+  //   bool check = await getLocation.updateLocation(studentDataProvider);
+  //   if (check) {
+  //     var temp = await GetLocation().getAddressFromLatLong(position);
+  //     studentDataProvider.setLocation(temp!);
+  //     if (studentDataProvider.userData.location.isNotEmpty) {
+  //       print('Successfully');
+  //     }
+  //   } else {
+  //     print('Failed to Update');
+  //   }
+  // }
 
   void showSettingsAlert() {
     showDialog(
@@ -124,7 +136,7 @@ class _HomePageBodyState extends State<HomePageBody> {
   Widget build(BuildContext context) {
     final classDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
-    final studentDataProvider = Provider.of<StudentDataProvider>(context);
+    final provider = Provider.of<StudentDataProvider>(context);
     return SingleChildScrollView(
         //Column Tổng body
         child: Column(
@@ -132,7 +144,7 @@ class _HomePageBodyState extends State<HomePageBody> {
         Stack(children: [
           CustomAppBar(
             context: context,
-            address: 'Address: ${studentDataProvider.userData.location}',
+            address: 'Address: ${provider.userData.location}',
           ),
           //Search Bar
           Positioned(
@@ -330,7 +342,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                             return const Text('No internet');
                           }
                         }
-                        return const Text('Internet is not available');
+                        return loading();
                       })
                 else
                   Container(
@@ -402,6 +414,12 @@ class _HomePageBodyState extends State<HomePageBody> {
         ]),
       ],
     ));
+  }
+
+  Widget loading() {
+    return const CircularProgressIndicator(
+      valueColor: AlwaysStoppedAnimation(AppColors.primaryButton),
+    );
   }
 
   Container classInformation(

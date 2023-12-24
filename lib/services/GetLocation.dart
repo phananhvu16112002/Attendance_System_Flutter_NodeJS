@@ -1,3 +1,4 @@
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -31,9 +32,6 @@ class GetLocation {
         forceAndroidLocationManager: true);
     latitude = position.latitude;
     longtitude = position.longitude;
-    await SecureStorage().writeSecureData('latitude', latitude.toString());
-    await SecureStorage().writeSecureData('longtitude', longtitude.toString());
-
     positionMain = position;
     return position;
   }
@@ -42,8 +40,37 @@ class GetLocation {
     List<Placemark> placemark =
         await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark place = placemark[0];
-    address =
+    var temp =
         '${place.street},${place.locality},${place.subAdministrativeArea},${place.administrativeArea},${place.country}';
+    address = processAddress(temp);
+    print('address $address');
     return address;
+  }
+
+  String processAddress(String address) {
+    List<String> components = address.split(',');
+    List<String> filteredComponents =
+        components.where((component) => component.trim().isNotEmpty).toList();
+    String processedAddress = filteredComponents.join(',');
+    return processedAddress;
+  }
+
+  Future<bool> updateLocation(StudentDataProvider provider) async {
+    Position position = await determinePosition();
+    String? address = await getAddressFromLatLong(position);
+    provider.setLatitude(position.latitude);
+    provider.setLongtitude(position.longitude);
+    provider.setLocation(address!);
+
+    if (provider.userData.latitude != 0 &&
+        provider.userData.longtitude != 0 &&
+        provider.userData.location.isNotEmpty) {
+      print('------ latitude: ${provider.userData.latitude}');
+      print('------ longitude: ${provider.userData.longtitude}');
+      print('------ location: ${provider.userData.location}');
+
+      return true;
+    }
+    return false;
   }
 }

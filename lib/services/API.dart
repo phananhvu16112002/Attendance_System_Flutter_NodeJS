@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 class API {
   Future<List<StudentClasses>> getStudentClass() async {
-    final URL = 'http://192.168.1.5:8080/test/getStudentClass'; //10.0.2.2
+    final URL = 'http://10.0.2.2:8080/test/getStudentClass'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',

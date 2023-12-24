@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ReportAttendance extends StatefulWidget {
-  const ReportAttendance({super.key});
+class FloatingButtonReport extends StatefulWidget {
+  const FloatingButtonReport({super.key});
 
   @override
-  State<ReportAttendance> createState() => _ReportAttendanceState();
+  State<FloatingButtonReport> createState() => _FloatingButtonReportState();
 }
 
-class _ReportAttendanceState extends State<ReportAttendance> {
+class _FloatingButtonReportState extends State<FloatingButtonReport> {
   final TextEditingController _lectuerController = TextEditingController();
   final TextEditingController _topicController = TextEditingController();
   final TextEditingController _message = TextEditingController();
@@ -118,7 +118,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                   ),
                   Center(
                       child: Text(
-                    'Report Attendance',
+                    'Send Report To Lectuer',
                     style: GoogleFonts.inter(
                         color: AppColors.primaryButton,
                         fontSize: 20,

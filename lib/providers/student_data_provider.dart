@@ -1,4 +1,5 @@
 import 'package:attendance_system_nodejs/models/Student.dart';
+import 'package:attendance_system_nodejs/services/GetLocation.dart';
 import 'package:flutter/material.dart';
 
 class StudentDataProvider with ChangeNotifier {
@@ -80,5 +81,16 @@ class StudentDataProvider with ChangeNotifier {
   void setUserData(Student data) {
     _student = data;
     notifyListeners();
+  }
+
+  void updateLocationData(double latitude, double longitude, String location) {
+    if (latitude == 0.0 && longitude == 0.0) {
+      // Gọi hàm updateLocation từ GetLocation nếu latitude và longitude không có giá trị
+      GetLocation().updateLocation(this);
+    } else {
+      setLatitude(latitude);
+      setLongtitude(longitude);
+      setLocation(location);
+    }
   }
 }

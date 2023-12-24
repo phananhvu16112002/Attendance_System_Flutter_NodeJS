@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/services/SmartCamera.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class AttendanceFormPage extends StatefulWidget {
   const AttendanceFormPage({super.key});
@@ -43,6 +45,8 @@ class _AttendancePageState extends State<AttendanceFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider =
+        Provider.of<StudentDataProvider>(context, listen: true);
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -63,11 +67,12 @@ class _AttendancePageState extends State<AttendanceFormPage> {
         centerTitle: true,
         backgroundColor: AppColors.primaryButton,
       ),
-      body: bodyAttendance(),
+      body: bodyAttendance(studentDataProvider),
     );
   }
 
-  SingleChildScrollView bodyAttendance() {
+  SingleChildScrollView bodyAttendance(
+      StudentDataProvider studentDataProvider) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(left: 15, right: 15),
@@ -82,7 +87,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             const SizedBox(
               height: 15,
             ),
-            infoLocation(),
+            infoLocation(studentDataProvider.userData.location),
             const SizedBox(
               height: 15,
             ),
@@ -153,7 +158,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     );
   }
 
-  Container infoLocation() {
+  Container infoLocation(String location) {
     return Container(
       width: 405,
       height: 70,
@@ -168,13 +173,8 @@ class _AttendancePageState extends State<AttendanceFormPage> {
           ]),
       child: Padding(
         padding: const EdgeInsets.only(left: 12, top: 15, bottom: 15),
-        child: customRichText(
-            'Location: ',
-            '19 Nguyen Huu Tho, District 7, Ho Chi Minh City',
-            FontWeight.bold,
-            FontWeight.w500,
-            AppColors.primaryText,
-            AppColors.primaryText),
+        child: customRichText('Location: ', location, FontWeight.bold,
+            FontWeight.w500, AppColors.primaryText, AppColors.primaryText),
       ),
     );
   }
