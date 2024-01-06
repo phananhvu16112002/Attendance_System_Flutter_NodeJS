@@ -13,6 +13,10 @@ class TestApp extends StatefulWidget {
 class _TestAppState extends State<TestApp> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    DateTime time = DateTime.now();
+    print(time);
+    return Scaffold(
+      body: Center(child: Text('$time')),
+    );
   }
 }

@@ -242,10 +242,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             if (_formKey.currentState!.validate()) {
                               try {
                                 if (password.text == confirmPassword.text) {
-                                  bool check = await Authenticate()
+                                  String check = await Authenticate()
                                       .registerUser(username.text,
                                           emailAddress.text, password.text);
-                                  if (check) {
+                                  if (check == '' || check.isEmpty) {
                                     // ignore: use_build_context_synchronously
                                     Navigator.pushReplacement(
                                       context,
@@ -279,8 +279,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                         3);
                                   } else {
                                     // ignore: use_build_context_synchronously
-                                    showFlushBarNotification(context, "Failed",
-                                        "User is not exist or active", 3);
+                                    showFlushBarNotification(
+                                        context, "Failed", check, 3);
                                   }
                                 } else {
                                   showFlushBarNotification(

@@ -126,7 +126,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                       : Colors.white,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(10))),
-                              child: Center(
+                              child: const Center(
                                 child: CustomText(
                                     message: 'Present: ${0}',
                                     fontSize: 15,
@@ -212,7 +212,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             );
           }
         }
-        return Text('Data Not Avalible');
+        return const Text('Data Not Avalible');
       },
     );
   }

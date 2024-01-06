@@ -251,7 +251,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const Center(
-                                child:  CircularProgressIndicator());
+                                child: CircularProgressIndicator());
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else if (snapshot.hasData) {
@@ -323,7 +323,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                         },
                       );
                     } else {
-                      return const Text('No internet');
+                      return const Center(child: Text('No internet'));
                     }
                   }
                   return loading();
