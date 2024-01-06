@@ -13,6 +13,7 @@ import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
+import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -60,7 +61,7 @@ class _MyAppState extends State<MyApp> {
         '/DetailReport': (context) => const DetailReport(),
         '/DetailPage': (context) => const DetailPage()
       },
-      home: const ReportAttendance(),
+      home: const AttendanceForm(),
       debugShowCheckedModeBanner: false,
     );
   }
