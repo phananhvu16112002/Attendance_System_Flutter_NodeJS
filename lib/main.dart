@@ -1,3 +1,5 @@
+import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/CreateNewPassword.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
@@ -7,21 +9,26 @@ import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dar
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
-import 'package:attendance_system_nodejs/screens/Home/AttendanceForm.dart';
-import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
+import 'package:attendance_system_nodejs/screens/TestSocket.dart';
+import 'package:face_camera/face_camera.dart';
 import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); //Add this
+
+  await FaceCamera.initialize(); //Add this
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => StudentDataProvider()),
+        ChangeNotifierProvider(create: (_) => StudentClassesDataProvider()),
+        ChangeNotifierProvider(create: (_) => AttendanceDetailDataProvider())
       ],
       child: const MyApp(),
     ),
@@ -36,8 +43,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -56,12 +61,11 @@ class _MyAppState extends State<MyApp> {
         '/CreateNewPassword': (context) => const CreateNewPassword(),
         '/OTP': (context) => const OTPPage(),
         '/HomePage': (context) => const HomePage(),
-        '/AttendanceForm': (context) => const AttendanceForm(),
+        '/AttendanceForm': (context) => const AttendanceFormPage(),
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
-        '/DetailPage': (context) => const DetailPage()
       },
-      home: const AttendanceForm(),
+      home: WelcomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

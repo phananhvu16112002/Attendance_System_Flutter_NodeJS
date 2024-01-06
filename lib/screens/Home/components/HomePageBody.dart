@@ -1,11 +1,24 @@
+import 'package:attendance_system_nodejs/common/bases/CustomAppBar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
+import 'package:attendance_system_nodejs/common/bases/CustomRichText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:easy_date_timeline/easy_date_timeline.dart';
+import 'package:attendance_system_nodejs/models/StudentClasses.dart';
+
+import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
+import 'package:attendance_system_nodejs/services/API.dart';
+import 'package:attendance_system_nodejs/services/GetLocation.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class HomePageBody extends StatefulWidget {
   const HomePageBody({super.key});
@@ -21,6 +34,7 @@ class _HomePageBodyState extends State<HomePageBody> {
   bool activeQR = false;
   bool activeForm = false;
   Barcode? result;
+  String? address;
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
@@ -34,17 +48,96 @@ class _HomePageBodyState extends State<HomePageBody> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkLocationService();
+    Future.delayed(Duration.zero, () {
+      if (mounted) {
+        var studentDataProvider =
+            Provider.of<StudentDataProvider>(context, listen: false);
+        studentDataProvider.updateLocationData(
+          studentDataProvider.userData.latitude,
+          studentDataProvider.userData.longtitude,
+          studentDataProvider.userData.location,
+        );
+      }
+    });
+  }
+
+  void getAddress() {
+    var studentDataProvider =
+        Provider.of<StudentDataProvider>(context, listen: false);
+    if (studentDataProvider.userData.latitude != 0.0 &&
+        studentDataProvider.userData.longtitude != 0.0 &&
+        studentDataProvider.userData.location.isNotEmpty) {
+      studentDataProvider.updateLocationData(
+        studentDataProvider.userData.latitude,
+        studentDataProvider.userData.longtitude,
+        studentDataProvider.userData.location,
+      );
+    }
+  }
+
+  Future<void> checkLocationService() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      showSettingsAlert();
+    }
+  }
+
+  void showSettingsAlert() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Location Permission'),
+        content: const Text('Please grant permission to get your location.'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Đóng hộp thoại
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await Geolocator.openLocationSettings();
+            },
+            child: const Text(
+              'Open Settings',
+              style: TextStyle(color: AppColors.primaryButton),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final classDataProvider =
+        Provider.of<StudentClassesDataProvider>(context, listen: false);
+    final provider = Provider.of<StudentDataProvider>(context);
     return SingleChildScrollView(
         //Column Tổng body
         child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Stack(children: [
-          customAppBar(context),
+          CustomAppBar(
+            context: context,
+            address: 'Address: ${provider.userData.location}',
+          ),
           //Search Bar
           Positioned(
             top: 285,
             left: 25,
+            right: 25,
             child: Container(
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -61,256 +154,78 @@ class _HomePageBodyState extends State<HomePageBody> {
                   controller: searchController,
                   textInputType: TextInputType.text,
                   obscureText: false,
-                  suffixIcon:
-                      IconButton(onPressed: () {}, icon: const Icon(null)),
+                  suffixIcon: IconButton(
+                      onPressed: () {}, icon: const Icon(Icons.search)),
                   prefixIcon: const Icon(Icons.search),
                   hintText: 'Search class | Example: CourseID,..',
                 )),
           ),
           //Body 2
           Container(
-            color: Colors.white,
-            height: MediaQuery.of(context).size.height,
-            margin: const EdgeInsets.only(top: 350),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          activeQR = false;
-                        });
-                      },
-                      child: Container(
-                        width: 142,
-                        height: 30,
-                        margin: const EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                            color: activeQR
-                                ? Colors.white
-                                : AppColors.primaryButton,
-                            border: Border.all(
-                                color: AppColors.secondaryText, width: 1),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(5))),
-                        child: Center(
-                            child: CustomText(
-                                message: 'Take Attendance',
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: activeQR
-                                    ? AppColors.primaryText
-                                    : Colors.white)),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          activeQR = true;
-                        });
-                      },
-                      child: Container(
-                        width: 142,
-                        height: 26,
-                        margin: const EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                            color: activeQR
-                                ? AppColors.primaryButton
-                                : Colors.white,
-                            border: Border.all(
-                                color: AppColors.secondaryText, width: 1),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(5))),
-                        child: Center(
-                            child: CustomText(
-                                message: 'Scan QR',
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: activeQR
-                                    ? Colors.white
-                                    : AppColors.primaryText)),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                if (!activeQR)
-                  Column(
-                    children: [
-                      classInformation(true),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      classInformation(false),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      classInformation(false),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      classInformation(false),
-                    ],
-                  )
-                else
-                  Container(
-                    height: 500,
-                    child: Column(
-                      children: [
-                        const Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CustomText(
-                                  message: 'SCAN QR CODE',
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryText),
-                              CustomText(
-                                  message:
-                                      'Scanning will be started automatically',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.primaryText),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Container(
-                          height: 400,
-                          width: 400,
-                          color: Colors.black,
-                          // child: QRView(
-                          //     key: qrKey, onQRViewCreated: _onQRViewCreated),
-                        )
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ]),
-      ],
-    ));
-  }
-
-  Container customAppBar(BuildContext context) {
-    return Container(
-      height: 320,
-      width: MediaQuery.of(context).size.width,
-      decoration: const BoxDecoration(
-          color: AppColors.colorAppbar,
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(15),
-              bottomRight: Radius.circular(15))),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 15, top: 25),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        CustomText(
-                            message: 'Hi, ',
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.thirdText),
-                        CustomText(
-                            message: 'Anh Vu',
-                            fontSize: 23,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white),
-                      ],
-                    ),
-                    Container(
-                      height: 1,
-                      color: const Color.fromARGB(106, 255, 255, 255),
-                      width: 140,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.person_3_outlined,
-                                size: 11, color: AppColors.thirdText),
-                            CustomText(
-                                message: '520H0696 | ',
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.thirdText),
-                            CustomText(
-                                message: 'Student',
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.thirdText),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    const Row(
-                      children: [
-                        Icon(Icons.location_on_outlined,
-                            size: 11, color: Colors.white),
-                        CustomText(
-                            message:
-                                'Adress: 19 Nguyen Huu Tho, District 7, HCMC ',
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 30),
+                Container(
+                  margin: EdgeInsets.only(top: 350),
                   child: Row(
-                    children: <Widget>[
-                      Container(
-                          width: 50,
-                          height: 50,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            activeQR = false;
+                          });
+                        },
+                        child: Container(
+                          width: 142,
+                          height: 30,
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                              color: activeQR
+                                  ? Colors.white
+                                  : AppColors.primaryButton,
+                              border: Border.all(
+                                  color: AppColors.secondaryText, width: 1),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: const Center(
-                              child: Icon(Icons.grid_view_outlined))),
-                      const SizedBox(
-                        width: 5,
+                                  const BorderRadius.all(Radius.circular(5))),
+                          child: Center(
+                              child: CustomText(
+                                  message: 'Take Attendance',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: activeQR
+                                      ? AppColors.primaryText
+                                      : Colors.white)),
+                        ),
                       ),
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(50))),
-                        child: Image.asset(
-                          'assets/images/logo.png',
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            activeQR = true;
+                          });
+                        },
+                        child: Container(
+                          width: 142,
+                          height: 26,
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                              color: activeQR
+                                  ? AppColors.primaryButton
+                                  : Colors.white,
+                              border: Border.all(
+                                  color: AppColors.secondaryText, width: 1),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5))),
+                          child: Center(
+                              child: CustomText(
+                                  message: 'Scan QR',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: activeQR
+                                      ? Colors.white
+                                      : AppColors.primaryText)),
                         ),
                       )
                     ],
@@ -318,103 +233,187 @@ class _HomePageBodyState extends State<HomePageBody> {
                 ),
               ],
             ),
-          ),
+          )
+        ]),
+        if (!activeQR)
           Container(
-              height: 1,
-              width: MediaQuery.of(context).size.width,
-              color: const Color.fromARGB(106, 255, 255, 255)),
-          const SizedBox(
-            height: 5,
-          ),
-          EasyDateTimeLine(
-            initialDate: DateTime.now(),
-            onDateChange: (selectedDate) {
-              //`selectedDate` the new date selected.
-            },
-            headerProps: const EasyHeaderProps(
-                selectedDateFormat: SelectedDateFormat.fullDateMonthAsStrDY,
-                selectedDateStyle: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
-                showMonthPicker: false,
-                monthPickerType: MonthPickerType.dropDown,
-                monthStyle: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
-                padding: EdgeInsets.only(top: 5, bottom: 15, left: 10)),
-            dayProps: const EasyDayProps(
-              dayStructure: DayStructure.dayStrDayNumMonth,
-              width: 65,
-              height: 85,
-              borderColor: Color.fromARGB(61, 207, 204, 204),
-              //activeDay
-              activeDayStyle: DayStyle(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  dayNumStyle: TextStyle(
-                      color: AppColors.primaryButton,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
-                  dayStrStyle: TextStyle(
-                      color: AppColors.primaryButton,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600),
-                  monthStrStyle: TextStyle(
-                      color: AppColors.primaryButton,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600)),
-              //inactiveDay
-              inactiveDayStyle: DayStyle(
-                  dayNumStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
-                  dayStrStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500),
-                  monthStrStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400)),
-              //TodayStyle
-              todayStyle: DayStyle(
-                  decoration: BoxDecoration(
-                      color: Color.fromARGB(78, 219, 217, 217),
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  dayNumStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                  dayStrStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600),
-                  monthStrStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600)),
+            child: StreamBuilder(
+                stream: Connectivity().onConnectivityChanged,
+                builder: (context, snapshot) {
+                  print(snapshot.toString());
+                  if (snapshot.hasData) {
+                    ConnectivityResult? result = snapshot.data;
+                    if (result == ConnectivityResult.wifi ||
+                        result == ConnectivityResult.mobile) {
+                      return FutureBuilder(
+                        future: API().getStudentClass(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child:  CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else if (snapshot.hasData) {
+                            if (snapshot.data != null) {
+                              List<StudentClasses> studentClasses =
+                                  snapshot.data!;
+                              // Cập nhật dữ liệu vào Provider
+                              Future.delayed(Duration.zero, () {
+                                classDataProvider
+                                    .setStudentClassesList(studentClasses);
+                              });
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: studentClasses.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  var data = studentClasses[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 5, right: 5, bottom: 10),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                    secondaryAnimation) =>
+                                                DetailPage(
+                                              studentClasses: data,
+                                            ),
+                                            transitionDuration: const Duration(
+                                                milliseconds: 200),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              return ScaleTransition(
+                                                scale: animation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 5,
+                                          right: 5,
+                                        ),
+                                        child: classInformation(
+                                          data.classes.course.totalWeeks,
+                                          data.classes.course.courseName,
+                                          data.classes.teacher.teacherName,
+                                          data.classes.course.courseID,
+                                          data.classes.classType,
+                                          data.classes.group,
+                                          data.classes.subGroup,
+                                          data.classes.shiftNumber,
+                                          data.classes.roomNumber,
+                                          true, // Chỉnh thành status Form
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          }
+                          return const Text('null');
+                        },
+                      );
+                    } else {
+                      return const Text('No internet');
+                    }
+                  }
+                  return loading();
+                }),
+          )
+        else
+          Container(
+            height: 500,
+            child: Column(
+              children: [
+                const Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomText(
+                          message: 'SCAN QR CODE',
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryText),
+                      CustomText(
+                          message: 'Scanning will be started automatically',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.primaryText),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Stack(children: [
+                  Container(
+                    height: 400,
+                    width: 400,
+                    child: QRView(
+                        overlay: QrScannerOverlayShape(
+                          borderLength: 30,
+                          borderColor: AppColors.primaryButton,
+                          borderWidth: 10,
+                          borderRadius: 10,
+                        ),
+                        key: qrKey,
+                        onQRViewCreated: _onQRViewCreated),
+                  ),
+                  Positioned(
+                    bottom: 30,
+                    left: 160,
+                    right: 160,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Center(
+                        child: Text(
+                          maxLines: 3,
+                          result != null ? '${result!.code}' : 'Scan QR Code',
+                          style: const TextStyle(
+                              fontSize: 12, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  )
+                ]),
+              ],
             ),
           ),
-          const SizedBox(
-            height: 5,
-          ),
-          Container(
-              height: 1,
-              width: MediaQuery.of(context).size.width,
-              color: const Color.fromARGB(106, 255, 255, 255)),
-        ],
-      ),
+      ],
+    ));
+  }
+
+  Widget loading() {
+    return const CircularProgressIndicator(
+      valueColor: AlwaysStoppedAnimation(AppColors.primaryButton),
     );
   }
 
-  Container classInformation(bool activeForm) {
+  Widget classInformation(
+      int totalWeeks,
+      String courseName,
+      String teacherName,
+      String courseID,
+      String classType,
+      String group,
+      String subGroup,
+      int shift,
+      String roomNumber,
+      bool activeForm) {
     return Container(
-        width: 405,
-        height: 120,
+        width: 410,
+        height: 150,
         decoration: BoxDecoration(
             color: !activeForm ? Colors.white : AppColors.cardHome,
             borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -422,30 +421,29 @@ class _HomePageBodyState extends State<HomePageBody> {
               BoxShadow(
                   color: AppColors.secondaryText,
                   blurRadius: 5.0,
-                  offset: Offset(0.0, 0.0))
+                  offset: Offset(3.0, 2.0))
             ]),
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20),
+          padding: const EdgeInsets.only(left: 20, top: 10),
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.only(bottom: 20, top: 20),
                 child: SizedBox(
                   width: 55,
                   height: 80,
                   child: CircularPercentIndicator(
                     radius: 40,
                     lineWidth: 5,
-                    percent: 0.5, // Thay đổi giá trị tại đây
-                    center: const Text(
-                      "15 Weeks",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                    percent: 0.9, // Thay đổi giá trị tại đây
+                    center: Text(
+                      "$totalWeeks Weeks",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 11),
                     ),
                     backgroundColor:
                         !activeForm ? AppColors.secondaryText : Colors.white,
-                    progressColor:
-                        !activeForm ? AppColors.primaryButton : Colors.green,
+                    progressColor: AppColors.primaryButton,
                     animation: true,
                   ),
                 ),
@@ -454,38 +452,101 @@ class _HomePageBodyState extends State<HomePageBody> {
                 width: 25,
               ),
               Container(
-                width: 155,
+                width: 150,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     customRichText(
-                        'Course: ',
-                        'Quản lý chất lượng dịch vụ và an toàn thông tin',
-                        FontWeight.bold,
-                        FontWeight.w400,
-                        AppColors.primaryText),
+                      title: 'Course: ',
+                      message: courseName,
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
                     const SizedBox(
                       height: 5,
                     ),
-                    customRichText('Lectuer: ', 'Mai Van Manh', FontWeight.bold,
-                        FontWeight.w400, AppColors.primaryText),
+                    customRichText(
+                      title: 'Type: ',
+                      message: '$classType',
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
                     const SizedBox(
                       height: 5,
                     ),
-                    customRichText('CourseID: ', '520H0696', FontWeight.bold,
-                        FontWeight.w400, AppColors.primaryText),
+                    customRichText(
+                      title: 'Lectuer: ',
+                      message: teacherName,
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    customRichText(
+                      title: 'CourseID: ',
+                      message: courseID,
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
                     const SizedBox(
                       height: 5,
                     ),
                     Row(
                       children: [
-                        customRichText('Shift: ', '5', FontWeight.bold,
-                            FontWeight.w400, AppColors.primaryText),
+                        customRichText(
+                          title: 'Shift: ',
+                          message: "$shift",
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
                         const SizedBox(
                           width: 10,
                         ),
-                        customRichText('Class: ', 'A0405', FontWeight.bold,
-                            FontWeight.w400, AppColors.primaryText),
+                        customRichText(
+                          title: 'Class: ',
+                          message: roomNumber,
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      children: [
+                        customRichText(
+                          title: 'Group: ',
+                          message: "$group",
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        customRichText(
+                          title: 'SubGroup: ',
+                          message: '$subGroup',
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
                       ],
                     ),
                   ],
@@ -493,75 +554,90 @@ class _HomePageBodyState extends State<HomePageBody> {
               ),
               Container(
                   margin: const EdgeInsets.only(bottom: 25),
-                  height: 75,
+                  height: 90,
                   width: 2,
-                  color: const Color.fromARGB(96, 190, 188, 188)),
+                  color: Colors.black),
               const SizedBox(
                 width: 10,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  customRichText('Total Attendance: ', '5', FontWeight.bold,
-                      FontWeight.w400, AppColors.primaryText),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  customRichText('Total Late: ', '5', FontWeight.bold,
-                      FontWeight.w400, AppColors.primaryText),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  customRichText('Total Absent: ', '5', FontWeight.bold,
-                      FontWeight.w400, AppColors.primaryText),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 50),
-                    child: CustomButton(
-                        buttonName: 'Attendance',
-                        backgroundColorButton: !activeForm
-                            ? AppColors.primaryButton
-                            : Colors.green,
-                        borderColor: Colors.transparent,
-                        textColor: Colors.white,
-                        function: () {},
-                        height: 20,
-                        width: 80,
-                        fontSize: 11),
-                  )
-                ],
+              Padding(
+                padding: !activeForm
+                    ? const EdgeInsets.only(top: 20, bottom: 20)
+                    : const EdgeInsets.only(top: 20, bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const customRichText(
+                      title: 'Total Attendance: ',
+                      message: '0',
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    const customRichText(
+                      title: 'Total Late: ',
+                      message: '0',
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    customRichText(
+                      title: 'Total Absent: ',
+                      message: '0',
+                      fontWeightTitle: FontWeight.bold,
+                      fontWeightMessage: FontWeight.w400,
+                      colorText: AppColors.primaryText,
+                      fontSize: 13,
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(left: 35, top: 10),
+                    //   child: !activeForm
+                    //       ? Container()
+                    //       : CustomButton(
+                    //           buttonName: 'Attendance',
+                    //           colorShadow: Colors.transparent,
+                    //           backgroundColorButton: AppColors.primaryButton,
+                    //           borderColor: Colors.transparent,
+                    //           textColor: Colors.white,
+                    //           function: () {
+                    //             Navigator.push(
+                    //               context,
+                    //               PageRouteBuilder(
+                    //                 pageBuilder: (context, animation,
+                    //                         secondaryAnimation) =>
+                    //                     const AttendanceFormPage(),
+                    //                 transitionDuration:
+                    //                     const Duration(milliseconds: 300),
+                    //                 transitionsBuilder: (context, animation,
+                    //                     secondaryAnimation, child) {
+                    //                   return ScaleTransition(
+                    //                     scale: animation,
+                    //                     child: child,
+                    //                   );
+                    //                 },
+                    //               ),
+                    //             );
+                    //           },
+                    //           height: 30,
+                    //           width: 90,
+                    //           fontSize: 13),
+                    // ),
+                  ],
+                ),
               ),
             ],
           ),
         ));
-  }
-
-  RichText customRichText(
-      String title,
-      String message,
-      FontWeight fontWeightTitle,
-      FontWeight fontWeightMessage,
-      Color colorText) {
-    return RichText(
-        text: TextSpan(children: [
-      TextSpan(
-        text: title,
-        style: TextStyle(
-          fontWeight: fontWeightTitle,
-          fontSize: 12,
-          color: colorText,
-        ),
-      ),
-      TextSpan(
-        text: message,
-        style: TextStyle(
-          fontWeight: fontWeightMessage,
-          fontSize: 12,
-          color: colorText,
-        ),
-      ),
-    ]));
   }
 }

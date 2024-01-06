@@ -4,8 +4,14 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
+import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -34,6 +40,7 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return Scaffold(
         body: SingleChildScrollView(
       child: Column(
@@ -41,9 +48,8 @@ class _SignInPageState extends State<SignInPage> {
         children: [
           const ImageSlider(),
           Container(
-            height: MediaQuery.of(context).size.height,
             child: Padding(
-              padding: const EdgeInsets.only(top: 15, left: 20),
+              padding: const EdgeInsets.only(top: 15, left: 20, right: 20),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -138,30 +144,45 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 250),
+                      padding: const EdgeInsets.only(left: 230),
                       child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, ('/ForgotPassword'));
-                        },
-                        child: const CustomText(
-                          message: 'Forgot Password?',
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.importantText,
-                        ),
-                      ),
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const ForgotPassword(),
+                                transitionDuration:
+                                    const Duration(milliseconds: 300),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return ScaleTransition(
+                                    scale: animation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                          child: CustomText(
+                              message: 'Forgot Password?',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.importantText)),
                     ),
 
                     const SizedBox(
                       height: 20,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 20),
+                      padding: const EdgeInsets.only(right: 0, left: 0),
                       child: CustomButton(
                           fontSize: 20,
                           height: 60,
                           width: 400,
                           buttonName: 'Login',
+                          colorShadow: AppColors.colorShadow,
                           backgroundColorButton: AppColors.primaryButton,
                           borderColor: Colors.white,
                           textColor: Colors.white,
@@ -177,10 +198,44 @@ class _SignInPageState extends State<SignInPage> {
                                 // studentDataProvider.setAccessToken(accessToken);
                                 // studentDataProvider
                                 //     .setRefreshToken(refreshToken);
+                                var studentID = await SecureStorage()
+                                    .readSecureData('studentID');
+                                var studentEmail = await SecureStorage()
+                                    .readSecureData('studentEmail');
+                                var studentName = await SecureStorage()
+                                    .readSecureData('studentName');
+                                studentDataProvider.setStudentID(studentID);
+                                studentDataProvider
+                                    .setStudentEmail(studentEmail);
+                                studentDataProvider.setStudentName(studentName);
                                 if (check) {
                                   // ignore: use_build_context_synchronously
-                                  Navigator.pushNamedAndRemoveUntil(
-                                      context, ('/HomePage'), (route) => false);
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          HomePage(),
+                                      transitionDuration:
+                                          const Duration(milliseconds: 1000),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        var curve = Curves.easeInOutCubic;
+                                        var tween = Tween(
+                                                begin: const Offset(1.0, 0.0),
+                                                end: Offset.zero)
+                                            .chain(CurveTween(curve: curve));
+                                        var offsetAnimation =
+                                            animation.drive(tween);
+                                        return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                    (route) => false,
+                                  );
+
                                   // ignore: use_build_context_synchronously
                                   Flushbar(
                                     title: "Successfully",
@@ -211,59 +266,6 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     //Build third login
-                    Padding(
-                      padding: const EdgeInsets.only(right: 18),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 0.8,
-                            width: 120,
-                            color: AppColors.secondaryText,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const CustomText(
-                            message: 'Or Login With',
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: AppColors.primaryText,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            height: 0.8,
-                            width: 120,
-                            color: AppColors.secondaryText,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 25),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          buildIcon('assets/icons/google.png'),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          buildIcon('assets/icons/google.png'),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          buildIcon('assets/icons/google.png'),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -275,8 +277,29 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, ('/Register'), (route) => false);
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const RegisterPage(),
+                                transitionDuration:
+                                    const Duration(milliseconds: 500),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  var curve = Curves.easeInOutCubic;
+                                  var tween = Tween(
+                                          begin: const Offset(1.0, 0.0),
+                                          end: Offset.zero)
+                                      .chain(CurveTween(curve: curve));
+                                  var offsetAnimation = animation.drive(tween);
+                                  return SlideTransition(
+                                    position: offsetAnimation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
                           },
                           child: const CustomText(
                             message: 'Register',

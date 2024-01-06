@@ -32,9 +32,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         children: [
           Image.asset('assets/images/forgot.png'),
           Container(
-            height: MediaQuery.of(context).size.height,
             child: Padding(
-              padding: const EdgeInsets.only(top: 15, left: 20),
+              padding: const EdgeInsets.only(top: 15, left: 20, right: 20),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -93,12 +92,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       height: 15,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 20),
+                      padding: const EdgeInsets.only(right: 0,left:0),
                       child: CustomButton(
                           fontSize: 20,
                           height: 60,
                           width: 400,
                           buttonName: "Send OTP",
+                          colorShadow: AppColors.colorShadow,
                           backgroundColorButton: AppColors.primaryButton,
                           borderColor: Colors.white,
                           textColor: Colors.white,

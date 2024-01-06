@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ReportAttendance extends StatefulWidget {
   const ReportAttendance({super.key});
@@ -14,8 +17,19 @@ class ReportAttendance extends StatefulWidget {
 class _ReportAttendanceState extends State<ReportAttendance> {
   final TextEditingController _lectuerController = TextEditingController();
   final TextEditingController _topicController = TextEditingController();
-  final TextEditingController _problemType = TextEditingController();
   final TextEditingController _message = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  XFile? _imageFile;
+
+  // Initial Selected Value
+
+  // List of items in our dropdown menu
+  var items = [
+    'Device failure',
+    'Personal reason',
+    'Others',
+  ];
+  String dropdownvalue = 'Device failure';
 
   @override
   Widget build(BuildContext context) {
@@ -82,10 +96,10 @@ class _ReportAttendanceState extends State<ReportAttendance> {
           ),
         ),
         body: Padding(
-          padding: const EdgeInsets.only(top: 10, left: 15),
+          padding: const EdgeInsets.only(top: 10, left: 15, right: 15),
           child: Container(
             width: 400,
-            height: 700,
+            height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
@@ -117,7 +131,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 15),
+                        padding: const EdgeInsets.only(left: 15, right: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -169,16 +183,44 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                             const SizedBox(
                               height: 5,
                             ),
-                            customFormField(
-                                'Device Failure',
-                                370,
-                                50,
-                                _problemType,
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.arrow_drop_down)),
-                                1,
-                                false),
+                            Container(
+                              width: 370,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                border: Border.all(
+                                    width: 1,
+                                    color: const Color.fromARGB(
+                                        92, 190, 188, 188)),
+                              ),
+                              child: DropdownButton(
+                                underline: Container(),
+                                value: dropdownvalue,
+                                icon: const Icon(Icons.keyboard_arrow_down),
+                                items: items.map((String items) {
+                                  return DropdownMenuItem(
+                                      value: items,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
+                                        child: Container(
+                                          width: 317,
+                                          child: Text(
+                                            items,
+                                            style: const TextStyle(
+                                                color:
+                                                    Color.fromARGB(99, 0, 0, 0),
+                                                fontWeight: FontWeight.normal),
+                                          ),
+                                        ),
+                                      ));
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    dropdownvalue = newValue!;
+                                  });
+                                },
+                              ),
+                            ),
                             const SizedBox(
                               height: 10,
                             ),
@@ -215,13 +257,20 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                 ),
                                 Row(
                                   children: [
+                                    //Call bottom modal imagepicker gallery or camera
                                     CustomButton(
                                       buttonName: 'Upload File',
                                       backgroundColorButton:
                                           AppColors.cardAttendance,
                                       borderColor: AppColors.secondaryText,
                                       textColor: AppColors.primaryButton,
-                                      function: () {},
+                                      colorShadow: Colors.transparent,
+                                      function: () {
+                                        showModalBottomSheet(
+                                            context: context,
+                                            builder: (builder) =>
+                                                bottomSheet());
+                                      },
                                       height: 35,
                                       width: 100,
                                       fontSize: 12,
@@ -234,15 +283,16 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                               height: 10,
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 30),
-                              child: Image.asset(
-                                'assets/images/logo.png',
-                                width: 300,
-                                height: 200,
-                              ),
-                            ),
+                                padding: const EdgeInsets.only(left: 30),
+                                child: _imageFile != null
+                                    ? Image(
+                                        width: 300,
+                                        height: 200,
+                                        image:
+                                            FileImage(File(_imageFile!.path)))
+                                    : Container()),
                             const SizedBox(
-                              height: 10,
+                              height: 5,
                             ),
                             Center(
                               child: Padding(
@@ -251,6 +301,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                     buttonName: 'Send',
                                     backgroundColorButton:
                                         AppColors.primaryButton,
+                                    colorShadow: AppColors.colorShadow,
                                     borderColor: Colors.transparent,
                                     textColor: Colors.white,
                                     function: () {},
@@ -303,5 +354,59 @@ class _ReportAttendanceState extends State<ReportAttendance> {
             )),
       ),
     );
+  }
+
+  Widget noChange() {
+    return Container();
+  }
+
+  Widget bottomSheet() {
+    return Container(
+      height: 100,
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        children: <Widget>[
+          const Text(
+            'Choose Your Photo',
+            style: TextStyle(fontSize: 20.0),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton.icon(
+                onPressed: () {
+                  takePhoto(ImageSource.camera);
+                },
+                icon: const Icon(Icons.camera),
+                label: const Text('Camera'),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  takePhoto(ImageSource.gallery);
+                },
+                icon: const Icon(Icons.camera),
+                label: const Text('Gallery'),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  void takePhoto(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = pickedFile;
+      });
+    }
   }
 }

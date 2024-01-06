@@ -5,6 +5,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/OTPPage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -55,259 +56,276 @@ class _RegisterPageState extends State<RegisterPage> {
           children: [
             const ImageSlider(),
             Container(
-                height: MediaQuery.of(context).size.height,
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 20, top: 15),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const CustomText(
-                              message: 'Register',
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryText),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          const CustomText(
-                              message: 'Enter your personal information',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.secondaryText),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const CustomText(
-                              message: 'Student ID',
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryText),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          CustomTextField(
-                            readOnly: false,
-                            controller: username,
-                            textInputType: TextInputType.text,
-                            obscureText: false,
-                            prefixIcon: const Icon(null),
-                            suffixIcon: IconButton(
-                                onPressed: () {}, icon: const Icon(null)),
-                            hintText: 'Enter your student ID',
-                            onChanged: (value) {
-                              studentDataProvider.setStudentName(value);
+              padding: const EdgeInsets.only(left: 20, top: 15, right: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const CustomText(
+                          message: 'Register',
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryText),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      const CustomText(
+                          message: 'Enter your personal information',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.secondaryText),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const CustomText(
+                          message: 'Student ID',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      CustomTextField(
+                        readOnly: false,
+                        controller: username,
+                        textInputType: TextInputType.text,
+                        obscureText: false,
+                        prefixIcon: const Icon(null),
+                        suffixIcon: IconButton(
+                            onPressed: () {}, icon: const Icon(null)),
+                        hintText: 'Enter your student ID',
+                        onChanged: (value) {
+                          studentDataProvider.setStudentName(value);
+                        },
+                        validator: (value) {
+                          if (value == null ||
+                              value.isEmpty ||
+                              value.length > 50) {
+                            return 'Please check studentID(must not 50 characters) ';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      const CustomText(
+                          message: 'Email',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      CustomTextField(
+                        readOnly: false,
+                        controller: emailAddress,
+                        textInputType: TextInputType.emailAddress,
+                        obscureText: false,
+                        prefixIcon: const Icon(null),
+                        suffixIcon: IconButton(
+                            onPressed: () {}, icon: const Icon(null)),
+                        hintText: 'Enter your email',
+                        onChanged: (value) {
+                          studentDataProvider.setStudentEmail(value);
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Email is required';
+                          }
+                          final RegExp tdtuEmailExp = RegExp(
+                              r'^[0-9A-Z]+@(student\.)?tdtu\.edu\.vn$',
+                              caseSensitive: false);
+                          if (!tdtuEmailExp.hasMatch(value)) {
+                            return 'Please check your valid email TDTU';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      const CustomText(
+                        message: 'Password',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryText,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      CustomTextField(
+                        readOnly: false,
+                        controller: password,
+                        textInputType: TextInputType.visiblePassword,
+                        obscureText: isCheckPassword,
+                        prefixIcon: const Icon(null),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isCheckPassword = !isCheckPassword;
+                              });
                             },
-                            validator: (value) {
-                              if (value == null ||
-                                  value.isEmpty ||
-                                  value.length > 50) {
-                                return 'Please check studentID(must not 50 characters) ';
-                              }
-                              return null;
+                            icon: isCheckPassword
+                                ? const Icon(Icons.visibility)
+                                : const Icon(Icons.visibility_off)),
+                        hintText: 'Enter your password',
+                        onChanged: (value) {
+                          studentDataProvider.setPassword(value);
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Password is required';
+                          }
+                          if (value.length < 8) {
+                            return 'Password must be at least 8 characters long';
+                          }
+                          if (!upperCaseRegex.hasMatch(value)) {
+                            return 'Password must be contain at least one uppercase letter';
+                          }
+                          if (!digitRegex.hasMatch(value)) {
+                            return 'Password must be contain at least one digit number';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      const CustomText(
+                          message: 'Confirm Password',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      CustomTextField(
+                        readOnly: false,
+                        controller: confirmPassword,
+                        textInputType: TextInputType.visiblePassword,
+                        obscureText: isCheckConfirmPassword,
+                        prefixIcon: const Icon(null),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isCheckConfirmPassword =
+                                    !isCheckConfirmPassword;
+                              });
                             },
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          const CustomText(
-                              message: 'Email',
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryText),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          CustomTextField(
-                            readOnly: false,
-                            controller: emailAddress,
-                            textInputType: TextInputType.emailAddress,
-                            obscureText: false,
-                            prefixIcon: const Icon(null),
-                            suffixIcon: IconButton(
-                                onPressed: () {}, icon: const Icon(null)),
-                            hintText: 'Enter your email',
-                            onChanged: (value) {
-                              studentDataProvider.setStudentEmail(value);
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Email is required';
-                              }
-                              final RegExp tdtuEmailExp = RegExp(
-                                  r'^[0-9A-Z]+@(student\.)?tdtu\.edu\.vn$',
-                                  caseSensitive: false);
-                              if (!tdtuEmailExp.hasMatch(value)) {
-                                return 'Please check your valid email TDTU';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          const CustomText(
-                            message: 'Password',
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryText,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          CustomTextField(
-                            readOnly: false,
-                            controller: password,
-                            textInputType: TextInputType.visiblePassword,
-                            obscureText: isCheckPassword,
-                            prefixIcon: const Icon(null),
-                            suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isCheckPassword = !isCheckPassword;
-                                  });
-                                },
-                                icon: isCheckPassword
-                                    ? const Icon(Icons.visibility)
-                                    : const Icon(Icons.visibility_off)),
-                            hintText: 'Enter your password',
-                            onChanged: (value) {
-                              studentDataProvider.setPassword(value);
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Password is required';
-                              }
-                              if (value.length < 8) {
-                                return 'Password must be at least 8 characters long';
-                              }
-                              if (!upperCaseRegex.hasMatch(value)) {
-                                return 'Password must be contain at least one uppercase letter';
-                              }
-                              if (!digitRegex.hasMatch(value)) {
-                                return 'Password must be contain at least one digit number';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          const CustomText(
-                              message: 'Confirm Password',
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryText),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          CustomTextField(
-                            readOnly: false,
-                            controller: confirmPassword,
-                            textInputType: TextInputType.visiblePassword,
-                            obscureText: isCheckConfirmPassword,
-                            prefixIcon: const Icon(null),
-                            suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isCheckConfirmPassword =
-                                        !isCheckConfirmPassword;
-                                  });
-                                },
-                                icon: isCheckConfirmPassword
-                                    ? const Icon(Icons.visibility)
-                                    : const Icon(Icons.visibility_off)),
-                            hintText: 'Confirm your password',
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Confirm password required';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          CustomButton(
-                              fontSize: 20,
-                              height: 60,
-                              width: 400,
-                              buttonName: 'Register',
-                              backgroundColorButton: AppColors.primaryButton,
-                              borderColor: Colors.white,
-                              textColor: Colors.white,
-                              function: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  try {
-                                    if (password.text == confirmPassword.text) {
-                                      bool check = await Authenticate()
-                                          .registerUser(username.text,
-                                              emailAddress.text, password.text);
-                                      if (check) {
-                                        // ignore: use_build_context_synchronously
-                                        Navigator.pushNamed(context, '/OTP');
-                                        // ignore: use_build_context_synchronously
-                                        showFlushBarNotification(
-                                            context,
-                                            "Successfully",
-                                            "Please enter your OTP",
-                                            3);
-                                      } else {
-                                        // ignore: use_build_context_synchronously
-                                        showFlushBarNotification(
-                                            context,
-                                            "Failed",
-                                            "User is not exist or active",
-                                            3);
-                                      }
-                                    } else {
-                                      showFlushBarNotification(
-                                          context,
-                                          "Failed",
-                                          "Check your password and confirm password",
-                                          3);
-                                    }
-                                  } catch (e) {
-                                    // ignore: avoid_print
-                                    print(e);
+                            icon: isCheckConfirmPassword
+                                ? const Icon(Icons.visibility)
+                                : const Icon(Icons.visibility_off)),
+                        hintText: 'Confirm your password',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Confirm password required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CustomButton(
+                          fontSize: 20,
+                          height: 60,
+                          width: 400,
+                          buttonName: 'Register',
+                          colorShadow: AppColors.colorShadow,
+                          backgroundColorButton: AppColors.primaryButton,
+                          borderColor: Colors.white,
+                          textColor: Colors.white,
+                          function: () async {
+                            if (_formKey.currentState!.validate()) {
+                              try {
+                                if (password.text == confirmPassword.text) {
+                                  bool check = await Authenticate()
+                                      .registerUser(username.text,
+                                          emailAddress.text, password.text);
+                                  if (check) {
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.pushReplacement(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                                secondaryAnimation) =>
+                                            const OTPPage(),
+                                        transitionDuration:
+                                            const Duration(milliseconds: 1000),
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          var curve = Curves.easeInOutCubic;
+                                          var tween = Tween(
+                                                  begin: const Offset(1.0, 0.0),
+                                                  end: Offset.zero)
+                                              .chain(CurveTween(curve: curve));
+                                          var offsetAnimation =
+                                              animation.drive(tween);
+                                          return SlideTransition(
+                                            position: offsetAnimation,
+                                            child: child,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                    // ignore: use_build_context_synchronously
+                                    showFlushBarNotification(
+                                        context,
+                                        "Successfully",
+                                        "Please enter your OTP",
+                                        3);
+                                  } else {
+                                    // ignore: use_build_context_synchronously
+                                    showFlushBarNotification(context, "Failed",
+                                        "User is not exist or active", 3);
                                   }
                                 } else {
                                   showFlushBarNotification(
                                       context,
-                                      "Invalid Form",
-                                      "Please complete the form property",
+                                      "Failed",
+                                      "Check your password and confirm password",
                                       3);
                                 }
-                              }),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const CustomText(
-                                    message: 'Already have an account ? ',
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.primaryText),
-                                GestureDetector(
-                                  onTap: () =>
-                                      Navigator.pushNamed(context, "/Login"),
-                                  child: const CustomText(
-                                      message: 'Log In',
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.importantText),
-                                )
-                              ],
-                            ),
-                          )
-                        ]),
-                  ),
-                ))
+                              } catch (e) {
+                                // ignore: avoid_print
+                                print(e);
+                              }
+                            } else {
+                              showFlushBarNotification(context, "Invalid Form",
+                                  "Please complete the form property", 3);
+                            }
+                          }),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const CustomText(
+                                message: 'Already have an account ? ',
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.primaryText),
+                            GestureDetector(
+                              onTap: () =>
+                                  Navigator.pushNamed(context, "/Login"),
+                              child: const CustomText(
+                                  message: 'Log In',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.importantText),
+                            )
+                          ],
+                        ),
+                      )
+                    ]),
+              ),
+            ))
           ],
         ),
       ),

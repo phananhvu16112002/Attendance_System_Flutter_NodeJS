@@ -1,20 +1,64 @@
+import 'dart:io';
+
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/services/SmartCamera.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-class AttendanceForm extends StatefulWidget {
-  const AttendanceForm({super.key});
+class AttendanceFormPage extends StatefulWidget {
+  const AttendanceFormPage({super.key});
 
   @override
-  State<AttendanceForm> createState() => _AttendancePageState();
+  State<AttendanceFormPage> createState() => _AttendancePageState();
 }
 
-class _AttendancePageState extends State<AttendanceForm> {
+class _AttendancePageState extends State<AttendanceFormPage> {
+  XFile? file;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getImage();
+  }
+
+  Future<void> getImage() async {
+    var value = await SecureStorage().readSecureData('image');
+    if (value.isNotEmpty && value != 'No Data Found') {
+      print(value);
+      setState(() {
+        file = XFile(value);
+      });
+    } else {
+      // Handle the case where the file path is empty or invalid
+      setState(() {
+        file = null;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final studentDataProvider =
+        Provider.of<StudentDataProvider>(context, listen: true);
     return Scaffold(
       appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: const Icon(Icons.arrow_back,
+                color: Colors.white), // Thay đổi icon và màu sắc tùy ý
+          ),
+        ),
         title: const Text(
           'Attendance Form',
           style: TextStyle(
@@ -23,14 +67,15 @@ class _AttendancePageState extends State<AttendanceForm> {
         centerTitle: true,
         backgroundColor: AppColors.primaryButton,
       ),
-      body: bodyAttendance(),
+      body: bodyAttendance(studentDataProvider),
     );
   }
 
-  SingleChildScrollView bodyAttendance() {
+  SingleChildScrollView bodyAttendance(
+      StudentDataProvider studentDataProvider) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.only(left: 14),
+        padding: const EdgeInsets.only(left: 15, right: 15),
         // Column Tổng
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,16 +87,33 @@ class _AttendancePageState extends State<AttendanceForm> {
             const SizedBox(
               height: 15,
             ),
-            infoLocation(),
+            infoLocation(studentDataProvider.userData.location),
             const SizedBox(
               height: 15,
             ),
             CustomButton(
                 buttonName: 'Scan your face',
+                colorShadow: AppColors.colorShadow,
                 backgroundColorButton: AppColors.cardAttendance,
                 borderColor: Colors.transparent,
                 textColor: AppColors.primaryButton,
-                function: () {},
+                function: () {
+                  Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          SmartCamera(),
+                      transitionDuration: const Duration(milliseconds: 300),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        return ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
                 height: 40,
                 width: 140,
                 fontSize: 15),
@@ -60,20 +122,32 @@ class _AttendancePageState extends State<AttendanceForm> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 15),
-              child: Container(
-                width: 350,
-                height: 320,
-                child: Center(child: Image.asset('assets/images/logo.png')),
-              ),
+              child: file != null
+                  ? Container(
+                      width: 350,
+                      height: 320,
+                      child: Center(
+                        child: file != null
+                            ? Image.file(File(file!.path))
+                            : Container(),
+                      ),
+                    )
+                  : Container(),
+            ),
+            const SizedBox(
+              height: 10,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 15),
+              padding: const EdgeInsets.only(left: 0),
               child: CustomButton(
                   buttonName: 'Attendance',
+                  colorShadow: AppColors.colorShadow,
                   backgroundColorButton: AppColors.primaryButton,
                   borderColor: Colors.transparent,
                   textColor: Colors.white,
-                  function: () {},
+                  function: () async {
+                    await SecureStorage().deleteSecureData('image');
+                  },
                   height: 55,
                   width: 380,
                   fontSize: 20),
@@ -84,10 +158,10 @@ class _AttendancePageState extends State<AttendanceForm> {
     );
   }
 
-  Container infoLocation() {
+  Container infoLocation(String location) {
     return Container(
       width: 405,
-      height: 50,
+      height: 70,
       decoration: const BoxDecoration(
           color: AppColors.cardAttendance,
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -98,14 +172,9 @@ class _AttendancePageState extends State<AttendanceForm> {
                 offset: Offset(0.0, 0.0))
           ]),
       child: Padding(
-        padding: const EdgeInsets.only(left: 12, top: 15),
-        child: customRichText(
-            'Location: ',
-            '19 Nguyen Huu Tho, District 7, Ho Chi Minh City',
-            FontWeight.bold,
-            FontWeight.w500,
-            AppColors.primaryText,
-            AppColors.primaryText),
+        padding: const EdgeInsets.only(left: 12, top: 15, bottom: 15),
+        child: customRichText('Location: ', location, FontWeight.bold,
+            FontWeight.w500, AppColors.primaryText, AppColors.primaryText),
       ),
     );
   }
@@ -128,7 +197,7 @@ class _AttendancePageState extends State<AttendanceForm> {
           const CustomText(
               message: 'Tuesday 7 January, 2023',
               fontSize: 16,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: AppColors.primaryText),
           const SizedBox(
             height: 2,
@@ -144,7 +213,7 @@ class _AttendancePageState extends State<AttendanceForm> {
               Container(
                 margin: const EdgeInsets.only(left: 15, top: 10),
                 child: Container(
-                  width: 220,
+                  width: 190,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -252,5 +321,17 @@ class _AttendancePageState extends State<AttendanceForm> {
         ),
       ),
     ]));
+  }
+
+  String formatDate(String date) {
+    DateTime serverDateTime = DateTime.parse(date);
+    String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+    return formattedDate;
+  }
+
+  String formatTime(String time) {
+    DateTime serverDateTime = DateTime.parse(time);
+    String formattedTime = DateFormat('HH:mm:ss').format(serverDateTime);
+    return formattedTime;
   }
 }

@@ -53,6 +53,7 @@ class _ImageSliderState extends State<ImageSlider> {
           children: [
             ImageWelcome(context, 'assets/images/image_welcome1.jpg'),
             ImageWelcome(context, 'assets/images/image_welcome3.jpg'),
+            ImageWelcome(context, 'assets/images/image_welcome4.jpg'),
             ImageWelcome(context, 'assets/images/image_welcome2.jpg'),
           ],
         ),

@@ -43,7 +43,7 @@ class CustomTextField extends StatelessWidget {
         decoration: InputDecoration(
             contentPadding: const EdgeInsets.all(20),
             suffixIcon: suffixIcon,
-            hintText: hintText,
+            labelText: hintText, // change here hinttext
             enabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),
                 borderSide:

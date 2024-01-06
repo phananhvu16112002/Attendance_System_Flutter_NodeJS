@@ -1,9 +1,16 @@
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
+import 'package:attendance_system_nodejs/models/StudentClasses.dart';
+import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class DetailPageBody extends StatefulWidget {
-  const DetailPageBody({super.key});
+  const DetailPageBody({super.key, required this.studentClasses});
+  final StudentClasses studentClasses;
 
   @override
   State<DetailPageBody> createState() => _DetailPageBodyState();
@@ -14,173 +21,222 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   bool activePresent = false;
   bool activeAbsent = false;
   bool activeLate = false;
+  late StudentClasses studentClasses;
+  int totalPresence = 0;
+  int totalAbsence = 0;
+  int totalLate = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    studentClasses = widget.studentClasses;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
+    final attendanceDetailDataProvider =
+        Provider.of<AttendanceDetailDataProvider>(context, listen: false);
+    return FutureBuilder(
+      future: API().getAttendanceDetail(studentClasses.classes.classID),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: AppColors.cardAttendance,
+            child: Text('Error: ${snapshot.error}'),
+          );
+        } else if (snapshot.hasData) {
+          if (snapshot.data != null) {
+            List<AttendanceDetail> attendanceDetail = snapshot.data!;
+
+            Future.delayed(Duration.zero, () {
+              attendanceDetailDataProvider
+                  .setAttendanceDetailList(attendanceDetail);
+            });
+
+            return Container(
               width: MediaQuery.of(context).size.width,
-              height: 50,
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: AppColors.secondaryText,
-                        blurRadius: 5.0,
-                        offset: Offset(0.0, 0.0))
-                  ]),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        activeAbsent = false;
-                        activeLate = false;
-                        activePresent = false;
-                        activeTotal = true;
-                      });
-                    },
-                    child: Container(
-                      width: 100,
-                      decoration: BoxDecoration(
-                          color: activeTotal
-                              ? AppColors.cardAttendance
-                              : Colors.white,
-                          borderRadius: const BorderRadius.all(Radius.circular(10))),
-                      child: const Center(
-                        child: CustomText(
-                            message: 'Total: 10',
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryText),
+              height: MediaQuery.of(context).size.height,
+              color: AppColors.cardAttendance,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 45,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          boxShadow: [
+                            BoxShadow(
+                                color: AppColors.secondaryText,
+                                blurRadius: 5.0,
+                                offset: Offset(0.0, 0.0))
+                          ]),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                activeAbsent = false;
+                                activeLate = false;
+                                activePresent = false;
+                                activeTotal = true;
+                              });
+                            },
+                            child: Container(
+                              width: 95,
+                              decoration: BoxDecoration(
+                                  color: activeTotal
+                                      ? AppColors.cardAttendance
+                                      : Colors.white,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              child: const Center(
+                                child: CustomText(
+                                    message: 'Total: 10',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryText),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                activeAbsent = false;
+                                activeLate = false;
+                                activePresent = true;
+                                activeTotal = false;
+                              });
+                            },
+                            child: Container(
+                              width: 95,
+                              decoration: BoxDecoration(
+                                  color: activePresent
+                                      ? const Color.fromARGB(94, 137, 210, 64)
+                                      : Colors.white,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              child: Center(
+                                child: CustomText(
+                                    message: 'Present: ${0}',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryText),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                activeAbsent = true;
+                                activeLate = false;
+                                activePresent = false;
+                                activeTotal = false;
+                              });
+                            },
+                            child: Container(
+                              width: 95,
+                              decoration: BoxDecoration(
+                                  color: activeAbsent
+                                      ? const Color.fromARGB(216, 219, 87, 87)
+                                      : Colors.white,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              child: Center(
+                                child: CustomText(
+                                    message: 'Absent: $totalAbsence',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryText),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                activeAbsent = false;
+                                activeLate = true;
+                                activePresent = false;
+                                activeTotal = false;
+                              });
+                            },
+                            child: Container(
+                              width: 95,
+                              decoration: BoxDecoration(
+                                  color: activeLate
+                                      ? const Color.fromARGB(231, 232, 156, 63)
+                                      : Colors.white,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              child: Center(
+                                child: CustomText(
+                                    message: 'Late: $totalLate',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryText),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        activeAbsent = false;
-                        activeLate = false;
-                        activePresent = true;
-                        activeTotal = false;
-                      });
-                    },
-                    child: Container(
-                      width: 100,
-                      decoration: BoxDecoration(
-                          color: activePresent
-                              ? const Color.fromARGB(94, 137, 210, 64)
-                              : Colors.white,
-                          borderRadius: const BorderRadius.all(Radius.circular(10))),
-                      child: const Center(
-                        child: CustomText(
-                            message: 'Present: 5',
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryText),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        activeAbsent = true;
-                        activeLate = false;
-                        activePresent = false;
-                        activeTotal = false;
-                      });
-                    },
-                    child: Container(
-                      width: 100,
-                      decoration: BoxDecoration(
-                          color: activeAbsent
-                              ? const Color.fromARGB(216, 219, 87, 87)
-                              : Colors.white,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10))),
-                      child: const Center(
-                        child: CustomText(
-                            message: 'Absent: 3',
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryText),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        activeAbsent = false;
-                        activeLate = true;
-                        activePresent = false;
-                        activeTotal = false;
-                      });
-                    },
-                    child: Container(
-                      width: 100,
-                      decoration: BoxDecoration(
-                          color: activeLate
-                              ? const Color.fromARGB(231, 232, 156, 63)
-                              : Colors.white,
-                          borderRadius: const BorderRadius.all(Radius.circular(10))),
-                      child: const Center(
-                        child: CustomText(
-                            message: 'Late: 2',
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryText),
-                      ),
-                    ),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: attendanceDetail.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          var data = attendanceDetail[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 15),
+                            child: customCard(
+                                formatDate(data.dateAttendanced.toString()),
+                                formatTime(data.dateAttendanced.toString()),
+                                getStatusText(
+                                    data.present, data.late, data.absence),
+                                data.location),
+                          );
+                        })
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            customCard('Tuesday 7 November, 2023', '15:30 PM', 'Successfully'),
-            const SizedBox(
-              height: 15,
-            ),
-            customCard('Thursday 9 November, 2023', '15:30 PM', 'Late'),
-            const SizedBox(
-              height: 15,
-            ),
-            customCard('Thursday 9 November, 2023', '', 'Absent')
-          ],
-        ),
-      ),
+            );
+          }
+        }
+        return Text('Data Not Avalible');
+      },
     );
   }
 
-  Container customCard(String date, String timeAttendance, String status) {
+  Container customCard(
+      String date, String timeAttendance, String status, String location) {
     return Container(
       width: 405,
       height: 220,
       decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 243, 248, 253),
+          color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
           boxShadow: [
             BoxShadow(
-                color: AppColors.secondaryText,
+                color: Color.fromARGB(195, 190, 188, 188),
                 blurRadius: 5.0,
-                offset: Offset(0.0, 0.0))
+                offset: Offset(2.0, 1.0))
           ]),
       child: Column(
         children: [
           CustomText(
-              message: date,
+              message: date.toString(),
               fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: AppColors.primaryText),
           const SizedBox(
             height: 2,
@@ -194,11 +250,11 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             height: 5,
           ),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                margin: const EdgeInsets.only(left: 15, top: 10),
+                margin: const EdgeInsets.only(left: 15),
                 child: Container(
                   width: 230,
                   child: Column(
@@ -206,8 +262,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                     children: [
                       customRichText(
                           'Location: ',
-                          'Ton Duc Thang University, District 7, Ho Chi Minh City',
-                          FontWeight.bold,
+                          location,
+                          FontWeight.w600,
                           FontWeight.w500,
                           AppColors.primaryText,
                           AppColors.primaryText),
@@ -216,8 +272,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       ),
                       customRichText(
                           'Time Attendance: ',
-                          timeAttendance,
-                          FontWeight.bold,
+                          timeAttendance.toString(),
+                          FontWeight.w600,
                           FontWeight.w500,
                           AppColors.primaryText,
                           AppColors.primaryText),
@@ -225,9 +281,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                         height: 10,
                       ),
                       customRichText(
-                          'Staus: ',
+                          'Status: ',
                           status,
-                          FontWeight.bold,
+                          FontWeight.w600,
                           FontWeight.w500,
                           AppColors.primaryText,
                           getColorBasedOnStatus(status)),
@@ -240,8 +296,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
               ),
               Container(
                 margin: const EdgeInsets.only(right: 10, top: 10),
-                height: 140,
-                width: 140,
+                height: 130,
+                width: 130,
                 child: Image.asset('assets/images/logo.png'),
               ),
             ],
@@ -303,8 +359,205 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     } else if (status.contains('Absent')) {
       return AppColors.importantText;
     } else {
-      // Mặc định hoặc trường hợp khác
       return AppColors.primaryText;
     }
   }
+
+  String getStatusText(bool present, bool late, bool absence) {
+    if (present) {
+      return 'Successfully';
+    } else if (late) {
+      return 'Late';
+    } else if (absence) {
+      return 'Absent';
+    } else {
+      // Nếu cả ba giá trị đều là false, trả về chuỗi "Absent"
+      return 'Absent';
+    }
+  }
+
+  String formatDate(String date) {
+    DateTime serverDateTime = DateTime.parse(date);
+    String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+    return formattedDate;
+  }
+
+  String formatTime(String time) {
+    DateTime serverDateTime = DateTime.parse(time);
+    String formattedTime = DateFormat('HH:mm:ss').format(serverDateTime);
+    return formattedTime;
+  }
 }
+
+//  return Container(
+//       width: MediaQuery.of(context).size.width,
+//       height: MediaQuery.of(context).size.height,
+//       color: AppColors.cardAttendance,
+//       child: SingleChildScrollView(
+//         child: Column(
+//           children: [
+//             const SizedBox(
+//               height: 10,
+//             ),
+//             Container(
+//               width: MediaQuery.of(context).size.width,
+//               height: 45,
+//               decoration: const BoxDecoration(
+//                   color: Colors.white,
+//                   borderRadius: BorderRadius.all(Radius.circular(10)),
+//                   boxShadow: [
+//                     BoxShadow(
+//                         color: AppColors.secondaryText,
+//                         blurRadius: 5.0,
+//                         offset: Offset(0.0, 0.0))
+//                   ]),
+//               child: Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+//                 children: [
+//                   GestureDetector(
+//                     onTap: () {
+//                       setState(() {
+//                         activeAbsent = false;
+//                         activeLate = false;
+//                         activePresent = false;
+//                         activeTotal = true;
+//                       });
+//                     },
+//                     child: Container(
+//                       width: 95,
+//                       decoration: BoxDecoration(
+//                           color: activeTotal
+//                               ? AppColors.cardAttendance
+//                               : Colors.white,
+//                           borderRadius:
+//                               const BorderRadius.all(Radius.circular(10))),
+//                       child: const Center(
+//                         child: CustomText(
+//                             message: 'Total: 10',
+//                             fontSize: 15,
+//                             fontWeight: FontWeight.w600,
+//                             color: AppColors.primaryText),
+//                       ),
+//                     ),
+//                   ),
+//                   GestureDetector(
+//                     onTap: () {
+//                       setState(() {
+//                         activeAbsent = false;
+//                         activeLate = false;
+//                         activePresent = true;
+//                         activeTotal = false;
+//                       });
+//                     },
+//                     child: Container(
+//                       width: 95,
+//                       decoration: BoxDecoration(
+//                           color: activePresent
+//                               ? const Color.fromARGB(94, 137, 210, 64)
+//                               : Colors.white,
+//                           borderRadius:
+//                               const BorderRadius.all(Radius.circular(10))),
+//                       child: const Center(
+//                         child: CustomText(
+//                             message: 'Present: 5',
+//                             fontSize: 15,
+//                             fontWeight: FontWeight.w600,
+//                             color: AppColors.primaryText),
+//                       ),
+//                     ),
+//                   ),
+//                   GestureDetector(
+//                     onTap: () {
+//                       setState(() {
+//                         activeAbsent = true;
+//                         activeLate = false;
+//                         activePresent = false;
+//                         activeTotal = false;
+//                       });
+//                     },
+//                     child: Container(
+//                       width: 95,
+//                       decoration: BoxDecoration(
+//                           color: activeAbsent
+//                               ? const Color.fromARGB(216, 219, 87, 87)
+//                               : Colors.white,
+//                           borderRadius:
+//                               const BorderRadius.all(Radius.circular(10))),
+//                       child: const Center(
+//                         child: CustomText(
+//                             message: 'Absent: 3',
+//                             fontSize: 15,
+//                             fontWeight: FontWeight.w600,
+//                             color: AppColors.primaryText),
+//                       ),
+//                     ),
+//                   ),
+//                   GestureDetector(
+//                     onTap: () {
+//                       setState(() {
+//                         activeAbsent = false;
+//                         activeLate = true;
+//                         activePresent = false;
+//                         activeTotal = false;
+//                       });
+//                     },
+//                     child: Container(
+//                       width: 95,
+//                       decoration: BoxDecoration(
+//                           color: activeLate
+//                               ? const Color.fromARGB(231, 232, 156, 63)
+//                               : Colors.white,
+//                           borderRadius:
+//                               const BorderRadius.all(Radius.circular(10))),
+//                       child: const Center(
+//                         child: CustomText(
+//                             message: 'Late: 3',
+//                             fontSize: 15,
+//                             fontWeight: FontWeight.w600,
+//                             color: AppColors.primaryText),
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             const SizedBox(height: 10),
+//             FutureBuilder(
+//                 future:
+//                     API().getAttendanceDetail(studentClasses.classes.classID),
+//                 builder: (context, snapshot) {
+//                   if (snapshot.connectionState == ConnectionState.waiting) {
+//                     return const CircularProgressIndicator();
+//                   } else if (snapshot.hasError) {
+//                     return Text('Error: ${snapshot.error}');
+//                   } else if (snapshot.hasData) {
+//                     if (snapshot.data != null) {
+//                       List<AttendanceDetail> attendanceDetail = snapshot.data!;
+//                       // Cập nhật dữ liệu vào Provider
+//                       Future.delayed(Duration.zero, () {
+//                         attendanceDetailDataProvider
+//                             .setAttendanceDetailList(attendanceDetail);
+//                       });
+//                       return ListView.builder(
+//                           shrinkWrap: true,
+//                           itemCount: attendanceDetail.length,
+//                           itemBuilder: (BuildContext context, int index) {
+//                             var data = attendanceDetail[index];
+//                             return Padding(
+//                               padding: const EdgeInsets.only(bottom: 15),
+//                               child: customCard(
+//                                   formatDate(data.dateAttendanced.toString()),
+//                                   formatTime(data.dateAttendanced.toString()),
+//                                   getStatusText(
+//                                       data.present, data.late, data.absence),
+//                                   data.location),
+//                             );
+//                           });
+//                     }
+//                   }
+//                   return const Text('Data is not available');
+//                 })
+//           ],
+//         ),
+//       ),
+//     );

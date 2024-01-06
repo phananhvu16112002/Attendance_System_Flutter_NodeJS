@@ -2,6 +2,8 @@ import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/ImageSlider.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -30,10 +32,10 @@ class _WelcomePageState extends State<WelcomePage> {
             children: [
               const ImageSlider(),
               Container(
-                height: MediaQuery.of(context).size.height,
                 color: Colors.white,
+                height: MediaQuery.of(context).size.height,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 10, left: 15),
+                  padding: const EdgeInsets.only(top: 10, left: 15, right: 15),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -47,14 +49,29 @@ class _WelcomePageState extends State<WelcomePage> {
                           const SizedBox(
                             width: 20,
                           ),
+                          // Expanded(
+                          //     child: CustomText(
+                          //   message: schoolName,
+                          //   fontSize: 40,
+                          //   fontWeight: FontWeight.w800,
+                          //   color: AppColors.primaryText,
+                          // )),
                           Expanded(
-                              child: CustomText(
-                            message: schoolName,
-                            fontSize: 40,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primaryText,
-                          )),
+                              child: customRichText(
+                                  'TON ',
+                                  'DUC ',
+                                  'THANG ',
+                                  'UNIVERISTY',
+                                  FontWeight.w700,
+                                  30,
+                                  const Color(0xff0364A9),
+                                  const Color(0xff0364A9),
+                                  const Color(0xff0364A9),
+                                  AppColors.primaryText))
                         ],
+                      ),
+                      const SizedBox(
+                        height: 5,
                       ),
                       CustomText(
                           message: descriptionSchool,
@@ -65,35 +82,79 @@ class _WelcomePageState extends State<WelcomePage> {
                         height: 20,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(right: 15),
-                        child: CustomButton(
-                            fontSize: 20,
-                            height: 60,
-                            width: 400,
-                            buttonName: 'Login',
-                            backgroundColorButton: AppColors.primaryButton,
-                            borderColor: Colors.white,
-                            textColor: Colors.white,
-                            function: () =>
-                                Navigator.of(context).pushNamed('/Login')),
-                      ),
+                          padding: const EdgeInsets.only(right: 0),
+                          child: CustomButton(
+                              fontSize: 20,
+                              height: 60,
+                              width: 400,
+                              buttonName: 'Login',
+                              colorShadow: AppColors.colorShadow,
+                              backgroundColorButton: AppColors.primaryButton,
+                              borderColor: Colors.transparent,
+                              textColor: Colors.white,
+                              function: () => Navigator.pushReplacement(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          SignInPage(),
+                                      transitionDuration:
+                                          const Duration(milliseconds: 1000),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        var curve = Curves.easeInOutCubic;
+                                        var tween = Tween(
+                                                begin: const Offset(1.0, 0.0),
+                                                end: Offset.zero)
+                                            .chain(CurveTween(curve: curve));
+                                        var offsetAnimation =
+                                            animation.drive(tween);
+
+                                        return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                  ))),
                       const SizedBox(
                         height: 20,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 0),
                         child: CustomButton(
-                          fontSize: 20,
-                          height: 60,
-                          width: 400,
-                          buttonName: 'Register',
-                          backgroundColorButton: Colors.white,
-                          borderColor: AppColors.primaryText,
-                          textColor: AppColors.primaryText,
-                          function: () =>
-                              Navigator.of(context, rootNavigator: true)
-                                  .pushNamed('/Register'),
-                        ),
+                            fontSize: 20,
+                            height: 60,
+                            width: 400,
+                            buttonName: 'Register',
+                            colorShadow: Colors.transparent,
+                            backgroundColorButton: Colors.white,
+                            borderColor: AppColors.primaryButton,
+                            textColor: AppColors.primaryButton,
+                            function: () => Navigator.pushReplacement(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        RegisterPage(),
+                                    transitionDuration:
+                                        const Duration(milliseconds: 1000),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      var curve = Curves.easeInOutCubic;
+                                      var tween = Tween(
+                                              begin: const Offset(1.0, 0.0),
+                                              end: Offset.zero)
+                                          .chain(CurveTween(curve: curve));
+                                      var offsetAnimation =
+                                          animation.drive(tween);
+                                      return SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                )),
                       )
                     ],
                   ),
@@ -102,5 +163,54 @@ class _WelcomePageState extends State<WelcomePage> {
             ],
           ),
         ));
+  }
+
+  RichText customRichText(
+    String title,
+    String title2,
+    String title3,
+    String title4,
+    FontWeight fontWeightTitle,
+    double fontSize,
+    Color colorTextTitle,
+    Color colorTextTitle2,
+    Color colorTextTitle3,
+    Color colorTextTitle4,
+  ) {
+    return RichText(
+        text: TextSpan(children: [
+      TextSpan(
+        text: title,
+        style: TextStyle(
+          fontWeight: fontWeightTitle,
+          fontSize: fontSize,
+          color: colorTextTitle,
+        ),
+      ),
+      TextSpan(
+        text: title2,
+        style: TextStyle(
+          fontWeight: fontWeightTitle,
+          fontSize: fontSize,
+          color: colorTextTitle2,
+        ),
+      ),
+      TextSpan(
+        text: title3,
+        style: TextStyle(
+          fontWeight: fontWeightTitle,
+          fontSize: fontSize,
+          color: colorTextTitle3,
+        ),
+      ),
+      TextSpan(
+        text: title4,
+        style: TextStyle(
+          fontWeight: fontWeightTitle,
+          fontSize: fontSize,
+          color: colorTextTitle4,
+        ),
+      ),
+    ]));
   }
 }

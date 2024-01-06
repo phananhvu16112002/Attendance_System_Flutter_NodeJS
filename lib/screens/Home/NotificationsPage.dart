@@ -14,7 +14,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     return Scaffold(
       appBar: AppBar(
           title: const Text(
-            'Reports',
+            'Notifications',
             style: TextStyle(
                 color: AppColors.primaryText,
                 fontWeight: FontWeight.bold,
@@ -56,7 +56,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       width: 10,
                     ),
                     Container(
-                      width: 350,
+                      width: 310,
                       child: customRichText(
                           'Class: Cross Platform Programming. ',
                           'Attendance form opens at 11:45 AM. Please take attendance.',
@@ -90,7 +90,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       width: 10,
                     ),
                     Container(
-                      width: 350,
+                      width: 310,
                       child: customRichText(
                           'Class: Cross Platform Programming. ',
                           'Attendance form opens at 11:45 AM. Please take attendance.',

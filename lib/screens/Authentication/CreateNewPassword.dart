@@ -4,6 +4,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,9 +37,8 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
           children: [
             Image.asset('assets/images/forgot.png'),
             Container(
-              height: MediaQuery.of(context).size.height,
               child: Padding(
-                padding: const EdgeInsets.only(left: 20, top: 15),
+                padding: const EdgeInsets.only(left: 15, top: 15, right: 15),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -139,13 +139,14 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                         height: 15,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(right: 20),
+                        padding: const EdgeInsets.only(right: 0),
                         child: CustomButton(
                           fontSize: 20,
                           height: 60,
                           width: 400,
                           buttonName: "Reset Password",
                           backgroundColorButton: AppColors.primaryButton,
+                          colorShadow: AppColors.colorShadow,
                           borderColor: Colors.white,
                           textColor: Colors.white,
                           function: () async {
@@ -158,8 +159,31 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                                     password.text);
                                 if (check) {
                                   // ignore: use_build_context_synchronously
-                                  Navigator.pushNamedAndRemoveUntil(
-                                      context, "/Login", (route) => false);
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          const SignInPage(),
+                                      transitionDuration:
+                                          const Duration(milliseconds: 1000),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        var curve = Curves.easeInOutCubic;
+                                        var tween = Tween(
+                                                begin: const Offset(1.0, 0.0),
+                                                end: Offset.zero)
+                                            .chain(CurveTween(curve: curve));
+                                        var offsetAnimation =
+                                            animation.drive(tween);
+                                        return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                    (route) => false,
+                                  );
                                   // ignore: use_build_context_synchronously
                                   showFlushBarNotification(
                                       context,

@@ -25,8 +25,10 @@ class AppColors {
   //Color SecondaryButton
   static const Color secondaryButton = Colors.white;
 
+  //Color ButtonColorShadow
+  static const Color colorShadow = Color.fromARGB(133, 1, 103, 255);
   //Color Card in Home
-  static const Color cardHome = Color.fromARGB(231, 245, 249, 3);
+  static const Color cardHome = Color.fromARGB(160, 247, 148, 28);
 
   //Color Card in Attendance
   static const Color cardAttendance = Color.fromARGB(255, 238, 246, 254);
