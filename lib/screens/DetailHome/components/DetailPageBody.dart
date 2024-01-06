@@ -41,12 +41,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
       future: API().getAttendanceDetail(studentClasses.classes.classID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            color: AppColors.cardAttendance,
-            child: const CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Container(
             width: MediaQuery.of(context).size.width,
@@ -57,7 +52,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
         } else if (snapshot.hasData) {
           if (snapshot.data != null) {
             List<AttendanceDetail> attendanceDetail = snapshot.data!;
-            // Cập nhật dữ liệu vào Provider
+
             Future.delayed(Duration.zero, () {
               attendanceDetailDataProvider
                   .setAttendanceDetailList(attendanceDetail);

@@ -9,16 +9,11 @@ import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dar
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/screens/DetailHome/FloatingButtonReport.dart';
-import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
-import 'package:attendance_system_nodejs/screens/DetailHome/ReportClass.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
-import 'package:attendance_system_nodejs/screens/Test.dart';
-import 'package:attendance_system_nodejs/screens/TestConnection.dart';
-import 'package:attendance_system_nodejs/screens/TestGenerateQRCode.dart';
+import 'package:attendance_system_nodejs/screens/TestSocket.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -69,7 +64,7 @@ class _MyAppState extends State<MyApp> {
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },
-      home: const HomePage(),
+      home: TestSocket(),
       debugShowCheckedModeBanner: false,
     );
   }

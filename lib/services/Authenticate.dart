@@ -68,7 +68,6 @@ class Authenticate {
       await SecureStorage().writeSecureData('studentID', studentID);
       await SecureStorage().writeSecureData('studentEmail', studentEmail);
       await SecureStorage().writeSecureData('studentName', studentName);
-
       return true;
     } else {
       // ignore: avoid_print

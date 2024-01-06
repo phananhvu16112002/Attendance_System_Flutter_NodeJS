@@ -91,20 +91,6 @@ class _HomePageBodyState extends State<HomePageBody> {
     }
   }
 
-  // Future<void> updateAddress() async {
-  //   Position position = await GetLocation().determinePosition();
-  //   bool check = await getLocation.updateLocation(studentDataProvider);
-  //   if (check) {
-  //     var temp = await GetLocation().getAddressFromLatLong(position);
-  //     studentDataProvider.setLocation(temp!);
-  //     if (studentDataProvider.userData.location.isNotEmpty) {
-  //       print('Successfully');
-  //     }
-  //   } else {
-  //     print('Failed to Update');
-  //   }
-  // }
-
   void showSettingsAlert() {
     showDialog(
       context: context,
@@ -140,6 +126,7 @@ class _HomePageBodyState extends State<HomePageBody> {
     return SingleChildScrollView(
         //Column Tổng body
         child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Stack(children: [
           CustomAppBar(
@@ -173,14 +160,12 @@ class _HomePageBodyState extends State<HomePageBody> {
                   hintText: 'Search class | Example: CourseID,..',
                 )),
           ),
-
           //Body 2
-
           Container(
-            margin: const EdgeInsets.only(top: 350),
             child: Column(
               children: [
                 Container(
+                  margin: EdgeInsets.only(top: 350),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -246,172 +231,165 @@ class _HomePageBodyState extends State<HomePageBody> {
                     ],
                   ),
                 ),
-                if (!activeQR)
-                  StreamBuilder(
-                      stream: Connectivity().onConnectivityChanged,
-                      builder: (context, snapshot) {
-                        print(snapshot.toString());
-                        if (snapshot.hasData) {
-                          ConnectivityResult? result = snapshot.data;
-                          if (result == ConnectivityResult.wifi ||
-                              result == ConnectivityResult.mobile) {
-                            return FutureBuilder(
-                              future: API().getStudentClass(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else if (snapshot.hasData) {
-                                  if (snapshot.data != null) {
-                                    List<StudentClasses> studentClasses =
-                                        snapshot.data!;
-                                    // Cập nhật dữ liệu vào Provider
-                                    Future.delayed(Duration.zero, () {
-                                      classDataProvider.setStudentClassesList(
-                                          studentClasses);
-                                    });
-                                    return ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: studentClasses.length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        var data = studentClasses[index];
-                                        return Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 5, right: 5, bottom: 10),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                          animation,
-                                                          secondaryAnimation) =>
-                                                      DetailPage(
-                                                    studentClasses: data,
-                                                  ),
-                                                  transitionDuration:
-                                                      const Duration(
-                                                          milliseconds: 200),
-                                                  transitionsBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation,
-                                                      child) {
-                                                    return ScaleTransition(
-                                                      scale: animation,
-                                                      child: child,
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 5,
-                                                right: 5,
-                                              ),
-                                              child: classInformation(
-                                                data.classes.course.totalWeeks,
-                                                data.classes.course.courseName,
-                                                data.classes.teacher
-                                                    .teacherName,
-                                                data.classes.course.courseID,
-                                                data.classes.classType,
-                                                data.classes.group,
-                                                data.classes.subGroup,
-                                                data.classes.shiftNumber,
-                                                data.classes.roomNumber,
-                                                data.presenceTotal,
-                                                data.lateTotal,
-                                                data.absenceTotal,
-                                                true, // Chỉnh thành status Form
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  }
-                                }
-                                return const Text('null');
-                              },
-                            );
-                          } else {
-                            return const Text('No internet');
-                          }
-                        }
-                        return loading();
-                      })
-                else
-                  Container(
-                    height: 500,
-                    child: Column(
-                      children: [
-                        const Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CustomText(
-                                  message: 'SCAN QR CODE',
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryText),
-                              CustomText(
-                                  message:
-                                      'Scanning will be started automatically',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.primaryText),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Stack(children: [
-                          Container(
-                            height: 400,
-                            width: 400,
-                            child: QRView(
-                                overlay: QrScannerOverlayShape(
-                                  borderLength: 30,
-                                  borderColor: AppColors.primaryButton,
-                                  borderWidth: 10,
-                                  borderRadius: 10,
-                                ),
-                                key: qrKey,
-                                onQRViewCreated: _onQRViewCreated),
-                          ),
-                          Positioned(
-                            bottom: 30,
-                            left: 160,
-                            right: 160,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white24,
-                                  borderRadius: BorderRadius.circular(8)),
-                              child: Center(
-                                child: Text(
-                                  maxLines: 3,
-                                  result != null
-                                      ? '${result!.code}'
-                                      : 'Scan QR Code',
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          )
-                        ]),
-                      ],
-                    ),
-                  ),
               ],
             ),
           )
         ]),
+        if (!activeQR)
+          Container(
+            child: StreamBuilder(
+                stream: Connectivity().onConnectivityChanged,
+                builder: (context, snapshot) {
+                  print(snapshot.toString());
+                  if (snapshot.hasData) {
+                    ConnectivityResult? result = snapshot.data;
+                    if (result == ConnectivityResult.wifi ||
+                        result == ConnectivityResult.mobile) {
+                      return FutureBuilder(
+                        future: API().getStudentClass(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child:  CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else if (snapshot.hasData) {
+                            if (snapshot.data != null) {
+                              List<StudentClasses> studentClasses =
+                                  snapshot.data!;
+                              // Cập nhật dữ liệu vào Provider
+                              Future.delayed(Duration.zero, () {
+                                classDataProvider
+                                    .setStudentClassesList(studentClasses);
+                              });
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: studentClasses.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  var data = studentClasses[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 5, right: 5, bottom: 10),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                    secondaryAnimation) =>
+                                                DetailPage(
+                                              studentClasses: data,
+                                            ),
+                                            transitionDuration: const Duration(
+                                                milliseconds: 200),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              return ScaleTransition(
+                                                scale: animation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 5,
+                                          right: 5,
+                                        ),
+                                        child: classInformation(
+                                          data.classes.course.totalWeeks,
+                                          data.classes.course.courseName,
+                                          data.classes.teacher.teacherName,
+                                          data.classes.course.courseID,
+                                          data.classes.classType,
+                                          data.classes.group,
+                                          data.classes.subGroup,
+                                          data.classes.shiftNumber,
+                                          data.classes.roomNumber,
+                                          true, // Chỉnh thành status Form
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          }
+                          return const Text('null');
+                        },
+                      );
+                    } else {
+                      return const Text('No internet');
+                    }
+                  }
+                  return loading();
+                }),
+          )
+        else
+          Container(
+            height: 500,
+            child: Column(
+              children: [
+                const Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomText(
+                          message: 'SCAN QR CODE',
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryText),
+                      CustomText(
+                          message: 'Scanning will be started automatically',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.primaryText),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Stack(children: [
+                  Container(
+                    height: 400,
+                    width: 400,
+                    child: QRView(
+                        overlay: QrScannerOverlayShape(
+                          borderLength: 30,
+                          borderColor: AppColors.primaryButton,
+                          borderWidth: 10,
+                          borderRadius: 10,
+                        ),
+                        key: qrKey,
+                        onQRViewCreated: _onQRViewCreated),
+                  ),
+                  Positioned(
+                    bottom: 30,
+                    left: 160,
+                    right: 160,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Center(
+                        child: Text(
+                          maxLines: 3,
+                          result != null ? '${result!.code}' : 'Scan QR Code',
+                          style: const TextStyle(
+                              fontSize: 12, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  )
+                ]),
+              ],
+            ),
+          ),
       ],
     ));
   }
@@ -422,7 +400,7 @@ class _HomePageBodyState extends State<HomePageBody> {
     );
   }
 
-  Container classInformation(
+  Widget classInformation(
       int totalWeeks,
       String courseName,
       String teacherName,
@@ -432,9 +410,6 @@ class _HomePageBodyState extends State<HomePageBody> {
       String subGroup,
       int shift,
       String roomNumber,
-      int presenceTotal,
-      int lateTotal,
-      int absenceTotal,
       bool activeForm) {
     return Container(
         width: 410,
@@ -592,9 +567,9 @@ class _HomePageBodyState extends State<HomePageBody> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    customRichText(
+                    const customRichText(
                       title: 'Total Attendance: ',
-                      message: '$presenceTotal',
+                      message: '0',
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
@@ -603,9 +578,9 @@ class _HomePageBodyState extends State<HomePageBody> {
                     const SizedBox(
                       height: 5,
                     ),
-                    customRichText(
+                    const customRichText(
                       title: 'Total Late: ',
-                      message: '$lateTotal',
+                      message: '0',
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
@@ -616,7 +591,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                     ),
                     customRichText(
                       title: 'Total Absent: ',
-                      message: '$absenceTotal',
+                      message: '0',
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
@@ -625,39 +600,39 @@ class _HomePageBodyState extends State<HomePageBody> {
                     const SizedBox(
                       height: 15,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 35, top: 10),
-                      child: !activeForm
-                          ? Container()
-                          : CustomButton(
-                              buttonName: 'Attendance',
-                              colorShadow: Colors.transparent,
-                              backgroundColorButton: AppColors.primaryButton,
-                              borderColor: Colors.transparent,
-                              textColor: Colors.white,
-                              function: () {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, animation,
-                                            secondaryAnimation) =>
-                                        const AttendanceFormPage(),
-                                    transitionDuration:
-                                        const Duration(milliseconds: 300),
-                                    transitionsBuilder: (context, animation,
-                                        secondaryAnimation, child) {
-                                      return ScaleTransition(
-                                        scale: animation,
-                                        child: child,
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                              height: 30,
-                              width: 90,
-                              fontSize: 13),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(left: 35, top: 10),
+                    //   child: !activeForm
+                    //       ? Container()
+                    //       : CustomButton(
+                    //           buttonName: 'Attendance',
+                    //           colorShadow: Colors.transparent,
+                    //           backgroundColorButton: AppColors.primaryButton,
+                    //           borderColor: Colors.transparent,
+                    //           textColor: Colors.white,
+                    //           function: () {
+                    //             Navigator.push(
+                    //               context,
+                    //               PageRouteBuilder(
+                    //                 pageBuilder: (context, animation,
+                    //                         secondaryAnimation) =>
+                    //                     const AttendanceFormPage(),
+                    //                 transitionDuration:
+                    //                     const Duration(milliseconds: 300),
+                    //                 transitionsBuilder: (context, animation,
+                    //                     secondaryAnimation, child) {
+                    //                   return ScaleTransition(
+                    //                     scale: animation,
+                    //                     child: child,
+                    //                   );
+                    //                 },
+                    //               ),
+                    //             );
+                    //           },
+                    //           height: 30,
+                    //           width: 90,
+                    //           fontSize: 13),
+                    // ),
                   ],
                 ),
               ),

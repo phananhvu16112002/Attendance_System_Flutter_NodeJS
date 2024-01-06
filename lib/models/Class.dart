@@ -29,7 +29,7 @@ class Class {
   factory Class.fromJson(Map<String, dynamic> json) {
     print('Class.fromJson: $json');
     return Class(
-      classID: json['classID'] ?? "",
+      classID: json['classID'],
       roomNumber: json['roomNumber'] ?? "",
       shiftNumber: json['shiftNumber'] as int? ?? 0,
       startTime: json['startTime'] ?? "",
