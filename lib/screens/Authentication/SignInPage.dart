@@ -258,7 +258,7 @@ class _SignInPageState extends State<SignInPage> {
                                 title: "Invalid Form",
                                 message: "Please complete the form property",
                                 duration: const Duration(seconds: 10),
-                              ).show(context);
+                              ).show(context); //CustomFlushBar Note in Facebook
                             }
                           }),
                     ),

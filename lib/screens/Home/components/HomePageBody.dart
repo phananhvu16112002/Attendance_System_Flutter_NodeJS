@@ -19,6 +19,7 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomePageBody extends StatefulWidget {
   const HomePageBody({super.key});
@@ -250,8 +251,22 @@ class _HomePageBodyState extends State<HomePageBody> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return const Center(
-                                child:  CircularProgressIndicator());
+                            return Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 5, right: 5, bottom: 10, top: 10),
+                                child: Column(
+                                  children: [
+                                    customLoading(),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    customLoading(),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    customLoading(),
+                                  ],
+                                ));
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else if (snapshot.hasData) {
@@ -564,10 +579,10 @@ class _HomePageBodyState extends State<HomePageBody> {
                 padding: !activeForm
                     ? const EdgeInsets.only(top: 20, bottom: 20)
                     : const EdgeInsets.only(top: 20, bottom: 10),
-                child: Column(
+                child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const customRichText(
+                    customRichText(
                       title: 'Total Attendance: ',
                       message: '0',
                       fontWeightTitle: FontWeight.bold,
@@ -575,10 +590,10 @@ class _HomePageBodyState extends State<HomePageBody> {
                       colorText: AppColors.primaryText,
                       fontSize: 13,
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 5,
                     ),
-                    const customRichText(
+                    customRichText(
                       title: 'Total Late: ',
                       message: '0',
                       fontWeightTitle: FontWeight.bold,
@@ -586,7 +601,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                       colorText: AppColors.primaryText,
                       fontSize: 13,
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 5,
                     ),
                     customRichText(
@@ -597,42 +612,159 @@ class _HomePageBodyState extends State<HomePageBody> {
                       colorText: AppColors.primaryText,
                       fontSize: 13,
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 15,
                     ),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(left: 35, top: 10),
-                    //   child: !activeForm
-                    //       ? Container()
-                    //       : CustomButton(
-                    //           buttonName: 'Attendance',
-                    //           colorShadow: Colors.transparent,
-                    //           backgroundColorButton: AppColors.primaryButton,
-                    //           borderColor: Colors.transparent,
-                    //           textColor: Colors.white,
-                    //           function: () {
-                    //             Navigator.push(
-                    //               context,
-                    //               PageRouteBuilder(
-                    //                 pageBuilder: (context, animation,
-                    //                         secondaryAnimation) =>
-                    //                     const AttendanceFormPage(),
-                    //                 transitionDuration:
-                    //                     const Duration(milliseconds: 300),
-                    //                 transitionsBuilder: (context, animation,
-                    //                     secondaryAnimation, child) {
-                    //                   return ScaleTransition(
-                    //                     scale: animation,
-                    //                     child: child,
-                    //                   );
-                    //                 },
-                    //               ),
-                    //             );
-                    //           },
-                    //           height: 30,
-                    //           width: 90,
-                    //           fontSize: 13),
-                    // ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ));
+  }
+
+  Widget customLoading() {
+    return Container(
+        width: 410,
+        height: 150,
+        decoration: BoxDecoration(
+            color: Color.fromARGB(164, 245, 244, 244),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            boxShadow: const [
+              BoxShadow(
+                  color: AppColors.secondaryText,
+                  blurRadius: 5.0,
+                  offset: Offset(3.0, 2.0))
+            ]),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 20, top: 20, bottom: 15),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20, top: 20),
+                child: Shimmer.fromColors(
+                  baseColor: const Color.fromARGB(78, 158, 158, 158),
+                  highlightColor: const Color.fromARGB(146, 255, 255, 255),
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: const BoxDecoration(
+                        color: Colors.white, shape: BoxShape.circle),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 15,
+              ),
+              Container(
+                width: 150,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Shimmer.fromColors(
+                        baseColor: const Color.fromARGB(78, 158, 158, 158),
+                        highlightColor:
+                            const Color.fromARGB(146, 255, 255, 255),
+                        child: Container(
+                            width: 200, height: 15, color: Colors.white)),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Shimmer.fromColors(
+                        baseColor: const Color.fromARGB(78, 158, 158, 158),
+                        highlightColor: Color.fromARGB(36, 255, 255, 255),
+                        child: Container(
+                            width: 200, height: 15, color: Colors.white)),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Shimmer.fromColors(
+                        baseColor: const Color.fromARGB(78, 158, 158, 158),
+                        highlightColor:
+                            const Color.fromARGB(146, 255, 255, 255),
+                        child: Container(
+                            width: 200, height: 15, color: Colors.white)),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Shimmer.fromColors(
+                        baseColor: const Color.fromARGB(78, 158, 158, 158),
+                        highlightColor:
+                            const Color.fromARGB(146, 255, 255, 255),
+                        child: Container(
+                            width: 200, height: 15, color: Colors.white)),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: [
+                        Shimmer.fromColors(
+                            baseColor: const Color.fromARGB(78, 158, 158, 158),
+                            highlightColor:
+                                const Color.fromARGB(146, 255, 255, 255),
+                            child: Container(
+                                width: 50, height: 5, color: Colors.white)),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Shimmer.fromColors(
+                            baseColor: const Color.fromARGB(78, 158, 158, 158),
+                            highlightColor:
+                                const Color.fromARGB(146, 255, 255, 255),
+                            child: Container(
+                                width: 50, height: 5, color: Colors.white)),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Shimmer.fromColors(
+                  baseColor: const Color.fromARGB(78, 158, 158, 158),
+                  highlightColor: const Color.fromARGB(146, 255, 255, 255),
+                  child: Container(width: 2, height: 90, color: Colors.white)),
+              const SizedBox(
+                width: 10,
+              ),
+              Padding(
+                padding: !activeForm
+                    ? const EdgeInsets.only(top: 20, bottom: 20)
+                    : const EdgeInsets.only(top: 20, bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Shimmer.fromColors(
+                        baseColor: const Color.fromARGB(78, 158, 158, 158),
+                        highlightColor:
+                            const Color.fromARGB(146, 255, 255, 255),
+                        child: Container(
+                            width: 100, height: 15, color: Colors.white)),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Shimmer.fromColors(
+                        baseColor: const Color.fromARGB(78, 158, 158, 158),
+                        highlightColor:
+                            const Color.fromARGB(146, 255, 255, 255),
+                        child: Container(
+                            width: 100, height: 15, color: Colors.white)),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Shimmer.fromColors(
+                        baseColor: const Color.fromARGB(78, 158, 158, 158),
+                        highlightColor:
+                            const Color.fromARGB(146, 255, 255, 255),
+                        child: Container(
+                            width: 100, height: 15, color: Colors.white)),
+                    const SizedBox(
+                      height: 10,
+                    ),
                   ],
                 ),
               ),

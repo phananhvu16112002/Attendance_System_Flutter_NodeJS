@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage> {
             size: 30,
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
         bottomNavigationBar: AnimatedBottomNavigationBar(
             icons: _iconList,
             activeIndex: _bottomNavIndex,
