@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 
 class Authenticate {
-  Future<bool> registerUser(
+  Future<String> registerUser(
       String userName, String email, String password) async {
     final URL = 'http://10.0.2.2:8080/api/student/register';
     var headers = {
@@ -16,10 +16,11 @@ class Authenticate {
         await http.post(Uri.parse(URL), headers: headers, body: body);
     if (response.statusCode == 200) {
       print('Registration successful');
-      return true;
+      return '';
     } else {
+      final Map<String, dynamic> responseData1 = jsonDecode(response.body);
       print('Failed to register. Error: ${response.body}');
-      return false;
+      return responseData1['message'];
     }
   }
 
@@ -43,7 +44,7 @@ class Authenticate {
     }
   }
 
-  Future<bool> login(String email, String password) async {
+  Future<String> login(String email, String password) async {
     final URL = 'http://10.0.2.2:8080/api/student/login';
     var request = {'email': email, 'password': password};
     var body = json.encode(request);
@@ -68,11 +69,12 @@ class Authenticate {
       await SecureStorage().writeSecureData('studentID', studentID);
       await SecureStorage().writeSecureData('studentEmail', studentEmail);
       await SecureStorage().writeSecureData('studentName', studentName);
-      return true;
+      return '';
     } else {
       // ignore: avoid_print
-      print('User is not exist');
-      return false;
+      final Map<String, dynamic> responseData1 = jsonDecode(response.body);
+      print('Message: ${responseData1['message']}');
+      return responseData1['message'];
     }
   }
 

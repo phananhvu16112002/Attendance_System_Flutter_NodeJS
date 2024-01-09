@@ -165,7 +165,7 @@ class _SignInPageState extends State<SignInPage> {
                               ),
                             );
                           },
-                          child: CustomText(
+                          child: const CustomText(
                               message: 'Forgot Password?',
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -189,26 +189,20 @@ class _SignInPageState extends State<SignInPage> {
                           function: () async {
                             if (_formKey.currentState!.validate()) {
                               try {
-                                bool check = await Authenticate()
+                                String check = await Authenticate()
                                     .login(emailAddress.text, password.text);
-                                // var accessToken = await SecureStorage()
-                                //     .readSecureData('accessToken');
-                                // var refreshToken = await SecureStorage()
-                                //     .readSecureData('refreshToken');
-                                // studentDataProvider.setAccessToken(accessToken);
-                                // studentDataProvider
-                                //     .setRefreshToken(refreshToken);
-                                var studentID = await SecureStorage()
-                                    .readSecureData('studentID');
-                                var studentEmail = await SecureStorage()
-                                    .readSecureData('studentEmail');
-                                var studentName = await SecureStorage()
-                                    .readSecureData('studentName');
-                                studentDataProvider.setStudentID(studentID);
-                                studentDataProvider
-                                    .setStudentEmail(studentEmail);
-                                studentDataProvider.setStudentName(studentName);
-                                if (check) {
+                                if (check == '' || check.isEmpty) {
+                                  var studentID = await SecureStorage() //520h0380
+                                      .readSecureData('studentID');
+                                  var studentEmail = await SecureStorage() //520h3080@student.tdtu.edu
+                                      .readSecureData('studentEmail');
+                                  var studentName = await SecureStorage()
+                                      .readSecureData('studentName');
+                                  studentDataProvider.setStudentID(studentID);
+                                  studentDataProvider
+                                      .setStudentEmail(studentEmail);
+                                  studentDataProvider
+                                      .setStudentName(studentName);
                                   // ignore: use_build_context_synchronously
                                   Navigator.pushAndRemoveUntil(
                                     context,
@@ -246,7 +240,7 @@ class _SignInPageState extends State<SignInPage> {
                                   // ignore: use_build_context_synchronously
                                   Flushbar(
                                     title: "Failed",
-                                    message: "Email or Password is not correct",
+                                    message: "$check",
                                     duration: const Duration(seconds: 3),
                                   ).show(context);
                                 }

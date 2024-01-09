@@ -338,7 +338,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                         },
                       );
                     } else {
-                      return const Text('No internet');
+                      return const Center(child: Text('No internet'));
                     }
                   }
                   return loading();
