@@ -253,7 +253,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                               ConnectionState.waiting) {
                             return Padding(
                                 padding: const EdgeInsets.only(
-                                    left: 5, right: 5, bottom: 10, top: 10),
+                                    left: 5, right: 10, bottom: 10, top: 10),
                                 child: Column(
                                   children: [
                                     customLoading(),
@@ -370,7 +370,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                   height: 5,
                 ),
                 Stack(children: [
-                  Container(
+                  SizedBox(
                     height: 400,
                     width: 400,
                     child: QRView(
@@ -627,10 +627,10 @@ class _HomePageBodyState extends State<HomePageBody> {
     return Container(
         width: 410,
         height: 150,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
             color: Color.fromARGB(164, 245, 244, 244),
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            boxShadow: const [
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+            boxShadow: [
               BoxShadow(
                   color: AppColors.secondaryText,
                   blurRadius: 5.0,

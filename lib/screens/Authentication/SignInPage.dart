@@ -144,7 +144,7 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 230),
+                      padding: const EdgeInsets.only(left: 240),
                       child: GestureDetector(
                           onTap: () {
                             Navigator.pushReplacement(

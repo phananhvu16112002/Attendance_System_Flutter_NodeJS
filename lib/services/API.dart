@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
-import 'package:attendance_system_nodejs/models/Class.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';

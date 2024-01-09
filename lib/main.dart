@@ -11,10 +11,8 @@ import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
-import 'package:attendance_system_nodejs/screens/Home/FloatingButtonMap.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
-import 'package:attendance_system_nodejs/screens/Test.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -68,5 +66,5 @@ class _MyAppState extends State<MyApp> {
       home: HomePage(),
       debugShowCheckedModeBanner: false,
     );
-  }         
+  }
 }
