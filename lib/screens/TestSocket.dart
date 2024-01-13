@@ -1,6 +1,8 @@
+import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/TestSocket3.dart';
 import 'package:attendance_system_nodejs/services/SocketServer.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class TestSocket extends StatefulWidget {
@@ -21,6 +23,7 @@ class _TestSocketState extends State<TestSocket> {
 
   @override
   Widget build(BuildContext context) {
+    final socketProvider = Provider.of<SocketServerProvider>(context);
     return Scaffold(
       body: Center(
         child: InkWell(

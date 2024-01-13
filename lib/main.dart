@@ -1,4 +1,5 @@
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/CreateNewPassword.dart';
@@ -30,7 +31,8 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => StudentDataProvider()),
         ChangeNotifierProvider(create: (_) => StudentClassesDataProvider()),
-        ChangeNotifierProvider(create: (_) => AttendanceDetailDataProvider())
+        ChangeNotifierProvider(create: (_) => AttendanceDetailDataProvider()),
+        ChangeNotifierProvider(create: (_) => SocketServerProvider())
       ],
       child: const MyApp(),
     ),
