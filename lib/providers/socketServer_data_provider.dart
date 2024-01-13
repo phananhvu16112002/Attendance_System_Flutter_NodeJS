@@ -11,7 +11,7 @@ class SocketServerProvider with ChangeNotifier {
   bool get isConnected => _isConnected;
 
   void connectToSocketServer(data) {
-    _socket = IO.io('http://192.168.1.4:9000', <String, dynamic>{
+    _socket = IO.io('http://192.168.0.106:9000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'headers': {'Content-Type': 'application/json'},

@@ -13,18 +13,22 @@ class TestSocket3 extends StatefulWidget {
 }
 
 class _TestSocket3State extends State<TestSocket3> {
-  late SocketServer socketServer;
+  
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    var socketProvider = Provider.of<SocketServerProvider>(context);
-    socketProvider.connectToSocketServer("1");
+    Future.delayed(Duration.zero , () {
+      if (mounted) {
+        var socketProvider =
+            Provider.of<SocketServerProvider>(context, listen: false);
+        socketProvider.connectToSocketServer("1");
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
           leading: InkWell(

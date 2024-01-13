@@ -13,17 +13,14 @@ class TestSocket extends StatefulWidget {
 }
 
 class _TestSocketState extends State<TestSocket> {
-  late SocketServer socketServer;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    socketServer = SocketServer();
   }
 
   @override
   Widget build(BuildContext context) {
-    final socketProvider = Provider.of<SocketServerProvider>(context);
     return Scaffold(
       body: Center(
         child: InkWell(
