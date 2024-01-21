@@ -1,14 +1,17 @@
 import 'dart:convert';
 
+import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketServerProvider with ChangeNotifier {
   late IO.Socket _socket;
   bool _isConnected = false;
+  late AttendanceForm _attendanceForm;
 
   IO.Socket get socket => _socket;
   bool get isConnected => _isConnected;
+  AttendanceForm get attendanceForm => _attendanceForm;
 
   void connectToSocketServer(data) {
     _socket = IO.io('http://192.168.0.106:9000', <String, dynamic>{
@@ -20,7 +23,7 @@ class SocketServerProvider with ChangeNotifier {
     _socket.connect();
     _isConnected = true;
     joinClassRoom(data);
-    getAttendanceForm(data);
+    _attendanceForm = getAttendanceForm(data)!;
     notifyListeners();
   }
 
@@ -31,14 +34,18 @@ class SocketServerProvider with ChangeNotifier {
     _socket.emit('joinClassRoom', jsonString);
   }
 
-  void getAttendanceForm(classRoom) {
+  AttendanceForm? getAttendanceForm(classRoom) {
     _socket.on('getAttendanceForm', (data) {
       var temp = jsonDecode(data);
       var temp1 = temp['classes'];
       if (temp1 == classRoom) {
         print('Attendance Form Detail:' + data);
+        AttendanceForm tempAttendanceForm = AttendanceForm.fromJson(temp);
+        notifyListeners();
+        return tempAttendanceForm;
       } else {
         print('Error ClassRoom not feat');
+        return null;
       }
     });
   }

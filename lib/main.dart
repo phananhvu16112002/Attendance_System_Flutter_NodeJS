@@ -17,6 +17,7 @@ import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
 import 'package:attendance_system_nodejs/screens/Test.dart';
 import 'package:attendance_system_nodejs/screens/TestSocket.dart';
+import 'package:attendance_system_nodejs/screens/TestTakeAttendance.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,7 @@ class _MyAppState extends State<MyApp> {
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },
-      home: HomePage(),
+      home: TestTakeAttendance(),
       debugShowCheckedModeBanner: false,
     );
   }
