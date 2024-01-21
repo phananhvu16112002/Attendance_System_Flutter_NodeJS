@@ -142,6 +142,8 @@ class _MapState extends State<FloatingButtonMap> {
               position: LatLng(position.latitude, position.longitude)));
           bool check = isLocationInsideTDTU(
               LatLng(position.latitude, position.longitude));
+          print('Latitude: ${position.latitude}');
+          print('Longtitude: ${position.longitude}');
           if (check) {
             // ignore: avoid_print
             print('INSIDE-----------------------');

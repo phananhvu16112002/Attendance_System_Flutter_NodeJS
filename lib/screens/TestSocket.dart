@@ -21,7 +21,6 @@ class _TestSocketState extends State<TestSocket> {
 
   @override
   Widget build(BuildContext context) {
-    final socketProvider = Provider.of<SocketServerProvider>(context);
     return Scaffold(
       body: Center(
         child: InkWell(
