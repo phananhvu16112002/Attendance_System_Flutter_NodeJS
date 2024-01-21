@@ -13,12 +13,10 @@ class TestSocket extends StatefulWidget {
 }
 
 class _TestSocketState extends State<TestSocket> {
-  late SocketServer socketServer;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    socketServer = SocketServer();
   }
 
   @override

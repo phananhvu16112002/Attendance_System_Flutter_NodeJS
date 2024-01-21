@@ -24,7 +24,6 @@ class _TestSocket3State extends State<TestSocket3> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
           leading: InkWell(
