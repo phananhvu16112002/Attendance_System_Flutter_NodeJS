@@ -166,7 +166,7 @@ class _HomePageBodyState extends State<HomePageBody> {
             child: Column(
               children: [
                 Container(
-                  margin: EdgeInsets.only(top: 350),
+                  margin: const EdgeInsets.only(top: 350),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -247,7 +247,8 @@ class _HomePageBodyState extends State<HomePageBody> {
                     if (result == ConnectivityResult.wifi ||
                         result == ConnectivityResult.mobile) {
                       return FutureBuilder(
-                        future: API().getStudentClass(),
+                        future:
+                            API().getStudentClass('520H0380'), //Chinh parameter
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -325,7 +326,10 @@ class _HomePageBodyState extends State<HomePageBody> {
                                           data.classes.subGroup,
                                           data.classes.shiftNumber,
                                           data.classes.roomNumber,
-                                          true, // Chỉnh thành status Form
+                                          data.totalPresence,
+                                          data.totalLate,
+                                          data.totalAbsence,
+                                          data.progress,
                                         ),
                                       ),
                                     ),
@@ -416,27 +420,31 @@ class _HomePageBodyState extends State<HomePageBody> {
   }
 
   Widget classInformation(
-      int totalWeeks,
-      String courseName,
-      String teacherName,
-      String courseID,
-      String classType,
-      String group,
-      String subGroup,
-      int shift,
-      String roomNumber,
-      bool activeForm) {
+    int totalWeeks,
+    String courseName,
+    String teacherName,
+    String courseID,
+    String classType,
+    String group,
+    String subGroup,
+    int shift,
+    String roomNumber,
+    double totalPresence,
+    double totalAbsence,
+    double totalLate,
+    double progress,
+  ) {
     return Container(
         width: 410,
         height: 150,
-        decoration: BoxDecoration(
-            color: !activeForm ? Colors.white : AppColors.cardHome,
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            boxShadow: const [
+        decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+            boxShadow: [
               BoxShadow(
                   color: AppColors.secondaryText,
-                  blurRadius: 5.0,
-                  offset: Offset(3.0, 2.0))
+                  blurRadius: 5,
+                  offset: Offset(5.0, 4.0))
             ]),
         child: Padding(
           padding: const EdgeInsets.only(left: 20, top: 10),
@@ -449,15 +457,14 @@ class _HomePageBodyState extends State<HomePageBody> {
                   height: 80,
                   child: CircularPercentIndicator(
                     radius: 40,
-                    lineWidth: 5,
-                    percent: 0.9, // Thay đổi giá trị tại đây
+                    lineWidth: 6,
+                    percent: progress, // Thay đổi giá trị tại đây
                     center: Text(
                       "$totalWeeks Weeks",
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 11),
                     ),
-                    backgroundColor:
-                        !activeForm ? AppColors.secondaryText : Colors.white,
+                    backgroundColor: AppColors.secondaryText,
                     progressColor: AppColors.primaryButton,
                     animation: true,
                   ),
@@ -484,7 +491,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                     ),
                     customRichText(
                       title: 'Type: ',
-                      message: '$classType',
+                      message: classType,
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
@@ -545,7 +552,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                       children: [
                         customRichText(
                           title: 'Group: ',
-                          message: "$group",
+                          message: group,
                           fontWeightTitle: FontWeight.bold,
                           fontWeightMessage: FontWeight.w400,
                           colorText: AppColors.primaryText,
@@ -556,7 +563,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                         ),
                         customRichText(
                           title: 'SubGroup: ',
-                          message: '$subGroup',
+                          message: subGroup,
                           fontWeightTitle: FontWeight.bold,
                           fontWeightMessage: FontWeight.w400,
                           colorText: AppColors.primaryText,
@@ -579,40 +586,40 @@ class _HomePageBodyState extends State<HomePageBody> {
                 padding: !activeForm
                     ? const EdgeInsets.only(top: 20, bottom: 20)
                     : const EdgeInsets.only(top: 20, bottom: 10),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     customRichText(
                       title: 'Total Attendance: ',
-                      message: '0',
+                      message: '${totalPresence.ceil()}',
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
                       fontSize: 13,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     customRichText(
                       title: 'Total Late: ',
-                      message: '0',
+                      message: '${totalLate}',
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
                       fontSize: 13,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     customRichText(
                       title: 'Total Absent: ',
-                      message: '0',
+                      message: '${totalAbsence.ceil()}',
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,
                       colorText: AppColors.primaryText,
                       fontSize: 13,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                   ],
@@ -672,7 +679,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                     ),
                     Shimmer.fromColors(
                         baseColor: const Color.fromARGB(78, 158, 158, 158),
-                        highlightColor: Color.fromARGB(36, 255, 255, 255),
+                        highlightColor: const Color.fromARGB(36, 255, 255, 255),
                         child: Container(
                             width: 200, height: 15, color: Colors.white)),
                     const SizedBox(

@@ -5,14 +5,17 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class API {
-  Future<List<StudentClasses>> getStudentClass() async {
-    final URL = 'http://10.0.2.2:8080/test/getStudentClass'; //10.0.2.2
+  Future<List<StudentClasses>> getStudentClass(String studentID) async {
+    final URL = 'http://10.0.2.2:8080/test/testGetClassesVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
     };
+    var request = {'studentID': studentID};
+    var json = jsonEncode(request);
     try {
-      final response = await http.get(Uri.parse(URL), headers: headers);
+      final response =
+          await http.post(Uri.parse(URL), headers: headers, body: json);
       if (response.statusCode == 200) {
         print('Respone.body ${response.body}');
         print('JsonDecode:${jsonDecode(response.body)}');
