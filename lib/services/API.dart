@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 class API {
   Future<List<StudentClasses>> getStudentClass(String studentID) async {
-    final URL = 'http://10.0.2.2:8080/test/testGetClassesVersion1'; //10.0.2.2 
+    final URL = 'http://10.0.2.2:8080/test/testGetClassesVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -44,14 +44,19 @@ class API {
     }
   }
 
-  Future<List<AttendanceDetail>> getAttendanceDetail(String classesID) async {
-    final URL = 'http://10.0.2.2:8080/test/getAttendanceDetail'; //10.0.2.2
+  Future<List<AttendanceDetail>> getAttendanceDetail(
+      String classesID, String studentID) async {
+    final URL =
+        'http://10.0.2.2:8080/test/testGetAttendanceDetailVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
     };
+    var request = {'classesID': classesID, 'studentID': studentID};
+    var body = jsonEncode(request);
     try {
-      final response = await http.get(Uri.parse(URL), headers: headers);
+      final response =
+          await http.post(Uri.parse(URL), headers: headers, body: body);
       if (response.statusCode == 200) {
         List attendanceDetailList = jsonDecode(response.body);
         List<AttendanceDetail> data = [];
@@ -116,17 +121,17 @@ class API {
   }
 }
 
-    // if (response.statusCode == 200) {
-    //   print('Take Attendance Successfully');
-    //   return true;
-    // } else if (response.statusCode == 403) {
-    //   // Handle status 403 - Forbidden
-    //   Map<String, dynamic> data = json.decode(response.body);
-    //   String message = data['message'];
-    //   print('Failed to take attendance: $message');
-    //   return false;
-    // } else {
-    //   // Handle other status codes
-    //   print('Failed to take attendance. Status code: ${response.statusCode}');
-    //   return false;
-    // }
+// if (response.statusCode == 200) {
+//   print('Take Attendance Successfully');
+//   return true;
+// } else if (response.statusCode == 403) {
+//   // Handle status 403 - Forbidden
+//   Map<String, dynamic> data = json.decode(response.body);
+//   String message = data['message'];
+//   print('Failed to take attendance: $message');
+//   return false;
+// } else {
+//   // Handle other status codes
+//   print('Failed to take attendance. Status code: ${response.statusCode}');
+//   return false;
+// }

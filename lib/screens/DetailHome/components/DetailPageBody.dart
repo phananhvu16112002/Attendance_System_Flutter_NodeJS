@@ -38,7 +38,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     final attendanceDetailDataProvider =
         Provider.of<AttendanceDetailDataProvider>(context, listen: false);
     return FutureBuilder(
-      future: API().getAttendanceDetail(studentClasses.classes.classID),
+      future:
+          API().getAttendanceDetail(studentClasses.classes.classID, '520H0380'),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -201,9 +202,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                             child: customCard(
                                 formatDate(data.dateAttendanced.toString()),
                                 formatTime(data.dateAttendanced.toString()),
-                                getStatusText(
-                                    data.present, data.late, data.absence),
-                                data.location),
+                                getResult(data.result),
+                                data.location,
+                                data.url),
                           );
                         })
                   ],
@@ -217,8 +218,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     );
   }
 
-  Container customCard(
-      String date, String timeAttendance, String status, String location) {
+  Container customCard(String date, String timeAttendance, String status,
+      String location, String url) {
     return Container(
       width: 405,
       height: 220,
@@ -298,7 +299,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                 margin: const EdgeInsets.only(right: 10, top: 10),
                 height: 130,
                 width: 130,
-                child: Image.asset('assets/images/logo.png'),
+                child: url.isEmpty || url == ''
+                    ? Image.asset('assets/images/logo.png')
+                    : Image.network(url),
               ),
             ],
           ),
@@ -352,7 +355,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   }
 
   Color getColorBasedOnStatus(String status) {
-    if (status.contains('Successfully')) {
+    if (status.contains('Present')) {
       return AppColors.textApproved;
     } else if (status.contains('Late')) {
       return const Color.fromARGB(231, 196, 123, 34);
@@ -363,16 +366,15 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     }
   }
 
-  String getStatusText(bool present, bool late, bool absence) {
-    if (present) {
-      return 'Successfully';
-    } else if (late) {
+  String getResult(double result) {
+    if (result.ceil() == 1) {
+      return 'Present';
+    } else if (result == 0.5) {
       return 'Late';
-    } else if (absence) {
-      return 'Absent';
+    } else if (result.ceil() == 0) {
+      return 'Absence';
     } else {
-      // Nếu cả ba giá trị đều là false, trả về chuỗi "Absent"
-      return 'Absent';
+      return 'Absence';
     }
   }
 

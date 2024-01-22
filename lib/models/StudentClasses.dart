@@ -7,7 +7,7 @@ class StudentClasses {
   Student studentID;
   Class classes;
   double progress;
-  int total;
+  double total;
   double totalPresence;
   double totalAbsence;
   double totalLate;
@@ -69,11 +69,12 @@ class StudentClasses {
                 requiredWeeks: 3,
                 credit: 3))
         : Class.fromJson(classJson ?? {});
+    print(json['total'].runtimeType);
     return StudentClasses(
       studentID: studentDetail,
       classes: classDetail,
       progress: json['progress'] ?? 0.0,
-      total: json['total'] ?? 0,
+      total: double.tryParse(json['total'].toString())  ?? 0.0,
       totalPresence: double.tryParse(json['totalPresence']) ?? 0.0,
       totalAbsence: double.tryParse(json['totalAbsence']) ?? 0.0,
       totalLate: double.tryParse(json['totalLate']) ?? 0.0,

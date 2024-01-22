@@ -70,7 +70,7 @@ class _MyAppState extends State<MyApp> {
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },
-      home: TestTakeAttendance(),
+      home: HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }
