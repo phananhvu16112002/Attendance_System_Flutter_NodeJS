@@ -5,14 +5,18 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class API {
-  Future<List<StudentClasses>> getStudentClass() async {
-    final URL = 'http://10.0.2.2:8080/test/getStudentClass'; //10.0.2.2
+  Future<List<StudentClasses>> getStudentClass(String studentID) async {
+    final URL =
+        'http://192.168.1.9:8080/test/testGetClassesVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
     };
+    var request = {'studentID': studentID};
+    var json = jsonEncode(request);
     try {
-      final response = await http.get(Uri.parse(URL), headers: headers);
+      final response =
+          await http.post(Uri.parse(URL), headers: headers, body: json);
       if (response.statusCode == 200) {
         print('Respone.body ${response.body}');
         print('JsonDecode:${jsonDecode(response.body)}');
@@ -41,20 +45,27 @@ class API {
     }
   }
 
-  Future<List<AttendanceDetail>> getAttendanceDetail(String classesID) async {
-    final URL = 'http://10.0.2.2:8080/test/getAttendanceDetail'; //10.0.2.2
+  Future<List<AttendanceDetail>> getAttendanceDetail(
+      String classesID, String studentID) async {
+    final URL =
+        'http://192.168.1.9:8080/test/testGetAttendanceDetailVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
     };
+    var request = {'classesID': classesID, 'studentID': studentID};
+    var body = jsonEncode(request);
     try {
-      final response = await http.get(Uri.parse(URL), headers: headers);
+      final response =
+          await http.post(Uri.parse(URL), headers: headers, body: body);
+      // print('Respone.body ${response.body}');
+      // print('JsonDecode:${jsonDecode(response.body)}');
       if (response.statusCode == 200) {
         List attendanceDetailList = jsonDecode(response.body);
         List<AttendanceDetail> data = [];
         for (var temp in attendanceDetailList) {
           if (temp is Map<String, dynamic>) {
-            if (temp['classes'] == classesID) {
+            if (temp['classDetail'] == classesID) {
               try {
                 data.add(AttendanceDetail.fromJson(temp));
               } catch (e) {
@@ -64,7 +75,14 @@ class API {
           } else {
             print('Invalid data type: $temp');
           }
+          // try {
+          //   data.add(AttendanceDetail.fromJson(temp));
+          // } catch (e) {
+          //   print('Error parsing data: $e');
+          // }
         }
+        print('Data ${data}');
+
         return data;
       } else {
         print('Failed to load data. Status code: ${response.statusCode}');
@@ -74,6 +92,7 @@ class API {
       print('Error: $e');
       return [];
     }
+    return [];
   }
 
   Future<bool> takeAttendance(
@@ -113,17 +132,17 @@ class API {
   }
 }
 
-    // if (response.statusCode == 200) {
-    //   print('Take Attendance Successfully');
-    //   return true;
-    // } else if (response.statusCode == 403) {
-    //   // Handle status 403 - Forbidden
-    //   Map<String, dynamic> data = json.decode(response.body);
-    //   String message = data['message'];
-    //   print('Failed to take attendance: $message');
-    //   return false;
-    // } else {
-    //   // Handle other status codes
-    //   print('Failed to take attendance. Status code: ${response.statusCode}');
-    //   return false;
-    // }
+// if (response.statusCode == 200) {
+//   print('Take Attendance Successfully');
+//   return true;
+// } else if (response.statusCode == 403) {
+//   // Handle status 403 - Forbidden
+//   Map<String, dynamic> data = json.decode(response.body);
+//   String message = data['message'];
+//   print('Failed to take attendance: $message');
+//   return false;
+// } else {
+//   // Handle other status codes
+//   print('Failed to take attendance. Status code: ${response.statusCode}');
+//   return false;
+// }

@@ -3,10 +3,12 @@ import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class DetailPageBody extends StatefulWidget {
   const DetailPageBody({super.key, required this.studentClasses});
@@ -37,11 +39,29 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   Widget build(BuildContext context) {
     final attendanceDetailDataProvider =
         Provider.of<AttendanceDetailDataProvider>(context, listen: false);
+    final studentClassesDataProvider =
+        Provider.of<StudentClassesDataProvider>(context, listen: false);
+    StudentClasses? dataStudentClasses = studentClassesDataProvider
+        .getDataForClass(widget.studentClasses.classes.classID);
     return FutureBuilder(
-      future: API().getAttendanceDetail(studentClasses.classes.classID),
+      future:
+          API().getAttendanceDetail(studentClasses.classes.classID, '520H0380'),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+              child: Column(
+            children: [
+              customLoading(),
+              const SizedBox(
+                height: 10,
+              ),
+              customLoading(),
+              const SizedBox(
+                height: 10,
+              ),
+              customLoading()
+            ],
+          ));
         } else if (snapshot.hasError) {
           return Container(
             width: MediaQuery.of(context).size.width,
@@ -52,7 +72,6 @@ class _DetailPageBodyState extends State<DetailPageBody> {
         } else if (snapshot.hasData) {
           if (snapshot.data != null) {
             List<AttendanceDetail> attendanceDetail = snapshot.data!;
-
             Future.delayed(Duration.zero, () {
               attendanceDetailDataProvider
                   .setAttendanceDetailList(attendanceDetail);
@@ -100,9 +119,10 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                       : Colors.white,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(10))),
-                              child: const Center(
+                              child: Center(
                                 child: CustomText(
-                                    message: 'Total: 10',
+                                    message:
+                                        'Total: ${dataStudentClasses!.total}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -126,9 +146,10 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                       : Colors.white,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(10))),
-                              child: const Center(
+                              child: Center(
                                 child: CustomText(
-                                    message: 'Present: ${0}',
+                                    message:
+                                        'Present: ${dataStudentClasses.totalPresence.ceil()}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -154,7 +175,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                       Radius.circular(10))),
                               child: Center(
                                 child: CustomText(
-                                    message: 'Absent: $totalAbsence',
+                                    message:
+                                        'Absent: ${dataStudentClasses.totalAbsence.ceil()}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -180,7 +202,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                       Radius.circular(10))),
                               child: Center(
                                 child: CustomText(
-                                    message: 'Late: $totalLate',
+                                    message:
+                                        'Late: ${dataStudentClasses.totalLate}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -199,11 +222,18 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 15),
                             child: customCard(
-                                formatDate(data.dateAttendanced.toString()),
-                                formatTime(data.dateAttendanced.toString()),
-                                getStatusText(
-                                    data.present, data.late, data.absence),
-                                data.location),
+                                data.dateAttendanced != ''
+                                    ? formatDate(
+                                        data.dateAttendanced.toString())
+                                    : formatDate(data.attendanceForm.dateOpen!),
+                                data.dateAttendanced != ''
+                                    ? formatTime(data.dateAttendanced!)
+                                    : 'null',
+                                getResult(data.result),
+                                data.dateAttendanced != ''
+                                    ? data.location
+                                    : 'null',
+                                data.url),
                           );
                         })
                   ],
@@ -217,8 +247,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     );
   }
 
-  Container customCard(
-      String date, String timeAttendance, String status, String location) {
+  Container customCard(String date, String timeAttendance, String status,
+      String location, String url) {
     return Container(
       width: 405,
       height: 220,
@@ -298,7 +328,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                 margin: const EdgeInsets.only(right: 10, top: 10),
                 height: 130,
                 width: 130,
-                child: Image.asset('assets/images/logo.png'),
+                child: url.isEmpty || url == ''
+                    ? Image.asset('assets/images/logo.png')
+                    : Image.network(url),
               ),
             ],
           ),
@@ -352,27 +384,26 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   }
 
   Color getColorBasedOnStatus(String status) {
-    if (status.contains('Successfully')) {
+    if (status.contains('Present')) {
       return AppColors.textApproved;
     } else if (status.contains('Late')) {
       return const Color.fromARGB(231, 196, 123, 34);
-    } else if (status.contains('Absent')) {
+    } else if (status.contains('Absence')) {
       return AppColors.importantText;
     } else {
       return AppColors.primaryText;
     }
   }
 
-  String getStatusText(bool present, bool late, bool absence) {
-    if (present) {
-      return 'Successfully';
-    } else if (late) {
+  String getResult(double result) {
+    if (result.ceil() == 1) {
+      return 'Present';
+    } else if (result == 0.5) {
       return 'Late';
-    } else if (absence) {
-      return 'Absent';
+    } else if (result.ceil() == 0) {
+      return 'Absence';
     } else {
-      // Nếu cả ba giá trị đều là false, trả về chuỗi "Absent"
-      return 'Absent';
+      return 'Absence';
     }
   }
 
@@ -384,8 +415,170 @@ class _DetailPageBodyState extends State<DetailPageBody> {
 
   String formatTime(String time) {
     DateTime serverDateTime = DateTime.parse(time);
-    String formattedTime = DateFormat('HH:mm:ss').format(serverDateTime);
+    String formattedTime = DateFormat('HH:mm:ss a').format(serverDateTime);
     return formattedTime;
+  }
+
+  Widget customLoading() {
+    return Container(
+      width: 405,
+      height: 220,
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+                color: Color.fromARGB(195, 190, 188, 188),
+                blurRadius: 5.0,
+                offset: Offset(2.0, 1.0))
+          ]),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 2,
+            ),
+            Shimmer.fromColors(
+                baseColor: const Color.fromARGB(78, 158, 158, 158),
+                highlightColor: const Color.fromARGB(146, 255, 255, 255),
+                child: Container(width: 300, height: 10, color: Colors.white)),
+            const SizedBox(
+              height: 2,
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(left: 10),
+                  child: Container(
+                    width: 230,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 50,
+                                    height: 10,
+                                    color: Colors.white)),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 150,
+                                    height: 10,
+                                    color: Colors.white)),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 40,
+                                    height: 10,
+                                    color: Colors.white)),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 175,
+                                    height: 10,
+                                    color: Colors.white)),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 50,
+                                    height: 10,
+                                    color: Colors.white)),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 170,
+                                    height: 10,
+                                    color: Colors.white)),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Shimmer.fromColors(
+                    baseColor: const Color.fromARGB(78, 158, 158, 158),
+                    highlightColor: const Color.fromARGB(146, 255, 255, 255),
+                    child: Container(
+                      width: 130,
+                      height: 130,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                    )),
+              ],
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Container(
+              height: 1,
+              width: 405,
+              color: const Color.fromARGB(105, 190, 188, 188),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Shimmer.fromColors(
+                baseColor: const Color.fromARGB(78, 158, 158, 158),
+                highlightColor: const Color.fromARGB(146, 255, 255, 255),
+                child: Container(width: 100, height: 10, color: Colors.white))
+          ],
+        ),
+      ),
+    );
   }
 }
 

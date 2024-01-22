@@ -1,56 +1,57 @@
+import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 
 class AttendanceDetail {
-  StudentClasses studentClassesDetail;
-  String classes;
-  String attendanceForm; //FormID
-  bool present;
-  bool late;
-  bool absence;
-  DateTime? dateAttendanced;
-  String location;
-  String note;
-  int latitude;
-  int longitude;
-  int altitude;
-
-  AttendanceDetail({
-    required this.studentClassesDetail,
-    required this.classes,
-    required this.attendanceForm,
-    required this.present,
-    required this.late,
-    required this.absence,
-    required this.dateAttendanced,
-    required this.location,
-    required this.note,
-    required this.latitude,
-    required this.longitude,
-    required this.altitude,
-  });
+  final String studentDetail;
+  final String classDetail;
+  final AttendanceForm attendanceForm;
+  final double result;
+  final String? dateAttendanced;
+  final String location;
+  final String note;
+  final double latitude;
+  final double longitude;
+  final String url;
+  
+  AttendanceDetail(
+      {required this.studentDetail,
+      required this.classDetail,
+      required this.attendanceForm,
+      required this.result,
+      required this.dateAttendanced,
+      required this.location,
+      required this.note,
+      required this.latitude,
+      required this.longitude,
+      required this.url});
 
   factory AttendanceDetail.fromJson(Map<String, dynamic> json) {
     print('AttendanceDetail.fromJson: $json');
-
+    final dynamic attendanceFormJson = json['attendanceForm'];
+    final AttendanceForm tempAttendanceForm = attendanceFormJson is String
+        ? AttendanceForm(
+            formID: attendanceFormJson,
+            classes: '',
+            startTime: '',
+            endTime: '',
+            dateOpen: '',
+            status: false,
+            typeAttendance: 0,
+            location: '',
+            latitude: 0.0,
+            longtitude: 0.0,
+            radius: 0.0)
+        : AttendanceForm.fromJson(attendanceFormJson ?? {});
     return AttendanceDetail(
-      studentClassesDetail:
-          StudentClasses.fromJson(json['studentDetail'] ?? {}),
-      classes: json['classes'] ?? "",
-      attendanceForm: json['attendanceForm'] ?? "",
-      present: json['present'] ?? false,
-      late: json['late'] ?? false,
-      absence: json['absence'] ?? false,
-      dateAttendanced: json['dateAttendanced'] != null
-          ? DateTime.tryParse(json['dateAttendanced'])
-          : null,
-      location: json['location'] ?? "",
-      note: json['note'] ?? "",
-      latitude:
-          json['latitude'] != null ? int.tryParse(json['latitude']) ?? 0 : 0,
-      longitude:
-          json['longitude'] != null ? int.tryParse(json['longitude']) ?? 0 : 0,
-      altitude:
-          json['altitude'] != null ? int.tryParse(json['altitude']) ?? 0 : 0,
-    );
+        studentDetail: json['studentDetail'] ?? '',
+        classDetail: json['classDetail'] ?? '',
+        attendanceForm: tempAttendanceForm,
+        result: double.tryParse(json['result'].toString()) ?? 0.0,
+        dateAttendanced: json['dateAttendanced'] ?? '',
+        location: json['location'] ?? '',
+        note: json['note'] ?? '',
+        latitude: double.tryParse(json['latitude'].toString()) ?? 0.0,
+        longitude: double.tryParse(json['longitude'].toString()) ?? 0.0,
+        url: json['url'] ?? '');
   }
 }

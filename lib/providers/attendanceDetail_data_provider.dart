@@ -6,8 +6,12 @@ class AttendanceDetailDataProvider with ChangeNotifier {
 
   List<AttendanceDetail> get attendanceDetailData => _attendanceDetailList;
 
+  
+
   void setAttendanceDetailList(List<AttendanceDetail> attendanceDetailList) {
     _attendanceDetailList = attendanceDetailList;
     notifyListeners();
   }
+
+  
 }
