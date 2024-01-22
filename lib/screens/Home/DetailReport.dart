@@ -15,12 +15,11 @@ class _DetailReportState extends State<DetailReport> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: AppColors.primaryButton,
         title: const Text(
           'Detail Report',
           style: TextStyle(
-              color: AppColors.primaryText,
-              fontWeight: FontWeight.bold,
-              fontSize: 25),
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
         ),
         actions: [
           Image.asset(
