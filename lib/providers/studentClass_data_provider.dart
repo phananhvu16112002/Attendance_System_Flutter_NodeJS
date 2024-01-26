@@ -1,4 +1,3 @@
-import 'package:attendance_system_nodejs/models/Student.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:flutter/material.dart';
 
@@ -20,5 +19,6 @@ class StudentClassesDataProvider with ChangeNotifier {
         return temp;
       } else {}
     }
+    return null;
   }
 }

@@ -78,12 +78,12 @@ class _AttendancePageState extends State<TestTakeAttendance> {
         centerTitle: true,
         backgroundColor: AppColors.primaryButton,
       ),
-      body: bodyAttendance(studentDataProvider,socketServerProvider),
+      body: bodyAttendance(studentDataProvider, socketServerProvider),
     );
   }
 
-  SingleChildScrollView bodyAttendance(
-      StudentDataProvider studentDataProvider, SocketServerProvider socketServerProvider) {
+  SingleChildScrollView bodyAttendance(StudentDataProvider studentDataProvider,
+      SocketServerProvider socketServerProvider) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(left: 15, right: 15),
@@ -274,23 +274,23 @@ class _AttendancePageState extends State<TestTakeAttendance> {
                       const SizedBox(
                         height: 10,
                       ),
-                      customRichText(
-                          'Start Time: ',
-                          '${socketServerProvider.attendanceForm.startTime}',
-                          FontWeight.bold,
-                          FontWeight.w500,
-                          AppColors.primaryText,
-                          AppColors.primaryText),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      customRichText(
-                          'End Time: ',
-                          '${socketServerProvider.attendanceForm.endTime}',
-                          FontWeight.bold,
-                          FontWeight.w500,
-                          AppColors.primaryText,
-                          AppColors.primaryText),
+                      // customRichText(
+                      //     'Start Time: ',
+                      //     '${socketServerProvider.attendanceForm.startTime}',
+                      //     FontWeight.bold,
+                      //     FontWeight.w500,
+                      //     AppColors.primaryText,
+                      //     AppColors.primaryText),
+                      // const SizedBox(
+                      //   height: 10,
+                      // ),
+                      // customRichText(
+                      //     'End Time: ',
+                      //     '${socketServerProvider.attendanceForm.endTime}',
+                      //     FontWeight.bold,
+                      //     FontWeight.w500,
+                      //     AppColors.primaryText,
+                      //     AppColors.primaryText),
                     ],
                   ),
                 ),
@@ -367,7 +367,21 @@ class _AttendancePageState extends State<TestTakeAttendance> {
             children: <Widget>[
               ElevatedButton.icon(
                 onPressed: () {
-                  takePhoto(ImageSource.camera);
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          SmartCamera(),
+                      transitionDuration: const Duration(milliseconds: 300),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        return ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
                 },
                 icon: const Icon(Icons.camera),
                 label: const Text('Camera'),

@@ -2,11 +2,13 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
+import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/Classroom.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/components/DetailPageBody.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/NotificationClass.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/ReportClass.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({
@@ -33,11 +35,22 @@ class _DetailPageState extends State<DetailPage> {
     // TODO: implement initState
     super.initState();
     studentClasses = widget.studentClasses;
+    Future.delayed(Duration.zero, () {
+      if (mounted) {
+        var socketServerDataProvider =
+            Provider.of<SocketServerProvider>(context, listen: false);
+        socketServerDataProvider
+            .connectToSocketServer(studentClasses.classes.classID);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final socketServerDataProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
     return Scaffold(
+        // extendBodyBehindAppBar: true,
         backgroundColor: Colors.white,
         floatingActionButton: FloatingActionButton(
           shape: const CircleBorder(),
@@ -50,7 +63,8 @@ class _DetailPageState extends State<DetailPage> {
             size: 30,
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.miniCenterDocked,
         bottomNavigationBar: AnimatedBottomNavigationBar(
             icons: _iconList,
             activeIndex: _bottomNavIndex,
@@ -60,16 +74,18 @@ class _DetailPageState extends State<DetailPage> {
             iconSize: 25,
             backgroundColor: Colors.white,
             onTap: onTapHandler),
-        appBar: customAppbar(),
+        appBar: customAppbar(socketServerDataProvider),
         body: _buildBody());
   }
 
-  PreferredSize customAppbar() {
+  PreferredSize customAppbar(SocketServerProvider socketServerProvider) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(100),
       child: AppBar(
         leading: GestureDetector(
           onTap: () {
+            socketServerProvider.disconnectSocketServer();
+            setState(() {});
             Navigator.pop(context);
           },
           child: Container(

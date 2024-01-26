@@ -164,6 +164,7 @@ class _HomePageBodyState extends State<HomePageBody> {
           //Body 2
           Container(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   margin: const EdgeInsets.only(top: 350),
@@ -279,62 +280,75 @@ class _HomePageBodyState extends State<HomePageBody> {
                                 classDataProvider
                                     .setStudentClassesList(studentClasses);
                               });
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: studentClasses.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  var data = studentClasses[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 5, right: 5, bottom: 10),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation,
-                                                    secondaryAnimation) =>
-                                                DetailPage(
-                                              studentClasses: data,
-                                            ),
-                                            transitionDuration: const Duration(
-                                                milliseconds: 200),
-                                            transitionsBuilder: (context,
-                                                animation,
-                                                secondaryAnimation,
-                                                child) {
-                                              return ScaleTransition(
-                                                scale: animation,
-                                                child: child,
+                              return SizedBox(
+                                height: 500,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ListView.builder(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      shrinkWrap: true,
+                                      itemCount: studentClasses.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        var data = studentClasses[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 5, right: 5, bottom: 10),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                PageRouteBuilder(
+                                                  pageBuilder: (context,
+                                                          animation,
+                                                          secondaryAnimation) =>
+                                                      DetailPage(
+                                                    studentClasses: data,
+                                                  ),
+                                                  transitionDuration:
+                                                      const Duration(
+                                                          milliseconds: 200),
+                                                  transitionsBuilder: (context,
+                                                      animation,
+                                                      secondaryAnimation,
+                                                      child) {
+                                                    return ScaleTransition(
+                                                      scale: animation,
+                                                      child: child,
+                                                    );
+                                                  },
+                                                ),
                                               );
                                             },
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 5,
+                                                right: 5,
+                                              ),
+                                              child: classInformation(
+                                                data.classes.course.totalWeeks,
+                                                data.classes.course.courseName,
+                                                data.classes.teacher
+                                                    .teacherName,
+                                                data.classes.course.courseID,
+                                                data.classes.classType,
+                                                data.classes.group,
+                                                data.classes.subGroup,
+                                                data.classes.shiftNumber,
+                                                data.classes.roomNumber,
+                                                data.totalPresence,
+                                                data.totalLate,
+                                                data.totalAbsence,
+                                                data.progress,
+                                              ),
+                                            ),
                                           ),
                                         );
                                       },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 5,
-                                          right: 5,
-                                        ),
-                                        child: classInformation(
-                                          data.classes.course.totalWeeks,
-                                          data.classes.course.courseName,
-                                          data.classes.teacher.teacherName,
-                                          data.classes.course.courseID,
-                                          data.classes.classType,
-                                          data.classes.group,
-                                          data.classes.subGroup,
-                                          data.classes.shiftNumber,
-                                          data.classes.roomNumber,
-                                          data.totalPresence,
-                                          data.totalLate,
-                                          data.totalAbsence,
-                                          data.progress,
-                                        ),
-                                      ),
                                     ),
-                                  );
-                                },
+                                  ],
+                                ),
                               );
                             }
                           }
@@ -351,62 +365,66 @@ class _HomePageBodyState extends State<HomePageBody> {
         else
           Container(
             height: 500,
-            child: Column(
-              children: [
-                const Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CustomText(
-                          message: 'SCAN QR CODE',
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryText),
-                      CustomText(
-                          message: 'Scanning will be started automatically',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.primaryText),
-                    ],
+            width: MediaQuery.of(context).size.width,
+            child: Padding(
+              padding: const EdgeInsets.only(),
+              child: Column(
+                children: [
+                  const Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CustomText(
+                            message: 'SCAN QR CODE',
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryText),
+                        CustomText(
+                            message: 'Scanning will be started automatically',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.primaryText),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Stack(children: [
-                  SizedBox(
-                    height: 400,
-                    width: 400,
-                    child: QRView(
-                        overlay: QrScannerOverlayShape(
-                          borderLength: 30,
-                          borderColor: AppColors.primaryButton,
-                          borderWidth: 10,
-                          borderRadius: 10,
-                        ),
-                        key: qrKey,
-                        onQRViewCreated: _onQRViewCreated),
+                  const SizedBox(
+                    height: 5,
                   ),
-                  Positioned(
-                    bottom: 30,
-                    left: 160,
-                    right: 160,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white24,
-                          borderRadius: BorderRadius.circular(8)),
-                      child: Center(
-                        child: Text(
-                          maxLines: 3,
-                          result != null ? '${result!.code}' : 'Scan QR Code',
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.white),
+                  Stack(children: [
+                    SizedBox(
+                      height: 400,
+                      width: 500,
+                      child: QRView(
+                          overlay: QrScannerOverlayShape(
+                            borderLength: 30,
+                            borderColor: AppColors.primaryButton,
+                            borderWidth: 10,
+                            borderRadius: 10,
+                          ),
+                          key: qrKey,
+                          onQRViewCreated: _onQRViewCreated),
+                    ),
+                    Positioned(
+                      bottom: 30,
+                      left: 160,
+                      right: 160,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Center(
+                          child: Text(
+                            maxLines: 3,
+                            result != null ? '${result!.code}' : 'Scan QR Code',
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.white),
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                ]),
-              ],
+                    )
+                  ]),
+                ],
+              ),
             ),
           ),
       ],
@@ -590,7 +608,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     customRichText(
-                      title: 'Total Attendance: ',
+                      title: 'Total Presence: ',
                       message: '${totalPresence.ceil()}',
                       fontWeightTitle: FontWeight.bold,
                       fontWeightMessage: FontWeight.w400,

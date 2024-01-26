@@ -19,7 +19,6 @@ import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
 import 'package:attendance_system_nodejs/screens/Test.dart';
 import 'package:attendance_system_nodejs/screens/TestAvatar.dart';
 import 'package:attendance_system_nodejs/screens/TestCustomLoading.dart';
-import 'package:attendance_system_nodejs/screens/TestSocket.dart';
 import 'package:attendance_system_nodejs/screens/TestTakeAttendance.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
@@ -69,7 +68,6 @@ class _MyAppState extends State<MyApp> {
         '/CreateNewPassword': (context) => const CreateNewPassword(),
         '/OTP': (context) => const OTPPage(),
         '/HomePage': (context) => const HomePage(),
-        '/AttendanceForm': (context) => const AttendanceFormPage(),
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },

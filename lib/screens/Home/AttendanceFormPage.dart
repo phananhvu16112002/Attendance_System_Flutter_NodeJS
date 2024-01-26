@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/services/SmartCamera.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
@@ -47,6 +48,8 @@ class _AttendancePageState extends State<AttendanceFormPage> {
   Widget build(BuildContext context) {
     final studentDataProvider =
         Provider.of<StudentDataProvider>(context, listen: true);
+    final attendanceDetailDataProvider =
+        Provider.of<AttendanceDetailDataProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -67,12 +70,12 @@ class _AttendancePageState extends State<AttendanceFormPage> {
         centerTitle: true,
         backgroundColor: AppColors.primaryButton,
       ),
-      body: bodyAttendance(studentDataProvider),
+      body: bodyAttendance(studentDataProvider, attendanceDetailDataProvider),
     );
   }
 
-  SingleChildScrollView bodyAttendance(
-      StudentDataProvider studentDataProvider) {
+  SingleChildScrollView bodyAttendance(StudentDataProvider studentDataProvider,
+      AttendanceDetailDataProvider attendanceDetailDataProvider) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(left: 15, right: 15),

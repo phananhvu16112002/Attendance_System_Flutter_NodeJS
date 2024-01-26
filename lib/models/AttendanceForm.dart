@@ -1,9 +1,9 @@
 class AttendanceForm {
   String formID;
   String classes;
-  String? startTime;
-  String? endTime;
-  String? dateOpen;
+  String startTime;
+  String endTime;
+  String dateOpen;
   bool status;
   int typeAttendance;
   String location;

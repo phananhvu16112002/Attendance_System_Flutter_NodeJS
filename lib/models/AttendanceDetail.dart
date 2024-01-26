@@ -6,12 +6,13 @@ class AttendanceDetail {
   final String classDetail;
   final AttendanceForm attendanceForm;
   final double result;
-  final String? dateAttendanced;
+  final String dateAttendanced;
   final String location;
   final String note;
   final double latitude;
   final double longitude;
   final String url;
+  
   
   AttendanceDetail(
       {required this.studentDetail,

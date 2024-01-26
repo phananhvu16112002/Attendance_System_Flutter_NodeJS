@@ -1,20 +1,34 @@
 import 'dart:convert';
 
+import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'dart:async';
 
 class SocketServerProvider with ChangeNotifier {
   late IO.Socket _socket;
   bool _isConnected = false;
-  late AttendanceForm _attendanceForm;
 
   IO.Socket get socket => _socket;
   bool get isConnected => _isConnected;
-  AttendanceForm get attendanceForm => _attendanceForm;
+
+  final StreamController<AttendanceForm> _attendanceFormController =
+      StreamController<AttendanceForm>.broadcast();
+
+  Stream<AttendanceForm> get attendanceFormStream =>
+      _attendanceFormController.stream.asBroadcastStream();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _attendanceFormController.close();
+    print('socket dispose');
+    super.dispose();
+  }
 
   void connectToSocketServer(data) {
-    _socket = IO.io('http://192.168.0.106:9000', <String, dynamic>{
+    _socket = IO.io('http://192.168.1.9:9000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'headers': {'Content-Type': 'application/json'},
@@ -23,7 +37,7 @@ class SocketServerProvider with ChangeNotifier {
     _socket.connect();
     _isConnected = true;
     joinClassRoom(data);
-    _attendanceForm = getAttendanceForm(data)!;
+    getAttendanceForm(data);
     notifyListeners();
   }
 
@@ -40,14 +54,15 @@ class SocketServerProvider with ChangeNotifier {
       var temp1 = temp['classes'];
       if (temp1 == classRoom) {
         print('Attendance Form Detail:' + data);
-        AttendanceForm tempAttendanceForm = AttendanceForm.fromJson(temp);
-        notifyListeners();
-        return tempAttendanceForm;
+        _attendanceFormController.add(AttendanceForm.fromJson(temp));
+        AttendanceForm attendanceForm = AttendanceForm.fromJson(temp);
+        return attendanceForm;
       } else {
         print('Error ClassRoom not feat');
         return null;
       }
     });
+    return null;
   }
 
   void disconnectSocketServer() {

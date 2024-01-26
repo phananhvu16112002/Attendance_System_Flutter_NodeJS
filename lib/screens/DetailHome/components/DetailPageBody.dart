@@ -1,9 +1,12 @@
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
+import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -36,6 +39,12 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final attendanceDetailDataProvider =
         Provider.of<AttendanceDetailDataProvider>(context, listen: false);
@@ -43,6 +52,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
         Provider.of<StudentClassesDataProvider>(context, listen: false);
     StudentClasses? dataStudentClasses = studentClassesDataProvider
         .getDataForClass(widget.studentClasses.classes.classID);
+    final socketServerDataProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
     return FutureBuilder(
       future:
           API().getAttendanceDetail(studentClasses.classes.classID, '520H0380'),
@@ -76,7 +87,6 @@ class _DetailPageBodyState extends State<DetailPageBody> {
               attendanceDetailDataProvider
                   .setAttendanceDetailList(attendanceDetail);
             });
-
             return Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
@@ -214,28 +224,66 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: attendanceDetail.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          var data = attendanceDetail[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 15),
-                            child: customCard(
-                                data.dateAttendanced != ''
-                                    ? formatDate(
-                                        data.dateAttendanced.toString())
-                                    : formatDate(data.attendanceForm.dateOpen!),
-                                data.dateAttendanced != ''
-                                    ? formatTime(data.dateAttendanced!)
-                                    : 'null',
-                                getResult(data.result),
-                                data.dateAttendanced != ''
-                                    ? data.location
-                                    : 'null',
-                                data.url),
-                          );
-                        })
+                    Container(
+                      height: MediaQuery.of(context).size.height,
+                      child: SingleChildScrollView(
+                        // reverse: true,
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            StreamBuilder(
+                                stream: socketServerDataProvider
+                                    .attendanceFormStream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    if (snapshot.data != null) {
+                                      AttendanceForm? data = snapshot.data;
+                                      return Container();
+                                    } else {
+                                      return const Text('Data is null');
+                                    }
+                                  } else if (snapshot.hasError) {
+                                    return Text('Error:${snapshot.error}');
+                                  } else {
+                                    return Container();
+                                  }
+                                }),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: attendanceDetail.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  var data = attendanceDetail[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 15),
+                                    child: customCard(
+                                      formatTime(data.attendanceForm.startTime),
+                                      formatTime(data.attendanceForm.endTime),
+                                      data.dateAttendanced != ''
+                                          ? formatDate(
+                                              data.dateAttendanced.toString())
+                                          : formatDate(
+                                              data.attendanceForm.dateOpen),
+                                      data.dateAttendanced != ''
+                                          ? formatTime(data.dateAttendanced)
+                                          : 'null',
+                                      getResult(data.result),
+                                      data.dateAttendanced != ''
+                                          ? data.location
+                                          : 'null',
+                                      data.url,
+                                      data.attendanceForm.status,
+                                    ),
+                                  );
+                                }),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -247,8 +295,16 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     );
   }
 
-  Container customCard(String date, String timeAttendance, String status,
-      String location, String url) {
+  Container customCard(
+    String startTime,
+    String endTime,
+    String date,
+    String timeAttendance,
+    String status,
+    String location,
+    String url,
+    bool statusForm,
+  ) {
     return Container(
       width: 405,
       height: 220,
@@ -290,6 +346,26 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      customRichText(
+                          'Start Time: ',
+                          startTime,
+                          FontWeight.w600,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      customRichText(
+                          'End Time: ',
+                          endTime,
+                          FontWeight.w600,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
                       customRichText(
                           'Location: ',
                           location,
@@ -345,11 +421,45 @@ class _DetailPageBodyState extends State<DetailPageBody> {
           const SizedBox(
             height: 5,
           ),
-          const CustomText(
-              message: 'Report',
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryButton)
+          if (statusForm)
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        AttendanceFormPage(),
+                    transitionDuration: const Duration(milliseconds: 1000),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      var curve = Curves.easeInOutCubic;
+                      var tween =
+                          Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                              .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              },
+              child: const CustomText(
+                  message: 'Take Attendance',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryButton),
+            )
+          else
+            InkWell(
+              onTap: () {},
+              child: const CustomText(
+                  message: 'Report',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.importantText),
+            )
         ],
       ),
     );
@@ -408,14 +518,14 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   }
 
   String formatDate(String date) {
-    DateTime serverDateTime = DateTime.parse(date);
+    DateTime serverDateTime = DateTime.parse(date).toLocal();
     String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
     return formattedDate;
   }
 
   String formatTime(String time) {
-    DateTime serverDateTime = DateTime.parse(time);
-    String formattedTime = DateFormat('HH:mm:ss a').format(serverDateTime);
+    DateTime serverDateTime = DateTime.parse(time).toLocal();
+    String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
     return formattedTime;
   }
 
@@ -460,6 +570,62 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          children: [
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 30,
+                                    height: 10,
+                                    color: Colors.white)),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 110,
+                                    height: 10,
+                                    color: Colors.white)),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 30,
+                                    height: 10,
+                                    color: Colors.white)),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Shimmer.fromColors(
+                                baseColor:
+                                    const Color.fromARGB(78, 158, 158, 158),
+                                highlightColor:
+                                    const Color.fromARGB(146, 255, 255, 255),
+                                child: Container(
+                                    width: 110,
+                                    height: 10,
+                                    color: Colors.white)),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
                         Row(
                           children: [
                             Shimmer.fromColors(
@@ -582,175 +748,24 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   }
 }
 
-//  return Container(
-//       width: MediaQuery.of(context).size.width,
-//       height: MediaQuery.of(context).size.height,
-//       color: AppColors.cardAttendance,
-//       child: SingleChildScrollView(
-//         child: Column(
-//           children: [
-//             const SizedBox(
-//               height: 10,
-//             ),
-//             Container(
-//               width: MediaQuery.of(context).size.width,
-//               height: 45,
-//               decoration: const BoxDecoration(
-//                   color: Colors.white,
-//                   borderRadius: BorderRadius.all(Radius.circular(10)),
-//                   boxShadow: [
-//                     BoxShadow(
-//                         color: AppColors.secondaryText,
-//                         blurRadius: 5.0,
-//                         offset: Offset(0.0, 0.0))
-//                   ]),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                 children: [
-//                   GestureDetector(
-//                     onTap: () {
-//                       setState(() {
-//                         activeAbsent = false;
-//                         activeLate = false;
-//                         activePresent = false;
-//                         activeTotal = true;
-//                       });
-//                     },
-//                     child: Container(
-//                       width: 95,
-//                       decoration: BoxDecoration(
-//                           color: activeTotal
-//                               ? AppColors.cardAttendance
-//                               : Colors.white,
-//                           borderRadius:
-//                               const BorderRadius.all(Radius.circular(10))),
-//                       child: const Center(
-//                         child: CustomText(
-//                             message: 'Total: 10',
-//                             fontSize: 15,
-//                             fontWeight: FontWeight.w600,
-//                             color: AppColors.primaryText),
-//                       ),
-//                     ),
-//                   ),
-//                   GestureDetector(
-//                     onTap: () {
-//                       setState(() {
-//                         activeAbsent = false;
-//                         activeLate = false;
-//                         activePresent = true;
-//                         activeTotal = false;
-//                       });
-//                     },
-//                     child: Container(
-//                       width: 95,
-//                       decoration: BoxDecoration(
-//                           color: activePresent
-//                               ? const Color.fromARGB(94, 137, 210, 64)
-//                               : Colors.white,
-//                           borderRadius:
-//                               const BorderRadius.all(Radius.circular(10))),
-//                       child: const Center(
-//                         child: CustomText(
-//                             message: 'Present: 5',
-//                             fontSize: 15,
-//                             fontWeight: FontWeight.w600,
-//                             color: AppColors.primaryText),
-//                       ),
-//                     ),
-//                   ),
-//                   GestureDetector(
-//                     onTap: () {
-//                       setState(() {
-//                         activeAbsent = true;
-//                         activeLate = false;
-//                         activePresent = false;
-//                         activeTotal = false;
-//                       });
-//                     },
-//                     child: Container(
-//                       width: 95,
-//                       decoration: BoxDecoration(
-//                           color: activeAbsent
-//                               ? const Color.fromARGB(216, 219, 87, 87)
-//                               : Colors.white,
-//                           borderRadius:
-//                               const BorderRadius.all(Radius.circular(10))),
-//                       child: const Center(
-//                         child: CustomText(
-//                             message: 'Absent: 3',
-//                             fontSize: 15,
-//                             fontWeight: FontWeight.w600,
-//                             color: AppColors.primaryText),
-//                       ),
-//                     ),
-//                   ),
-//                   GestureDetector(
-//                     onTap: () {
-//                       setState(() {
-//                         activeAbsent = false;
-//                         activeLate = true;
-//                         activePresent = false;
-//                         activeTotal = false;
-//                       });
-//                     },
-//                     child: Container(
-//                       width: 95,
-//                       decoration: BoxDecoration(
-//                           color: activeLate
-//                               ? const Color.fromARGB(231, 232, 156, 63)
-//                               : Colors.white,
-//                           borderRadius:
-//                               const BorderRadius.all(Radius.circular(10))),
-//                       child: const Center(
-//                         child: CustomText(
-//                             message: 'Late: 3',
-//                             fontSize: 15,
-//                             fontWeight: FontWeight.w600,
-//                             color: AppColors.primaryText),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             const SizedBox(height: 10),
-//             FutureBuilder(
-//                 future:
-//                     API().getAttendanceDetail(studentClasses.classes.classID),
+
+
+
+
+
+
+
+// return StreamBuilder(
+//                 stream: socketServerDataProvider.attendanceFormStream,
 //                 builder: (context, snapshot) {
-//                   if (snapshot.connectionState == ConnectionState.waiting) {
-//                     return const CircularProgressIndicator();
-//                   } else if (snapshot.hasError) {
-//                     return Text('Error: ${snapshot.error}');
-//                   } else if (snapshot.hasData) {
+//                   if (snapshot.hasData) {
 //                     if (snapshot.data != null) {
-//                       List<AttendanceDetail> attendanceDetail = snapshot.data!;
-//                       // Cập nhật dữ liệu vào Provider
-//                       Future.delayed(Duration.zero, () {
-//                         attendanceDetailDataProvider
-//                             .setAttendanceDetailList(attendanceDetail);
-//                       });
-//                       return ListView.builder(
-//                           shrinkWrap: true,
-//                           itemCount: attendanceDetail.length,
-//                           itemBuilder: (BuildContext context, int index) {
-//                             var data = attendanceDetail[index];
-//                             return Padding(
-//                               padding: const EdgeInsets.only(bottom: 15),
-//                               child: customCard(
-//                                   formatDate(data.dateAttendanced.toString()),
-//                                   formatTime(data.dateAttendanced.toString()),
-//                                   getStatusText(
-//                                       data.present, data.late, data.absence),
-//                                   data.location),
-//                             );
-//                           });
+//                       return Text('Data: ${snapshot.data!.dateOpen}');
+//                     } else {
+//                       return Text('Error:${snapshot.error}');
 //                     }
+//                   } else {
+//                     return Text('---Error');
 //                   }
-//                   return const Text('Data is not available');
-//                 })
-//           ],
-//         ),
-//       ),
-//     );
+//                 });
+
