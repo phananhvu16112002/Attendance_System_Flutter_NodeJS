@@ -30,6 +30,12 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   int totalPresence = 0;
   int totalAbsence = 0;
   int totalLate = 0;
+  final ScrollController _controller = ScrollController();
+
+  void _scrollDown() {
+    _controller.animateTo(_controller.position.maxScrollExtent,
+        duration: Duration(seconds: 2), curve: Curves.fastOutSlowIn);
+  }
 
   @override
   void initState() {
@@ -60,18 +66,20 @@ class _DetailPageBodyState extends State<DetailPageBody> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
-              child: Column(
-            children: [
-              customLoading(),
-              const SizedBox(
-                height: 10,
-              ),
-              customLoading(),
-              const SizedBox(
-                height: 10,
-              ),
-              customLoading()
-            ],
+              child: SingleChildScrollView(
+            child: Column(
+              children: [
+                customLoading(),
+                const SizedBox(
+                  height: 10,
+                ),
+                customLoading(),
+                const SizedBox(
+                  height: 10,
+                ),
+                customLoading()
+              ],
+            ),
           ));
         } else if (snapshot.hasError) {
           return Container(
@@ -224,65 +232,59 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Container(
-                      height: MediaQuery.of(context).size.height,
-                      child: SingleChildScrollView(
-                        // reverse: true,
-                        physics: AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          children: [
-                            StreamBuilder(
-                                stream: socketServerDataProvider
-                                    .attendanceFormStream,
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    if (snapshot.data != null) {
-                                      AttendanceForm? data = snapshot.data;
-                                      return Container();
-                                    } else {
-                                      return const Text('Data is null');
-                                    }
-                                  } else if (snapshot.hasError) {
-                                    return Text('Error:${snapshot.error}');
-                                  } else {
-                                    return Container();
-                                  }
-                                }),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: attendanceDetail.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  var data = attendanceDetail[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 15),
-                                    child: customCard(
-                                      formatTime(data.attendanceForm.startTime),
-                                      formatTime(data.attendanceForm.endTime),
-                                      data.dateAttendanced != ''
-                                          ? formatDate(
-                                              data.dateAttendanced.toString())
-                                          : formatDate(
-                                              data.attendanceForm.dateOpen),
-                                      data.dateAttendanced != ''
-                                          ? formatTime(data.dateAttendanced)
-                                          : 'null',
-                                      getResult(data.result),
-                                      data.dateAttendanced != ''
-                                          ? data.location
-                                          : 'null',
-                                      data.url,
-                                      data.attendanceForm.status,
-                                    ),
-                                  );
-                                }),
-                          ],
-                        ),
-                      ),
+                    Column(
+                      children: [
+                        // StreamBuilder(
+                        //     stream:
+                        //         socketServerDataProvider.attendanceFormStream,
+                        //     builder: (context, snapshot) {
+                        //       if (snapshot.hasData) {
+                        //         if (snapshot.data != null) {
+                        //           AttendanceForm? data = snapshot.data;
+                        //           return Container();
+                        //         } else {
+                        //           return const Text('Data is null');
+                        //         }
+                        //       } else if (snapshot.hasError) {
+                        //         return Text('Error:${snapshot.error}');
+                        //       } else {
+                        //         return Container();
+                        //       }
+                        //     }),
+                        // const SizedBox(
+                        //   height: 10,
+                        // ),
+                        ListView.builder(
+                            itemCount: attendanceDetail.length,
+                            shrinkWrap: true,
+                            controller: _controller,
+                            itemBuilder: (BuildContext context, int index) {
+                              var data = attendanceDetail[index];
+                              return SingleChildScrollView(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 15),
+                                  child: customCard(
+                                    formatTime(data.attendanceForm.startTime),
+                                    formatTime(data.attendanceForm.endTime),
+                                    data.dateAttendanced != ''
+                                        ? formatDate(
+                                            data.dateAttendanced.toString())
+                                        : formatDate(
+                                            data.attendanceForm.dateOpen),
+                                    data.dateAttendanced != ''
+                                        ? formatTime(data.dateAttendanced)
+                                        : 'null',
+                                    getResult(data.result),
+                                    data.dateAttendanced != ''
+                                        ? data.location
+                                        : 'null',
+                                    data.url,
+                                    data.attendanceForm.status,
+                                  ),
+                                ),
+                              );
+                            }),
+                      ],
                     ),
                   ],
                 ),

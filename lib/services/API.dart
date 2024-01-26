@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 class API {
   Future<List<StudentClasses>> getStudentClass(String studentID) async {
     final URL =
-        'http://192.168.1.9:8080/test/testGetClassesVersion1'; //10.0.2.2
+        'http://10.0.2.2:8080/test/testGetClassesVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -48,7 +48,7 @@ class API {
   Future<List<AttendanceDetail>> getAttendanceDetail(
       String classesID, String studentID) async {
     final URL =
-        'http://192.168.1.9:8080/test/testGetAttendanceDetailVersion1'; //10.0.2.2
+        'http://10.0.2.2:8080/test/testGetAttendanceDetailVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -92,7 +92,7 @@ class API {
       print('Error: $e');
       return [];
     }
-    return [];
+    
   }
 
   Future<bool> takeAttendance(
