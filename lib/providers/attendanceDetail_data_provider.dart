@@ -6,12 +6,19 @@ class AttendanceDetailDataProvider with ChangeNotifier {
 
   List<AttendanceDetail> get attendanceDetailData => _attendanceDetailList;
 
-  
-
   void setAttendanceDetailList(List<AttendanceDetail> attendanceDetailList) {
     _attendanceDetailList = attendanceDetailList;
     notifyListeners();
   }
 
-  
+  AttendanceDetail? getDataFormAndStudent(String studentID, String formID) {
+    for (var i = 0; i < _attendanceDetailList.length; i++) {
+      if (_attendanceDetailList[i].attendanceForm.formID == formID &&
+          _attendanceDetailList[i].studentDetail == studentID) {
+        var temp = _attendanceDetailList[i];
+        return temp;
+      }
+    }
+    return null;
+  }
 }

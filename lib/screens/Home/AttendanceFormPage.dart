@@ -1,19 +1,30 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
+import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
+import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Home/AfterAttendance.dart';
+import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:attendance_system_nodejs/services/SmartCamera.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class AttendanceFormPage extends StatefulWidget {
   const AttendanceFormPage({super.key});
+  // final AttendanceForm attendanceForm;
 
   @override
   State<AttendanceFormPage> createState() => _AttendancePageState();
@@ -21,12 +32,20 @@ class AttendanceFormPage extends StatefulWidget {
 
 class _AttendancePageState extends State<AttendanceFormPage> {
   XFile? file;
+  // late AttendanceForm attendanceForm;
+  final ImagePicker _picker = ImagePicker();
+  // late StreamController<String> _durationController;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    // attendanceForm = widget.attendanceForm;
     getImage();
+    //  _durationController = StreamController<String>();
+
+    // Bắt đầu tính toán và phát thời gian đếm ngược
+    // startCountdown();
   }
 
   Future<void> getImage() async {
@@ -48,8 +67,14 @@ class _AttendancePageState extends State<AttendanceFormPage> {
   Widget build(BuildContext context) {
     final studentDataProvider =
         Provider.of<StudentDataProvider>(context, listen: true);
+    final studentClassesDataProvider =
+        Provider.of<StudentClassesDataProvider>(context, listen: false);
+    final attendanceFormDataProvider =
+        Provider.of<AttendanceFormDataProvider>(context, listen: false);
     final attendanceDetailDataProvider =
         Provider.of<AttendanceDetailDataProvider>(context, listen: false);
+    final socketServerDataProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -70,12 +95,21 @@ class _AttendancePageState extends State<AttendanceFormPage> {
         centerTitle: true,
         backgroundColor: AppColors.primaryButton,
       ),
-      body: bodyAttendance(studentDataProvider, attendanceDetailDataProvider),
+      body: bodyAttendance(
+          studentDataProvider,
+          attendanceFormDataProvider,
+          studentClassesDataProvider,
+          attendanceDetailDataProvider,
+          socketServerDataProvider),
     );
   }
 
-  SingleChildScrollView bodyAttendance(StudentDataProvider studentDataProvider,
-      AttendanceDetailDataProvider attendanceDetailDataProvider) {
+  SingleChildScrollView bodyAttendance(
+      StudentDataProvider studentDataProvider,
+      AttendanceFormDataProvider attendanceFormDataProvider,
+      StudentClassesDataProvider studentClassesDataProvider,
+      AttendanceDetailDataProvider attendanceDetailDataProvider,
+      SocketServerProvider socketServerProvider) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(left: 15, right: 15),
@@ -86,7 +120,8 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             const SizedBox(
               height: 20,
             ),
-            infoClass(),
+            infoClass(attendanceFormDataProvider, studentClassesDataProvider,
+                attendanceDetailDataProvider, studentDataProvider),
             const SizedBox(
               height: 15,
             ),
@@ -94,32 +129,35 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             const SizedBox(
               height: 15,
             ),
-            CustomButton(
-                buttonName: 'Scan your face',
-                colorShadow: AppColors.colorShadow,
-                backgroundColorButton: AppColors.cardAttendance,
-                borderColor: Colors.transparent,
-                textColor: AppColors.primaryButton,
-                function: () {
-                  Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          SmartCamera(),
-                      transitionDuration: const Duration(milliseconds: 300),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return ScaleTransition(
-                          scale: animation,
-                          child: child,
-                        );
-                      },
-                    ),
-                  );
-                },
+            GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                    context: context, builder: (builder) => bottomSheet());
+              },
+              child: Container(
                 height: 40,
-                width: 140,
-                fontSize: 15),
+                width: 150,
+                decoration: BoxDecoration(
+                    color: AppColors.cardAttendance,
+                    borderRadius: const BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(width: 1, color: Colors.transparent),
+                    boxShadow: [
+                      BoxShadow(
+                          color: AppColors.colorShadow.withOpacity(0.2),
+                          blurRadius: 1,
+                          offset: const Offset(0, 2))
+                    ]),
+                child: Center(
+                  child: Text(
+                    'Scan your face',
+                    style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryButton),
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(
               height: 15,
             ),
@@ -149,10 +187,40 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                   borderColor: Colors.transparent,
                   textColor: Colors.white,
                   function: () async {
-                    await SecureStorage().deleteSecureData('image');
+                    bool check = await API().takeAttendance(
+                        studentDataProvider.userData.studentID,
+                        attendanceFormDataProvider.attendanceFormData.classes,
+                        attendanceFormDataProvider.attendanceFormData.formID,
+                        DateTime.now().toString(),
+                        studentDataProvider.userData.location,
+                        studentDataProvider.userData.latitude,
+                        studentDataProvider.userData.longtitude,
+                        file!);
+                    if (check) {
+                      print('Successfully');
+                      socketServerProvider.takeAttendance(
+                          studentDataProvider.userData.studentID,
+                          attendanceFormDataProvider.attendanceFormData.classes,
+                          attendanceFormDataProvider.attendanceFormData.formID,
+                          DateTime.now().toString(),
+                          studentDataProvider.userData.location,
+                          studentDataProvider.userData.latitude,
+                          studentDataProvider.userData.longtitude,
+                          file!);
+                      if (mounted) {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (builder) => AfterAttendance()));
+                      }
+                    } else {
+                      print('Failed');
+                      if (mounted) {}
+                    }
+                    SecureStorage().deleteSecureData('image');
                   },
                   height: 55,
-                  width: 380,
+                  width: 400,
                   fontSize: 20),
             )
           ],
@@ -182,10 +250,16 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     );
   }
 
-  Container infoClass() {
+  Container infoClass(
+      AttendanceFormDataProvider attendanceFormDataProvider,
+      StudentClassesDataProvider studentClassesDataProvider,
+      AttendanceDetailDataProvider attendanceDetailDataProvider,
+      StudentDataProvider studentDataProvider) {
+    StudentClasses? studentClasses = studentClassesDataProvider
+        .getDataForClass(attendanceFormDataProvider.attendanceFormData.classes);
     return Container(
       width: 405,
-      height: 200,
+      height: 220,
       decoration: const BoxDecoration(
           color: AppColors.cardAttendance,
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -197,8 +271,12 @@ class _AttendancePageState extends State<AttendanceFormPage> {
           ]),
       child: Column(
         children: [
-          const CustomText(
-              message: 'Tuesday 7 January, 2023',
+          CustomText(
+              message: attendanceFormDataProvider.attendanceFormData.dateOpen !=
+                      ''
+                  ? formatDate(
+                      attendanceFormDataProvider.attendanceFormData.dateOpen)
+                  : 'null',
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.primaryText),
@@ -222,7 +300,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                     children: [
                       customRichText(
                           'Class: ',
-                          'Phát triển hệ thống thông tin doanh nghiệp',
+                          studentClasses!.classes.course.courseName,
                           FontWeight.bold,
                           FontWeight.w500,
                           AppColors.primaryText,
@@ -232,7 +310,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                       ),
                       customRichText(
                           'Status: ',
-                          'Absent',
+                          getResult(0),
                           FontWeight.bold,
                           FontWeight.w500,
                           AppColors.primaryText,
@@ -244,7 +322,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                         children: [
                           customRichText(
                               'Shift: ',
-                              '4',
+                              '${studentClasses.classes.shiftNumber}',
                               FontWeight.bold,
                               FontWeight.w500,
                               AppColors.primaryText,
@@ -254,7 +332,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                           ),
                           customRichText(
                               'Room: ',
-                              'A0405',
+                              studentClasses.classes.roomNumber,
                               FontWeight.bold,
                               FontWeight.w500,
                               AppColors.primaryText,
@@ -266,7 +344,8 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                       ),
                       customRichText(
                           'Start Time: ',
-                          '15:30 PM',
+                          formatTime(attendanceFormDataProvider
+                              .attendanceFormData.startTime),
                           FontWeight.bold,
                           FontWeight.w500,
                           AppColors.primaryText,
@@ -276,7 +355,18 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                       ),
                       customRichText(
                           'End Time: ',
-                          '16:30 PM',
+                          formatTime(attendanceFormDataProvider
+                              .attendanceFormData.endTime),
+                          FontWeight.bold,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      customRichText(
+                          'Duration: ',
+                          '',
                           FontWeight.bold,
                           FontWeight.w500,
                           AppColors.primaryText,
@@ -285,12 +375,23 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                   ),
                 ),
               ),
-              Container(
-                margin: const EdgeInsets.only(right: 10, top: 10),
-                height: 140,
-                width: 140,
-                color: Colors.amber,
-              )
+              attendanceFormDataProvider.attendanceFormData.typeAttendance == 0
+                  ? Container(
+                      margin: const EdgeInsets.only(right: 10, top: 10),
+                      height: 140,
+                      width: 140,
+                      color: Colors.amber,
+                      child: Center(
+                        child: Text(attendanceFormDataProvider
+                            .attendanceFormData.formID),
+                      ),
+                    )
+                  : Container(
+                      margin: const EdgeInsets.only(right: 10, top: 10),
+                      height: 140,
+                      width: 140,
+                      color: Colors.black,
+                    )
             ],
           )
         ],
@@ -326,15 +427,103 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     ]));
   }
 
+  Widget bottomSheet() {
+    return Container(
+      height: 100,
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        children: <Widget>[
+          const Text(
+            'Choose Your Photo',
+            style: TextStyle(fontSize: 20.0),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          SmartCamera(),
+                      transitionDuration: const Duration(milliseconds: 300),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        return ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.camera),
+                label: const Text('Camera'),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  takePhoto(ImageSource.gallery);
+                },
+                icon: const Icon(Icons.camera),
+                label: const Text('Gallery'),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  void takePhoto(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        file = pickedFile;
+      });
+    }
+  }
+
+  Color getColorBasedOnStatus(String status) {
+    if (status.contains('Present')) {
+      return AppColors.textApproved;
+    } else if (status.contains('Late')) {
+      return const Color.fromARGB(231, 196, 123, 34);
+    } else if (status.contains('Absence')) {
+      return AppColors.importantText;
+    } else {
+      return AppColors.primaryText;
+    }
+  }
+
+  String getResult(double result) {
+    if (result.ceil() == 1) {
+      return 'Present';
+    } else if (result == 0.5) {
+      return 'Late';
+    } else if (result.ceil() == 0) {
+      return 'Absence';
+    } else {
+      return 'Absence';
+    }
+  }
+
   String formatDate(String date) {
-    DateTime serverDateTime = DateTime.parse(date);
+    DateTime serverDateTime = DateTime.parse(date).toLocal();
     String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
     return formattedDate;
   }
 
   String formatTime(String time) {
-    DateTime serverDateTime = DateTime.parse(time);
-    String formattedTime = DateFormat('HH:mm:ss').format(serverDateTime);
+    DateTime serverDateTime = DateTime.parse(time).toLocal();
+    String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
     return formattedTime;
   }
 }

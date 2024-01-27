@@ -28,7 +28,7 @@ class SocketServerProvider with ChangeNotifier {
   }
 
   void connectToSocketServer(data) {
-    _socket = IO.io('http://localhost:9000', <String, dynamic>{
+    _socket = IO.io('http://192.168.1.9:9000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'headers': {'Content-Type': 'application/json'},
@@ -63,6 +63,24 @@ class SocketServerProvider with ChangeNotifier {
       }
     });
     return null;
+  }
+
+  void takeAttendance(studentID, classID, formID, dateTimeAttendance, location,
+      latitude, longitude, image) {
+    var jsonData = {
+      'studentID': studentID,
+      'classID': classID,
+      'formID': formID,
+      'dateTimeAttendance': dateTimeAttendance,
+      'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
+      'image': image.toString()
+    };
+
+    var jsonString = jsonEncode(jsonData);
+    print('Student $studentID Sending Attendance Form $formID to $classID');
+    _socket.emit('takeAttendance', jsonString);
   }
 
   void disconnectSocketServer() {

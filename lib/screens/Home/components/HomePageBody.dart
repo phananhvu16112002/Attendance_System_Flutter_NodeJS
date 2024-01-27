@@ -36,6 +36,7 @@ class _HomePageBodyState extends State<HomePageBody> {
   bool activeForm = false;
   Barcode? result;
   String? address;
+  final ScrollController _controller = ScrollController();
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
@@ -123,8 +124,9 @@ class _HomePageBodyState extends State<HomePageBody> {
   Widget build(BuildContext context) {
     final classDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
-    final provider = Provider.of<StudentDataProvider>(context);
+    final studentDataProvider = Provider.of<StudentDataProvider>(context);
     return SingleChildScrollView(
+        // controller: _controller,
         //Column Tổng body
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,7 +134,7 @@ class _HomePageBodyState extends State<HomePageBody> {
         Stack(children: [
           CustomAppBar(
             context: context,
-            address: 'Address: ${provider.userData.location}',
+            address: 'Address: ${studentDataProvider.userData.location}',
           ),
           //Search Bar
           Positioned(
@@ -248,8 +250,8 @@ class _HomePageBodyState extends State<HomePageBody> {
                     if (result == ConnectivityResult.wifi ||
                         result == ConnectivityResult.mobile) {
                       return FutureBuilder(
-                        future:
-                            API().getStudentClass('520H0380'), //Chinh parameter
+                        future: API().getStudentClass(studentDataProvider
+                            .userData.studentID), //Chinh parameter
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {

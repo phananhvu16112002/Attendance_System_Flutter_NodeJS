@@ -1,4 +1,5 @@
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
@@ -16,10 +17,11 @@ import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
-import 'package:attendance_system_nodejs/screens/Test.dart';
-import 'package:attendance_system_nodejs/screens/TestAvatar.dart';
-import 'package:attendance_system_nodejs/screens/TestCustomLoading.dart';
-import 'package:attendance_system_nodejs/screens/TestTakeAttendance.dart';
+import 'package:attendance_system_nodejs/TestApp/Test.dart';
+import 'package:attendance_system_nodejs/TestApp/TestAvatar.dart';
+import 'package:attendance_system_nodejs/TestApp/TestConnection.dart';
+import 'package:attendance_system_nodejs/TestApp/TestCustomLoading.dart';
+import 'package:attendance_system_nodejs/TestApp/TestTakeAttendance.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +37,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => StudentDataProvider()),
         ChangeNotifierProvider(create: (_) => StudentClassesDataProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceDetailDataProvider()),
-        ChangeNotifierProvider(create: (_) => SocketServerProvider())
+        ChangeNotifierProvider(create: (_) => SocketServerProvider()),
+        ChangeNotifierProvider(create: (_) => AttendanceFormDataProvider())
       ],
       child: const MyApp(),
     ),
@@ -71,7 +74,7 @@ class _MyAppState extends State<MyApp> {
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },
-      home: const HomePage(),
+      home: const WelcomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

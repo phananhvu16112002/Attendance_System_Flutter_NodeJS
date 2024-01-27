@@ -1,5 +1,5 @@
 import 'package:app_settings/app_settings.dart';
-import 'package:attendance_system_nodejs/screens/TestNotification2.dart';
+import 'package:attendance_system_nodejs/TestApp/TestNotification2.dart';
 import 'package:attendance_system_nodejs/services/NotificationService.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';

@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 class API {
   Future<List<StudentClasses>> getStudentClass(String studentID) async {
     final URL =
-        'http://10.0.2.2:8080/test/testGetClassesVersion1'; //10.0.2.2
+        'http://192.168.1.9:8080/test/testGetClassesVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -48,7 +48,7 @@ class API {
   Future<List<AttendanceDetail>> getAttendanceDetail(
       String classesID, String studentID) async {
     final URL =
-        'http://10.0.2.2:8080/test/testGetAttendanceDetailVersion1'; //10.0.2.2
+        'http://192.168.1.9:8080/test/testGetAttendanceDetailVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -92,12 +92,18 @@ class API {
       print('Error: $e');
       return [];
     }
-    
   }
 
   Future<bool> takeAttendance(
-      String studentID, String classID, String formID, XFile fileImage) async {
-    const URL = 'http://10.0.2.2:8080/api/student/takeAttendance';
+      String studentID,
+      String classID,
+      String formID,
+      String dateAttendance,
+      String location,
+      double latitude,
+      double longitude,
+      XFile fileImage) async {
+    const URL = 'http://192.168.1.9:8080/api/student/takeAttendance';
     final headers = {
       'Content-type': 'multipart/form-data',
     };
@@ -108,6 +114,10 @@ class API {
       ..fields['studentID'] = studentID
       ..fields['classID'] = classID
       ..fields['formID'] = formID
+      ..fields['dateTimeAttendance'] = dateAttendance
+      ..fields['location'] = location
+      ..fields['latitude'] = latitude.toString()
+      ..fields['longitude'] = longitude.toString()
       ..files.add(imageFile);
     try {
       var response = await request.send();
@@ -121,7 +131,6 @@ class API {
         print('Failed to take attendance: $message');
         return false;
       } else {
-        // Handle other status codes
         print('Failed to take attendance. Status code: ${response.statusCode}');
         return false;
       }

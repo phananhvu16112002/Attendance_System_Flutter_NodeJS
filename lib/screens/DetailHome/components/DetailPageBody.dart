@@ -4,8 +4,11 @@ import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
@@ -58,11 +61,15 @@ class _DetailPageBodyState extends State<DetailPageBody> {
         Provider.of<StudentClassesDataProvider>(context, listen: false);
     StudentClasses? dataStudentClasses = studentClassesDataProvider
         .getDataForClass(widget.studentClasses.classes.classID);
+    final attendanceFormDataProvider =
+        Provider.of<AttendanceFormDataProvider>(context, listen: false);
     final socketServerDataProvider =
         Provider.of<SocketServerProvider>(context, listen: false);
+    final studentDataProvider =
+        Provider.of<StudentDataProvider>(context, listen: false);
     return FutureBuilder(
-      future:
-          API().getAttendanceDetail(studentClasses.classes.classID, '520H0380'),
+      future: API().getAttendanceDetail(studentClasses.classes.classID,
+          studentDataProvider.userData.studentID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -233,37 +240,51 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                     ),
                     const SizedBox(height: 10),
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // StreamBuilder(
-                        //     stream:
-                        //         socketServerDataProvider.attendanceFormStream,
-                        //     builder: (context, snapshot) {
-                        //       if (snapshot.hasData) {
-                        //         if (snapshot.data != null) {
-                        //           AttendanceForm? data = snapshot.data;
-                        //           return Container();
-                        //         } else {
-                        //           return const Text('Data is null');
-                        //         }
-                        //       } else if (snapshot.hasError) {
-                        //         return Text('Error:${snapshot.error}');
-                        //       } else {
-                        //         return Container();
-                        //       }
-                        //     }),
-                        // const SizedBox(
-                        //   height: 10,
-                        // ),
+                        StreamBuilder(
+                            stream:
+                                socketServerDataProvider.attendanceFormStream,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                if (snapshot.data != null) {
+                                  AttendanceForm? data = snapshot.data;
+                                  Future.delayed(Duration.zero, () {
+                                    attendanceFormDataProvider
+                                        .setAttendanceFormData(data!);
+                                  });
+                                  return customCard(
+                                      formatTime(data!.startTime),
+                                      formatTime(data.endTime),
+                                      formatDate(data.dateOpen),
+                                      '',
+                                      getResult(0),
+                                      '',
+                                      '',
+                                      data.status,
+                                      data);
+                                } else {
+                                  return const Text('Data is null');
+                                }
+                              } else if (snapshot.hasError) {
+                                return Text('Error:${snapshot.error}');
+                              } else {
+                                return Container();
+                              }
+                            }),
+                        const SizedBox(
+                          height: 10,
+                        ),
                         ListView.builder(
                             itemCount: attendanceDetail.length,
                             shrinkWrap: true,
                             controller: _controller,
                             itemBuilder: (BuildContext context, int index) {
                               var data = attendanceDetail[index];
-                              return SingleChildScrollView(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(bottom: 15),
-                                  child: customCard(
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                    bottom: 15, left: 10, right: 10),
+                                child: customCard(
                                     formatTime(data.attendanceForm.startTime),
                                     formatTime(data.attendanceForm.endTime),
                                     data.dateAttendanced != ''
@@ -280,8 +301,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                         : 'null',
                                     data.url,
                                     data.attendanceForm.status,
-                                  ),
-                                ),
+                                    data.attendanceForm),
                               );
                             }),
                       ],
@@ -298,18 +318,18 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   }
 
   Container customCard(
-    String startTime,
-    String endTime,
-    String date,
-    String timeAttendance,
-    String status,
-    String location,
-    String url,
-    bool statusForm,
-  ) {
+      String startTime,
+      String endTime,
+      String date,
+      String timeAttendance,
+      String status,
+      String location,
+      String url,
+      bool statusForm,
+      AttendanceForm attendanceForm) {
     return Container(
       width: 405,
-      height: 220,
+      height: 240,
       decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -430,7 +450,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        AttendanceFormPage(),
+                        AttendanceFormPage(
+                            // attendanceForm: attendanceForm,
+                            ),
                     transitionDuration: const Duration(milliseconds: 1000),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
@@ -455,7 +477,28 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             )
           else
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        ReportAttendance(),
+                    transitionDuration: const Duration(milliseconds: 1000),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      var curve = Curves.easeInOutCubic;
+                      var tween =
+                          Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                              .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              },
               child: const CustomText(
                   message: 'Report',
                   fontSize: 15,

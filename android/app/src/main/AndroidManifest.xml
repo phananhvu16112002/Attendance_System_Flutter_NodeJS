@@ -11,6 +11,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true"
+        android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBeXmfS_J09cX3frhZTzOHu1iw5YWDOM08"/> 
         <activity

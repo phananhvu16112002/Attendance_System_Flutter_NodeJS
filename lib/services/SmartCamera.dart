@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
+import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SmartCamera extends StatefulWidget {
   const SmartCamera({super.key});
@@ -18,6 +21,8 @@ class _SmartCameraState extends State<SmartCamera> {
 
   @override
   Widget build(BuildContext context) {
+    final attendanceFormDataProvider =
+        Provider.of<AttendanceFormDataProvider>(context, listen: false);
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -48,7 +53,31 @@ class _SmartCameraState extends State<SmartCamera> {
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                      builder: (builder) => const AttendanceFormPage()),
+                      builder: (builder) => const AttendanceFormPage(
+                          // attendanceForm: AttendanceForm(
+                          //     formID: attendanceFormDataProvider
+                          //         .attendanceFormData.formID,
+                          //     classes: attendanceFormDataProvider
+                          //         .attendanceFormData.classes,
+                          //     startTime: attendanceFormDataProvider
+                          //         .attendanceFormData.startTime,
+                          //     endTime: attendanceFormDataProvider
+                          //         .attendanceFormData.endTime,
+                          //     dateOpen: attendanceFormDataProvider
+                          //         .attendanceFormData.dateOpen,
+                          //     status: attendanceFormDataProvider
+                          //         .attendanceFormData.status,
+                          //     typeAttendance: attendanceFormDataProvider
+                          //         .attendanceFormData.typeAttendance,
+                          //     location: attendanceFormDataProvider
+                          //         .attendanceFormData.location,
+                          //     latitude: attendanceFormDataProvider
+                          //         .attendanceFormData.latitude,
+                          //     longtitude: attendanceFormDataProvider
+                          //         .attendanceFormData.longtitude,
+                          //     radius: attendanceFormDataProvider
+                          //         .attendanceFormData.radius),
+                          )),
                   (route) => false);
             }
           }
