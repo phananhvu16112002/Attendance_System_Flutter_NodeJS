@@ -187,7 +187,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                   borderColor: Colors.transparent,
                   textColor: Colors.white,
                   function: () async {
-                    bool check = await API().takeAttendance(
+                    AttendanceDetail? data = await API().takeAttendance(
                         studentDataProvider.userData.studentID,
                         attendanceFormDataProvider.attendanceFormData.classes,
                         attendanceFormDataProvider.attendanceFormData.formID,
@@ -196,26 +196,41 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                         studentDataProvider.userData.latitude,
                         studentDataProvider.userData.longtitude,
                         file!);
-                    if (check) {
-                      print('Successfully');
+                    if (data != null) {
+                      print('Take Attendance Successfully');
                       socketServerProvider.takeAttendance(
-                          studentDataProvider.userData.studentID,
-                          attendanceFormDataProvider.attendanceFormData.classes,
-                          attendanceFormDataProvider.attendanceFormData.formID,
-                          DateTime.now().toString(),
-                          studentDataProvider.userData.location,
-                          studentDataProvider.userData.latitude,
-                          studentDataProvider.userData.longtitude,
-                          file!);
+                          data.studentDetail,
+                          data.classDetail,
+                          data.attendanceForm.formID,
+                          data.dateAttendanced,
+                          data.location,
+                          data.latitude,
+                          data.longitude,
+                          data.result,
+                          data.url);
                       if (mounted) {
                         Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (builder) => AfterAttendance()));
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    AfterAttendance(
+                              attendanceDetail: data,
+                            ),
+                            transitionDuration:
+                                const Duration(milliseconds: 200),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              return ScaleTransition(
+                                scale: animation,
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
                       }
                     } else {
-                      print('Failed');
-                      if (mounted) {}
+                      print('Failed take attendance');
                     }
                     SecureStorage().deleteSecureData('image');
                   },

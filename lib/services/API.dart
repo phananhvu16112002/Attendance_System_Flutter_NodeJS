@@ -94,7 +94,7 @@ class API {
     }
   }
 
-  Future<bool> takeAttendance(
+  Future<AttendanceDetail?> takeAttendance(
       String studentID,
       String classID,
       String formID,
@@ -110,7 +110,7 @@ class API {
     var imageBytes = await fileImage.readAsBytes();
     var imageFile =
         http.MultipartFile.fromBytes('file', imageBytes, filename: 'image.jpg');
-    var request = await http.MultipartRequest('POST', Uri.parse(URL))
+    var request = http.MultipartRequest('POST', Uri.parse(URL))
       ..fields['studentID'] = studentID
       ..fields['classID'] = classID
       ..fields['formID'] = formID
@@ -123,20 +123,24 @@ class API {
       var response = await request.send();
       if (response.statusCode == 200) {
         print('Take Attendance Successfully');
-        return true;
+        Map<String, dynamic> data =
+            json.decode(await response.stream.bytesToString());
+        AttendanceDetail attendanceDetail = AttendanceDetail.fromJson(data);
+        print('data:$data');
+        return attendanceDetail;
       } else if (response.statusCode == 403) {
         Map<String, dynamic> data =
             json.decode(await response.stream.bytesToString());
         String message = data['message'];
         print('Failed to take attendance: $message');
-        return false;
+        return null;
       } else {
         print('Failed to take attendance. Status code: ${response.statusCode}');
-        return false;
+        return null;
       }
     } catch (e) {
       print('Error sending request: $e');
-      return false;
+      return null;
     }
   }
 }

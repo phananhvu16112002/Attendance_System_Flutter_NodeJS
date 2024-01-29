@@ -147,7 +147,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               child: Center(
                                 child: CustomText(
                                     message:
-                                        'Total: ${dataStudentClasses!.total}',
+                                        'Total: ${dataStudentClasses!.total.ceil()}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -228,7 +228,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               child: Center(
                                 child: CustomText(
                                     message:
-                                        'Late: ${dataStudentClasses.totalLate}',
+                                        'Late: ${dataStudentClasses.totalLate.ceil()}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -441,7 +441,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             color: const Color.fromARGB(105, 190, 188, 188),
           ),
           const SizedBox(
-            height: 5,
+            height: 8,
           ),
           if (statusForm)
             InkWell(

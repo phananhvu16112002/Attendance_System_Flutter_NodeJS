@@ -272,9 +272,46 @@ class _HomePageBodyState extends State<HomePageBody> {
                                   ],
                                 ));
                           } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
+                            print('Error');
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
                           } else if (snapshot.hasData) {
-                            if (snapshot.data != null) {
+                            if (snapshot.data == [] ||
+                                snapshot.data!.isEmpty ||
+                                snapshot.data == null) {
+                              return Center(
+                                child: Container(
+                                  width: 200,
+                                  height: 350,
+                                  child: Center(
+                                    child: Column(
+                                      children: [
+                                        const SizedBox(
+                                          height: 100,
+                                        ),
+                                        Opacity(
+                                          opacity: 0.3,
+                                          child: Image.asset(
+                                              'assets/images/nodata.png'),
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        CustomText(
+                                            message:
+                                                "You haven't joint any classes yet!",
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColors.primaryText
+                                                .withOpacity(0.5))
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            } else if (snapshot.data != null ||
+                                snapshot.data != []) {
+                              print('snapshot is null or []: ${snapshot.data}');
                               List<StudentClasses> studentClasses =
                                   snapshot.data!;
                               // Cập nhật dữ liệu vào Provider
@@ -358,7 +395,35 @@ class _HomePageBodyState extends State<HomePageBody> {
                         },
                       );
                     } else {
-                      return const Center(child: Text('No internet'));
+                      return Center(
+                        child: Container(
+                          width: 200,
+                          height: 350,
+                          child: Center(
+                            child: Column(
+                              children: [
+                                const SizedBox(
+                                  height: 100,
+                                ),
+                                Opacity(
+                                  opacity: 0.3,
+                                  child: Image.asset(
+                                      'assets/images/nointernet.png'),
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                CustomText(
+                                    message: "Please check your internet!",
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color:
+                                        AppColors.primaryText.withOpacity(0.5))
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
                     }
                   }
                   return loading();

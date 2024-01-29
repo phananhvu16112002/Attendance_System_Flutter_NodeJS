@@ -1,19 +1,35 @@
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
+import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class AfterAttendance extends StatefulWidget {
-  const AfterAttendance({super.key});
+  const AfterAttendance({super.key, required this.attendanceDetail});
+  final AttendanceDetail attendanceDetail;
 
   @override
   State<AfterAttendance> createState() => _AfterAttendanceState();
 }
 
 class _AfterAttendanceState extends State<AfterAttendance> {
+  late AttendanceDetail data;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    data = widget.attendanceDetail;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final studentClasses =
+        Provider.of<StudentClassesDataProvider>(context, listen: false);
+    var temp = studentClasses.getDataForClass(data.classDetail);
     return Scaffold(
         body: SingleChildScrollView(
       child: Column(
@@ -24,9 +40,12 @@ class _AfterAttendanceState extends State<AfterAttendance> {
             child: Column(
               children: [
                 GifView.asset(
-                  'assets/images/test.gif',
+                  'assets/images/success1.gif',
+                  color: AppColors.backgroundColor,
+                  colorBlendMode: BlendMode.overlay,
                   width: 150,
                   height: 150,
+                  fit: BoxFit.cover,
                 ),
                 const SizedBox(
                   height: 10,
@@ -49,82 +68,19 @@ class _AfterAttendanceState extends State<AfterAttendance> {
           const SizedBox(
             height: 10,
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 10, right: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CustomText(
+                const CustomText(
                     message: 'Class: ',
-                    fontSize: 15,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.secondaryText),
                 CustomText(
-                    message: 'Cross-Platform Programming',
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryText)
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomText(
-                    message: 'Status: ',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.secondaryText),
-                CustomText(
-                    message: 'Successfully',
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textApproved)
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomText(
-                    message: 'Time: ',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.secondaryText),
-                CustomText(
-                    message: '7/12/2023 - 16:40:43',
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryText)
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomText(
-                    message: 'Location: ',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.secondaryText),
-                CustomText(
-                    message: '19 Nguyen Huu Tho, District 7, HCMC',
-                    fontSize: 15,
+                    message: temp!.classes.course.courseName,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryText)
               ],
@@ -134,22 +90,92 @@ class _AfterAttendanceState extends State<AfterAttendance> {
             height: 10,
           ),
           Padding(
-            padding: EdgeInsets.only(left: 10, right: 10),
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CustomText(
+                    message: 'Status: ',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.secondaryText),
+                CustomText(
+                    message: getResult(data.result),
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textApproved)
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CustomText(
+                    message: 'Time: ',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.secondaryText),
+                CustomText(
+                    message:
+                        '${formatDate(data.dateAttendanced)} - ${formatTime(data.dateAttendanced)}',
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryText)
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CustomText(
+                    message: 'Location: ',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.secondaryText),
+                const SizedBox(
+                  width: 150,
+                ),
+                Expanded(
+                  child: CustomText(
+                      message: data.location,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryText),
+                )
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const CustomText(
                     message: 'Image Evidence: ',
-                    fontSize: 15,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.secondaryText),
                 const SizedBox(
                   height: 10,
                 ),
-                Image.asset(
-                  'assets/images/logo.png',
-                  width: 400,
-                  height: 200,
+                Image.network(
+                  data.url,
+                  // fit: BoxFit.cover,
+                  width: 600,
+                  height: 400,
                 ),
               ],
             ),
@@ -200,5 +226,41 @@ class _AfterAttendanceState extends State<AfterAttendance> {
         ],
       ),
     ));
+  }
+}
+
+String formatDate(String date) {
+  DateTime serverDateTime = DateTime.parse(date).toLocal();
+  String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+  return formattedDate;
+}
+
+String formatTime(String time) {
+  DateTime serverDateTime = DateTime.parse(time).toLocal();
+  String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
+  return formattedTime;
+}
+
+Color getColorBasedOnStatus(String status) {
+  if (status.contains('Present')) {
+    return AppColors.textApproved;
+  } else if (status.contains('Late')) {
+    return const Color.fromARGB(231, 196, 123, 34);
+  } else if (status.contains('Absence')) {
+    return AppColors.importantText;
+  } else {
+    return AppColors.primaryText;
+  }
+}
+
+String getResult(double result) {
+  if (result.ceil() == 1) {
+    return 'Present';
+  } else if (result == 0.5) {
+    return 'Late';
+  } else if (result.ceil() == 0) {
+    return 'Absence';
+  } else {
+    return 'Absence';
   }
 }

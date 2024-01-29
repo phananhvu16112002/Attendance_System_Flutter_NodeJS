@@ -66,7 +66,7 @@ class SocketServerProvider with ChangeNotifier {
   }
 
   void takeAttendance(studentID, classID, formID, dateTimeAttendance, location,
-      latitude, longitude, image) {
+      latitude, longitude, result,image) {
     var jsonData = {
       'studentID': studentID,
       'classID': classID,
@@ -75,7 +75,8 @@ class SocketServerProvider with ChangeNotifier {
       'location': location,
       'latitude': latitude,
       'longitude': longitude,
-      'image': image.toString()
+      'result': result,
+      'image': image
     };
 
     var jsonString = jsonEncode(jsonData);
