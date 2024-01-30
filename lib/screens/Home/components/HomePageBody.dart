@@ -1,9 +1,9 @@
 import 'package:attendance_system_nodejs/common/bases/CustomAppBar.dart';
-import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomRichText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
@@ -11,8 +11,6 @@ import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
-import 'package:attendance_system_nodejs/services/GetLocation.dart';
-import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -47,6 +45,12 @@ class _HomePageBodyState extends State<HomePageBody> {
         result = scanData;
       });
     });
+    if (result!.code!.isNotEmpty) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (builder) => AttendanceFormPage()));
+    } else {
+      print('Data is not available');
+    }
   }
 
   @override

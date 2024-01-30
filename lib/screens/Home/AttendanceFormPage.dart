@@ -43,8 +43,6 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     // attendanceForm = widget.attendanceForm;
     getImage();
     //  _durationController = StreamController<String>();
-
-    // Bắt đầu tính toán và phát thời gian đếm ngược
     // startCountdown();
   }
 
@@ -56,7 +54,6 @@ class _AttendancePageState extends State<AttendanceFormPage> {
         file = XFile(value);
       });
     } else {
-      // Handle the case where the file path is empty or invalid
       setState(() {
         file = null;
       });
