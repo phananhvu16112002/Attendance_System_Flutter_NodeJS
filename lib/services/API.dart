@@ -3,6 +3,7 @@ import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:http_parser/http_parser.dart';
 
 class API {
   Future<List<StudentClasses>> getStudentClass(String studentID) async {
@@ -110,6 +111,7 @@ class API {
     var imageBytes = await fileImage.readAsBytes();
     var imageFile =
         http.MultipartFile.fromBytes('file', imageBytes, filename: 'image.jpg');
+    // var imageFile = await http.MultipartFile.fromPath('image', fileImage.path);
     var request = http.MultipartRequest('POST', Uri.parse(URL))
       ..fields['studentID'] = studentID
       ..fields['classID'] = classID
