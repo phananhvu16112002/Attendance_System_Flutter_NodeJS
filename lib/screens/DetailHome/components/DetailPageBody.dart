@@ -451,8 +451,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         AttendanceFormPage(
-                            // attendanceForm: attendanceForm,
-                            ),
+                      attendanceForm: attendanceForm,
+                    ),
                     transitionDuration: const Duration(milliseconds: 1000),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {

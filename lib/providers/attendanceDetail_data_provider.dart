@@ -11,10 +11,12 @@ class AttendanceDetailDataProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  AttendanceDetail? getDataFormAndStudent(String studentID, String formID) {
+  AttendanceDetail? getDataFormAndStudent(
+      String studentID, String classes, String formID) {
     for (var i = 0; i < _attendanceDetailList.length; i++) {
       if (_attendanceDetailList[i].attendanceForm.formID == formID &&
-          _attendanceDetailList[i].studentDetail == studentID) {
+          _attendanceDetailList[i].studentDetail == studentID &&
+          _attendanceDetailList[i].classDetail == classes) {
         var temp = _attendanceDetailList[i];
         return temp;
       }
