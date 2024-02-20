@@ -18,7 +18,7 @@ class CustomText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(message,
-        overflow: TextOverflow.ellipsis,
+        // overflow: TextOverflow.ellipsis,
         style: GoogleFonts.inter(
             fontSize: fontSize, fontWeight: fontWeight, color: color));
   }

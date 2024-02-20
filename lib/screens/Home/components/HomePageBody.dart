@@ -250,8 +250,8 @@ class _HomePageBodyState extends State<HomePageBody> {
                     if (result == ConnectivityResult.wifi ||
                         result == ConnectivityResult.mobile) {
                       return FutureBuilder(
-                        future: API().getStudentClass(studentDataProvider
-                            .userData.studentID), //Chinh parameter
+                        future:
+                            API(context).getStudentClass(), //Chinh parameter
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -499,8 +499,10 @@ class _HomePageBodyState extends State<HomePageBody> {
   }
 
   Widget loading() {
-    return const CircularProgressIndicator(
-      valueColor: AlwaysStoppedAnimation(AppColors.primaryButton),
+    return const Center(
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(AppColors.primaryButton),
+      ),
     );
   }
 
@@ -514,9 +516,9 @@ class _HomePageBodyState extends State<HomePageBody> {
     String subGroup,
     int shift,
     String roomNumber,
-    double totalPresence,
-    double totalAbsence,
-    double totalLate,
+    int totalPresence,
+    int totalAbsence,
+    int totalLate,
     double progress,
   ) {
     return Container(

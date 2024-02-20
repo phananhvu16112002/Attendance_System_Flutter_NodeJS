@@ -5,7 +5,7 @@ import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 class Authenticate {
   Future<String> registerUser(
       String userName, String email, String password) async {
-    final URL = 'http://192.168.1.9:8080/api/student/register';
+    final URL = 'http://192.168.1.5:8080/api/student/register';
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -25,7 +25,7 @@ class Authenticate {
   }
 
   Future<bool> verifyOTP(String email, String otp) async {
-    final URL = 'http://192.168.1.9:8080/api/student/verifyRegister';
+    final URL = 'http://192.168.1.5:8080/api/student/verifyRegister';
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -45,7 +45,7 @@ class Authenticate {
   }
 
   Future<String> login(String email, String password) async {
-    final URL = 'http://192.168.1.9:8080/api/student/login';
+    final URL = 'http://192.168.1.5:8080/api/student/login';
     var request = {'email': email, 'password': password};
     var body = json.encode(request);
     var headers = {
@@ -56,8 +56,8 @@ class Authenticate {
         await http.post(Uri.parse(URL), headers: headers, body: body);
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
-      var accessToken = responseData['refreshToken'];
-      var refreshToken = responseData['accessToken'];
+      var accessToken = responseData['accessToken'];
+      var refreshToken = responseData['refreshToken'];
       var studentID = responseData['studentID'];
       var studentEmail = responseData['studentEmail'];
       var studentName = responseData['studentName'];

@@ -31,7 +31,7 @@ class Class {
     return Class(
       classID: json['classID'],
       roomNumber: json['roomNumber'] ?? "",
-      shiftNumber: json['shiftNumber'] as int? ?? 0,
+      shiftNumber: int.tryParse(json['shiftNumber'].toString()) ?? 0,
       startTime: json['startTime'] ?? "",
       endTime: json['endTime'] ?? "",
       classType: json['classType'] ?? "",
