@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:attendance_system_nodejs/common/bases/CustomAppBar.dart';
-import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomRichText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
@@ -11,7 +13,6 @@ import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
-import 'package:attendance_system_nodejs/services/GetLocation.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -37,15 +38,39 @@ class _HomePageBodyState extends State<HomePageBody> {
   Barcode? result;
   String? address;
   final ScrollController _controller = ScrollController();
+  final SecureStorage secureStorage = SecureStorage();
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
-      // ignore: avoid_print
-      print('Scanned Data: $scanData');
       setState(() {
         result = scanData;
       });
+      if (result != null && result!.code != null && result!.code!.isNotEmpty) {
+        print('-------------Result:${result!.code}');
+        print('JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
+        var temp = jsonDecode(result!.code.toString());
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AttendanceFormPage(
+                    attendanceForm: AttendanceForm(
+                        formID: temp['formID'],
+                        classes: temp['classes'],
+                        startTime: '',
+                        endTime: '',
+                        dateOpen: '',
+                        status: false,
+                        typeAttendance: 0,
+                        location: '',
+                        latitude: 0.0,
+                        longtitude: 0.0,
+                        radius: 0),
+                  )),
+        );
+      } else {
+        print('Data is not available');
+      }
     });
   }
 

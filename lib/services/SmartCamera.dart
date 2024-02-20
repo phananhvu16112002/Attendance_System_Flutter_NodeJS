@@ -53,30 +53,30 @@ class _SmartCameraState extends State<SmartCamera> {
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                      builder: (builder) => const AttendanceFormPage(
-                          // attendanceForm: AttendanceForm(
-                          //     formID: attendanceFormDataProvider
-                          //         .attendanceFormData.formID,
-                          //     classes: attendanceFormDataProvider
-                          //         .attendanceFormData.classes,
-                          //     startTime: attendanceFormDataProvider
-                          //         .attendanceFormData.startTime,
-                          //     endTime: attendanceFormDataProvider
-                          //         .attendanceFormData.endTime,
-                          //     dateOpen: attendanceFormDataProvider
-                          //         .attendanceFormData.dateOpen,
-                          //     status: attendanceFormDataProvider
-                          //         .attendanceFormData.status,
-                          //     typeAttendance: attendanceFormDataProvider
-                          //         .attendanceFormData.typeAttendance,
-                          //     location: attendanceFormDataProvider
-                          //         .attendanceFormData.location,
-                          //     latitude: attendanceFormDataProvider
-                          //         .attendanceFormData.latitude,
-                          //     longtitude: attendanceFormDataProvider
-                          //         .attendanceFormData.longtitude,
-                          //     radius: attendanceFormDataProvider
-                          //         .attendanceFormData.radius),
+                      builder: (builder) => AttendanceFormPage(
+                            attendanceForm: AttendanceForm(
+                                formID: attendanceFormDataProvider
+                                    .attendanceFormData.formID,
+                                classes: attendanceFormDataProvider
+                                    .attendanceFormData.classes,
+                                startTime: attendanceFormDataProvider
+                                    .attendanceFormData.startTime,
+                                endTime: attendanceFormDataProvider
+                                    .attendanceFormData.endTime,
+                                dateOpen: attendanceFormDataProvider
+                                    .attendanceFormData.dateOpen,
+                                status: attendanceFormDataProvider
+                                    .attendanceFormData.status,
+                                typeAttendance: attendanceFormDataProvider
+                                    .attendanceFormData.typeAttendance,
+                                location: attendanceFormDataProvider
+                                    .attendanceFormData.location,
+                                latitude: attendanceFormDataProvider
+                                    .attendanceFormData.latitude,
+                                longtitude: attendanceFormDataProvider
+                                    .attendanceFormData.longtitude,
+                                radius: attendanceFormDataProvider
+                                    .attendanceFormData.radius),
                           )),
                   (route) => false);
             }
