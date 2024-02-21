@@ -55,6 +55,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+  print('Hope to my code and my essay will success and get a high score in 2024. And i want to have a job in the next month. Hope so');
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -74,7 +75,7 @@ class _MyAppState extends State<MyApp> {
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },
-      home: const HomePage(),
+      home: const WelcomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

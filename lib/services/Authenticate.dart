@@ -5,7 +5,7 @@ import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 class Authenticate {
   Future<String> registerUser(
       String userName, String email, String password) async {
-    final URL = 'http://192.168.1.9:8080/api/student/register';
+    final URL = 'http://10.0.2.2:8080/api/student/register';
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -25,7 +25,7 @@ class Authenticate {
   }
 
   Future<bool> verifyOTP(String email, String otp) async {
-    final URL = 'http://192.168.1.9:8080/api/student/verifyRegister';
+    final URL = 'http://10.0.2.2:8080/api/student/verifyRegister';
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -45,7 +45,7 @@ class Authenticate {
   }
 
   Future<String> login(String email, String password) async {
-    final URL = 'http://192.168.1.9:8080/api/student/login';
+    final URL = 'http://10.0.2.2:8080/api/student/login';
     var request = {'email': email, 'password': password};
     var body = json.encode(request);
     var headers = {
