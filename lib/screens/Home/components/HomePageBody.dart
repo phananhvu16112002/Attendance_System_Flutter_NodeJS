@@ -48,25 +48,12 @@ class _HomePageBodyState extends State<HomePageBody> {
       });
       if (result != null && result!.code != null && result!.code!.isNotEmpty) {
         print('-------------Result:${result!.code}');
-        print('JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
+        print(
+            'JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
         var temp = jsonDecode(result!.code.toString());
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => AttendanceFormPage(
-                    attendanceForm: AttendanceForm(
-                        formID: temp['formID'],
-                        classes: temp['classes'],
-                        startTime: '',
-                        endTime: '',
-                        dateOpen: '',
-                        status: false,
-                        typeAttendance: 0,
-                        location: '',
-                        latitude: 0.0,
-                        longtitude: 0.0,
-                        radius: 0),
-                  )),
+          MaterialPageRoute(builder: (context) => AttendanceFormPage()),
         );
       } else {
         print('Data is not available');

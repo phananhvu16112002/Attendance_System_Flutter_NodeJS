@@ -18,7 +18,7 @@ class API {
   }
 
   Future<String> refreshAccessToken(String refreshToken) async {
-    const url = 'http://192.168.1.5:8080/api/token/refreshAccessToken';
+    const url = 'http://192.168.1.5:8080/api/token/refreshAccessToken'; // 10.0.2.2
     var headers = {'authorization': refreshToken};
 
     try {
@@ -179,7 +179,7 @@ class API {
 
   Future<List<AttendanceDetail>> getAttendanceDetail(
       String classesID, String studentID) async {
-    final URL =
+    const URL =
         'http://192.168.1.5:8080/test/testGetAttendanceDetailVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',

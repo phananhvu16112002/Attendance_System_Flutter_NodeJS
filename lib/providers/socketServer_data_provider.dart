@@ -28,7 +28,7 @@ class SocketServerProvider with ChangeNotifier {
   }
 
   void connectToSocketServer(data) {
-    _socket = IO.io('http://192.168.1.9:9000', <String, dynamic>{
+    _socket = IO.io('http://192.168.1.5:9000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'headers': {'Content-Type': 'application/json'},
@@ -66,7 +66,7 @@ class SocketServerProvider with ChangeNotifier {
   }
 
   void takeAttendance(studentID, classID, formID, dateTimeAttendance, location,
-      latitude, longitude, result,image) {
+      latitude, longitude, result, image) {
     var jsonData = {
       'studentID': studentID,
       'classID': classID,

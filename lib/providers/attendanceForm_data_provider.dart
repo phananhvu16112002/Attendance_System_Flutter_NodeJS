@@ -16,6 +16,7 @@ class AttendanceFormDataProvider with ChangeNotifier {
       radius: 0.0);
 
   AttendanceForm get attendanceFormData => _attendanceFormData;
+  
 
   void setAttendanceFormData(AttendanceForm attendanceForm) {
     if (attendanceForm.formID == '') {

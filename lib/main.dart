@@ -11,19 +11,20 @@ import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dar
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
-import 'package:attendance_system_nodejs/screens/Home/AfterAttendance.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
+// import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
+// import 'package:attendance_system_nodejs/screens/Home/AfterAttendance.dart';
+// import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
-import 'package:attendance_system_nodejs/TestApp/Test.dart';
-import 'package:attendance_system_nodejs/TestApp/TestAvatar.dart';
-import 'package:attendance_system_nodejs/TestApp/TestConnection.dart';
-import 'package:attendance_system_nodejs/TestApp/TestCustomLoading.dart';
-import 'package:attendance_system_nodejs/TestApp/TestTakeAttendance.dart';
+// import 'package:attendance_system_nodejs/TestApp/Test.dart';
+// import 'package:attendance_system_nodejs/TestApp/TestAvatar.dart';
+// import 'package:attendance_system_nodejs/TestApp/TestConnection.dart';
+// import 'package:attendance_system_nodejs/TestApp/TestCustomLoading.dart';
+// import 'package:attendance_system_nodejs/TestApp/TestTakeAttendance.dart';
 import 'package:face_camera/face_camera.dart';
-import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
+// import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -74,7 +75,7 @@ class _MyAppState extends State<MyApp> {
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },
-      home: const HomePage(),
+      home: const WelcomePage(),
       debugShowCheckedModeBanner: false,
     );
   }
