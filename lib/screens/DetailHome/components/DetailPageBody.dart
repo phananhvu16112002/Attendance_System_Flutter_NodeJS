@@ -68,7 +68,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     final studentDataProvider =
         Provider.of<StudentDataProvider>(context, listen: false);
     return FutureBuilder(
-      future: API().getAttendanceDetail(studentClasses.classes.classID,
+      future: API(context).getAttendanceDetail(studentClasses.classes.classID,
           studentDataProvider.userData.studentID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

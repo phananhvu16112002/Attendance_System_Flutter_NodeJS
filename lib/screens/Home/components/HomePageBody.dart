@@ -48,7 +48,8 @@ class _HomePageBodyState extends State<HomePageBody> {
       });
       if (result != null && result!.code != null && result!.code!.isNotEmpty) {
         print('-------------Result:${result!.code}');
-        print('JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
+        print(
+            'JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
         var temp = jsonDecode(result!.code.toString());
         Navigator.push(
           context,
@@ -275,8 +276,8 @@ class _HomePageBodyState extends State<HomePageBody> {
                     if (result == ConnectivityResult.wifi ||
                         result == ConnectivityResult.mobile) {
                       return FutureBuilder(
-                        future: API().getStudentClass(studentDataProvider
-                            .userData.studentID), //Chinh parameter
+                        future:
+                            API(context).getStudentClass(), //Chinh parameter
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -361,6 +362,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                                               left: 5, right: 5, bottom: 10),
                                           child: GestureDetector(
                                             onTap: () {
+                                              // Navigator.pushNamed(context,'/DetailPage',arguments: {'studentClasses': data});
                                               Navigator.push(
                                                 context,
                                                 PageRouteBuilder(
@@ -524,8 +526,10 @@ class _HomePageBodyState extends State<HomePageBody> {
   }
 
   Widget loading() {
-    return const CircularProgressIndicator(
-      valueColor: AlwaysStoppedAnimation(AppColors.primaryButton),
+    return const Center(
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(AppColors.primaryButton),
+      ),
     );
   }
 
@@ -539,9 +543,9 @@ class _HomePageBodyState extends State<HomePageBody> {
     String subGroup,
     int shift,
     String roomNumber,
-    double totalPresence,
-    double totalAbsence,
-    double totalLate,
+    int totalPresence,
+    int totalAbsence,
+    int totalLate,
     double progress,
   ) {
     return Container(

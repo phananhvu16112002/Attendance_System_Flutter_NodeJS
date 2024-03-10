@@ -182,7 +182,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                   borderColor: Colors.transparent,
                   textColor: Colors.white,
                   function: () async {
-                    AttendanceDetail? data = await API().takeAttendance(
+                    AttendanceDetail? data = await API(context).takeAttendance(
                         studentDataProvider.userData.studentID,
                         attendanceFormDataProvider.attendanceFormData.classes,
                         attendanceFormDataProvider.attendanceFormData.formID,

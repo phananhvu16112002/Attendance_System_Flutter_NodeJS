@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },
-      home: const WelcomePage(),
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

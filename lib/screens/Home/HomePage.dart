@@ -55,11 +55,6 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(builder: (context) => const WelcomePage()),
       );
-    } else {
-      setState(() {
-        accessToken = loadToken;
-        refreshToken = refreshToken1;
-      });
     }
   }
 
@@ -93,7 +88,8 @@ class _HomePageState extends State<HomePage> {
             size: 30,
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.miniCenterDocked,
         bottomNavigationBar: AnimatedBottomNavigationBar(
             icons: _iconList,
             activeIndex: _bottomNavIndex,

@@ -17,8 +17,8 @@ class Course {
     return Course(
         courseID: json['courseID'] ?? "",
         courseName: json['courseName'] ?? "",
-        totalWeeks: json['totalWeeks'] ?? 0,
-        requiredWeeks: json['requiredWeeks'] ?? 0,
-        credit: json['credit'] ?? 0);
+        totalWeeks: int.tryParse(json['totalWeeks'].toString()) ?? 0,
+        requiredWeeks: int.tryParse(json['requiredWeeks'].toString()) ?? 0,
+        credit: int.tryParse(json['credit'].toString()) ?? 0);
   }
 }
