@@ -1,3 +1,10 @@
+import 'package:attendance_system_nodejs/TestApp/TestConnection.dart';
+import 'package:attendance_system_nodejs/adapter/CourseAdapter.dart';
+import 'package:attendance_system_nodejs/adapter/StudentAdapter.dart';
+import 'package:attendance_system_nodejs/adapter/StudentClassesAdapter.dart';
+import 'package:attendance_system_nodejs/adapter/TeacherAdapter.dart';
+import 'package:attendance_system_nodejs/adapter/ClassAdapter.dart';
+import 'package:attendance_system_nodejs/models/Class.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
@@ -26,12 +33,20 @@ import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
 import 'package:face_camera/face_camera.dart';
 // import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); //Add this
-
+  WidgetsFlutterBinding.ensureInitialized();
   await FaceCamera.initialize(); //Add this
+  Hive.registerAdapter(ClassAdapter());
+  Hive.registerAdapter(TeacherAdapter());
+  Hive.registerAdapter(CourseAdapter());
+  Hive.registerAdapter(StudentClassesAdapter());
+  Hive.registerAdapter(StudentAdapter());
+  await Hive.initFlutter();
+  
+
   runApp(
     MultiProvider(
       providers: [
@@ -75,7 +90,7 @@ class _MyAppState extends State<MyApp> {
         '/ProfilePage': (context) => const ProfilePage(),
         '/DetailReport': (context) => const DetailReport(),
       },
-      home: const WelcomePage(),
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

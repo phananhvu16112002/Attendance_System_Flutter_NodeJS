@@ -42,7 +42,6 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     super.initState();
     // attendanceForm = widget.attendanceForm;
     getImage(); //avoid rebuild
-
   }
 
   Future<void> getImage() async {
@@ -187,63 +186,68 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 0),
-              child: CustomButton(
-                  buttonName: 'Attendance',
-                  colorShadow: AppColors.colorShadow,
-                  backgroundColorButton: AppColors.primaryButton,
-                  borderColor: Colors.transparent,
-                  textColor: Colors.white,
-                  function: () async {
-                    AttendanceDetail? data = await API(context).takeAttendance(
-                        studentDataProvider.userData.studentID,
-                        attendanceFormDataProvider.attendanceFormData.classes,
-                        attendanceFormDataProvider.attendanceFormData.formID,
-                        DateTime.now().toString(),
-                        studentDataProvider.userData.location,
-                        studentDataProvider.userData.latitude,
-                        studentDataProvider.userData.longtitude,
-                        file!);
-                    if (data != null) {
-                      print('Take Attendance Successfully');
-                      socketServerProvider.takeAttendance(
-                          data.studentDetail,
-                          data.classDetail,
-                          data.attendanceForm.formID,
-                          data.dateAttendanced,
-                          data.location,
-                          data.latitude,
-                          data.longitude,
-                          data.result,
-                          data.url);
-                      if (mounted) {
-                        Navigator.pushReplacement(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    AfterAttendance(
-                              attendanceDetail: data,
-                            ),
-                            transitionDuration:
-                                const Duration(milliseconds: 200),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              return ScaleTransition(
-                                scale: animation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                      }
-                    } else {
-                      print('Failed take attendance');
-                    }
-                    SecureStorage().deleteSecureData('image');
-                  },
-                  height: 55,
-                  width: 400,
-                  fontSize: 20),
+              child: file != null
+                  ? CustomButton(
+                      buttonName: 'Attendance',
+                      colorShadow: AppColors.colorShadow,
+                      backgroundColorButton: AppColors.primaryButton,
+                      borderColor: Colors.transparent,
+                      textColor: Colors.white,
+                      function: () async {
+                        AttendanceDetail? data = await API(context)
+                            .takeAttendance(
+                                studentDataProvider.userData.studentID,
+                                attendanceFormDataProvider
+                                    .attendanceFormData.classes,
+                                attendanceFormDataProvider
+                                    .attendanceFormData.formID,
+                                DateTime.now().toString(),
+                                studentDataProvider.userData.location,
+                                studentDataProvider.userData.latitude,
+                                studentDataProvider.userData.longtitude,
+                                file!);
+                        if (data != null) {
+                          print('Take Attendance Successfully');
+                          socketServerProvider.takeAttendance(
+                              data.studentDetail,
+                              data.classDetail,
+                              data.attendanceForm.formID,
+                              data.dateAttendanced,
+                              data.location,
+                              data.latitude,
+                              data.longitude,
+                              data.result,
+                              data.url);
+                          if (mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        AfterAttendance(
+                                  attendanceDetail: data,
+                                ),
+                                transitionDuration:
+                                    const Duration(milliseconds: 200),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return ScaleTransition(
+                                    scale: animation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+                          }
+                        } else {
+                          print('Failed take attendance');
+                        }
+                        SecureStorage().deleteSecureData('image');
+                      },
+                      height: 55,
+                      width: 400,
+                      fontSize: 20)
+                  : Container(),
             )
           ],
         ),
