@@ -1,12 +1,18 @@
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class GetLocation {
   double? latitude;
   double? longtitude;
   Position? positionMain;
   String? address;
+
+  Future<bool> hasNetworkConnection() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    return connectivityResult != ConnectivityResult.none;
+  }
 
   Future<Position> determinePosition() async {
     bool serviceEnabled;
@@ -54,8 +60,35 @@ class GetLocation {
     return processedAddress;
   }
 
+  // Future<bool> updateLocation(StudentDataProvider provider) async {
+  //   Position position = await determinePosition();
+  //   String? address = await getAddressFromLatLong(position);
+  //   provider.setLatitude(position.latitude);
+  //   provider.setLongtitude(position.longitude);
+  //   provider.setLocation(address!);
+
+  //   if (provider.userData.latitude != 0 &&
+  //       provider.userData.longtitude != 0 &&
+  //       provider.userData.location.isNotEmpty) {
+  //     // print('------ latitude: ${provider.userData.latitude}');
+  //     // print('------ longitude: ${provider.userData.longtitude}');
+  //     // print('------ location: ${provider.userData.location}');
+
+  //     return true;
+  //   }
+  //   return false;
+  // }
+
   Future<bool> updateLocation(StudentDataProvider provider) async {
     Position position = await determinePosition();
+    if (!(await hasNetworkConnection())) {
+      provider.setLatitude(position.latitude);
+      provider.setLongtitude(position.longitude);
+      print(position.latitude);
+      print(position.longitude);
+      return false;
+    }
+
     String? address = await getAddressFromLatLong(position);
     provider.setLatitude(position.latitude);
     provider.setLongtitude(position.longitude);
@@ -64,10 +97,6 @@ class GetLocation {
     if (provider.userData.latitude != 0 &&
         provider.userData.longtitude != 0 &&
         provider.userData.location.isNotEmpty) {
-      // print('------ latitude: ${provider.userData.latitude}');
-      // print('------ longitude: ${provider.userData.longtitude}');
-      // print('------ location: ${provider.userData.location}');
-
       return true;
     }
     return false;
