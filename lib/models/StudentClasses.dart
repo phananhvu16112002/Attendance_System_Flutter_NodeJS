@@ -2,14 +2,29 @@ import 'package:attendance_system_nodejs/models/Class.dart';
 import 'package:attendance_system_nodejs/models/Course.dart';
 import 'package:attendance_system_nodejs/models/Student.dart';
 import 'package:attendance_system_nodejs/models/Teacher.dart';
+import 'package:hive/hive.dart';
 
+@HiveType(typeId: 3)
 class StudentClasses {
+  @HiveField(0)
   Student studentID;
+
+  @HiveField(1)
   Class classes;
+
+  @HiveField(2)
   double progress;
+
+  @HiveField(3)
   double total;
+
+  @HiveField(4)
   int totalPresence;
+
+  @HiveField(5)
   int totalAbsence;
+
+  @HiveField(6)
   int totalLate;
 
   StudentClasses({
@@ -22,7 +37,7 @@ class StudentClasses {
     required this.totalLate,
   });
   factory StudentClasses.fromJson(Map<String, dynamic> json) {
-    print('StudentClasses.fromJson: $json');
+    // print('StudentClasses.fromJson: $json');
 
     final dynamic studentJson = json['studentDetail'];
     final Student studentDetail = studentJson is String

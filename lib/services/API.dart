@@ -18,13 +18,13 @@ class API {
   }
 
   Future<String> refreshAccessToken(String refreshToken) async {
-    const url = 'http://192.168.1.5:8080/api/token/refreshAccessToken';
+    const url = 'http://192.168.1.13:8080/api/token/refreshAccessToken'; // 10.0.2.2
     var headers = {'authorization': refreshToken};
 
     try {
       final response = await http.get(Uri.parse(url), headers: headers);
       if (response.statusCode == 200) {
-        print('Create New AccessToken is successfully');
+        // print('Create New AccessToken is successfully');
         var newAccessToken = jsonDecode(response.body)['accessToken'];
         return newAccessToken;
       } else if (response.statusCode == 401) {
@@ -87,15 +87,15 @@ class API {
 
   Future<List<StudentClasses>> getStudentClass() async {
     const URL =
-        'http://192.168.1.5:8080/api/student/getStudentClasses'; //10.0.2.2
+        'http://192.168.1.13:8080/api/student/getStudentClasses'; //10.0.2.2
 
     var accessToken = await getAccessToken();
     var headers = {'authorization': accessToken};
     try {
       final response = await http.get(Uri.parse(URL), headers: headers);
       if (response.statusCode == 200) {
-        print('Response.body ${response.body}');
-        print('JsonDecode:${jsonDecode(response.body)}');
+        // print('Response.body ${response.body}');
+        // print('JsonDecode:${jsonDecode(response.body)}');
         dynamic responseData = jsonDecode(response.body);
         List<StudentClasses> data = [];
 
@@ -120,7 +120,7 @@ class API {
         } else {
           print('Unexpected data type: $responseData');
         }
-        print('Data $data');
+        // print('Data $data');
         return data;
       } else if (response.statusCode == 498 || response.statusCode == 401) {
         print('Status code: ${response.statusCode}');
@@ -131,8 +131,8 @@ class API {
           final retryResponse =
               await http.get(Uri.parse(URL), headers: headers);
           if (retryResponse.statusCode == 200) {
-            print('-- RetryResponse.body ${retryResponse.body}');
-            print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
             dynamic responseData = jsonDecode(retryResponse.body);
             List<StudentClasses> data = [];
 
@@ -158,7 +158,7 @@ class API {
               print('Unexpected data type: $responseData');
             }
 
-            print('Data $data');
+            // print('Data $data');
             return data;
           } else {
             return [];
@@ -179,8 +179,8 @@ class API {
 
   Future<List<AttendanceDetail>> getAttendanceDetail(
       String classesID, String studentID) async {
-    final URL =
-        'http://192.168.1.5:8080/test/testGetAttendanceDetailVersion1'; //10.0.2.2
+    const URL =
+        'http://192.168.1.13:8080/test/testGetAttendanceDetailVersion1'; //10.0.2.2
     var headers = {
       'Content-type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
@@ -213,7 +213,7 @@ class API {
           //   print('Error parsing data: $e');
           // }
         }
-        print('Data ${data}');
+        // print('Data ${data}');
 
         return data;
       } else {
@@ -235,7 +235,7 @@ class API {
       double latitude,
       double longitude,
       XFile fileImage) async {
-    const URL = 'http://192.168.1.5:8080/api/student/takeAttendance';
+    const URL = 'http://192.168.1.13:8080/api/student/takeAttendance';
     final headers = {
       'Content-type': 'multipart/form-data',
     };
@@ -259,7 +259,7 @@ class API {
         Map<String, dynamic> data =
             json.decode(await response.stream.bytesToString());
         AttendanceDetail attendanceDetail = AttendanceDetail.fromJson(data);
-        print('data:$data');
+        // print('data:$data');
         return attendanceDetail;
       } else if (response.statusCode == 403) {
         Map<String, dynamic> data =

@@ -66,7 +66,7 @@ class SocketServerProvider with ChangeNotifier {
   }
 
   void takeAttendance(studentID, classID, formID, dateTimeAttendance, location,
-      latitude, longitude, result,image) {
+      latitude, longitude, result, image) {
     var jsonData = {
       'studentDetail': studentID,
       'classDetail': classID,

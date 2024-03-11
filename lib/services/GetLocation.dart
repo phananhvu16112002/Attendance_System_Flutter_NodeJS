@@ -42,7 +42,7 @@ class GetLocation {
     var temp =
         '${place.street},${place.locality},${place.subAdministrativeArea},${place.administrativeArea},${place.country}';
     address = processAddress(temp);
-    print('address $address');
+    // print('address $address');
     return address;
   }
 
@@ -64,9 +64,9 @@ class GetLocation {
     if (provider.userData.latitude != 0 &&
         provider.userData.longtitude != 0 &&
         provider.userData.location.isNotEmpty) {
-      print('------ latitude: ${provider.userData.latitude}');
-      print('------ longitude: ${provider.userData.longtitude}');
-      print('------ location: ${provider.userData.location}');
+      // print('------ latitude: ${provider.userData.latitude}');
+      // print('------ longitude: ${provider.userData.longtitude}');
+      // print('------ location: ${provider.userData.location}');
 
       return true;
     }

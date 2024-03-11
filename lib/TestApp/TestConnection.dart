@@ -1,8 +1,7 @@
-import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
-import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/models/Class.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class TestConnection extends StatefulWidget {
   const TestConnection({super.key});
@@ -12,12 +11,43 @@ class TestConnection extends StatefulWidget {
 }
 
 class _TestConnectionState extends State<TestConnection> {
+  late Box<Class> box;
+  List<Class> listTemp = Class.listTest();
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    openBox();
+  }
+
+  Future<void> openBox() async {
+    await Hive.initFlutter();
+    box = await Hive.openBox<Class>('class');
+  }
+
+  void saveListClass(List<Class> classes) async {
+    if (box.isOpen) {
+      for (var temp in classes) {
+        await box.put(temp.classID, temp);
+      }
+    } else {
+      print('Box is not opened yet!');
+    }
+  }
+
+  Future<List<Class>> getClasses() async {
+    listTemp = box.values.toList();
+    return listTemp;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final attendanceFormDataProvider =
-        Provider.of<AttendanceFormDataProvider>(context, listen: false);
-    final studentDataProvider =
-        Provider.of<StudentDataProvider>(context, listen: false);
     return Scaffold(
         appBar: AppBar(
           title: Text('Test Connection'),
@@ -28,12 +58,84 @@ class _TestConnectionState extends State<TestConnection> {
             height: 300,
             width: 300,
             color: Colors.black,
-            child: Center(
-              child: Text(
-                '${studentDataProvider.userData.studentID}',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+            child: StreamBuilder(
+                stream: Connectivity().onConnectivityChanged,
+                builder: (context, snapshot) {
+                  print(snapshot.toString());
+                  if (snapshot.hasData) {
+                    ConnectivityResult? result = snapshot.data;
+                    if (result == ConnectivityResult.wifi ||
+                        result == ConnectivityResult.mobile) {
+                      return Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Have internet',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  saveListClass(listTemp);
+                                  print('Tapped');
+                                  // box.close();
+                                },
+                                child: Text('Write Data')),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  for (var i in box.values) {
+                                    print(i.course.courseID);
+                                  }
+                                  print('Tapped');
+                                  // box.close();
+                                },
+                                child: Text('Read Data'))
+                          ],
+                        ),
+                      );
+                    } else if (result == ConnectivityResult.none) {
+                      return Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'No internet',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            ElevatedButton(
+                                onPressed: () async {
+                                  List<Class> listTemp = await getClasses();
+                                  for (var c in listTemp) {
+                                    print(c.teacher.teacherEmail);
+                                  }
+                                  print('Tapped');
+                                },
+                                child: const Text('Read Data'))
+                          ],
+                        ),
+                      );
+                    } else if (result == ConnectivityResult.other) {
+                      return Text(
+                        'alo alo',
+                        style: TextStyle(color: Colors.white),
+                      );
+                    } else {
+                      return Center(
+                          child: Text(
+                        'Others',
+                        style: TextStyle(color: Colors.white),
+                      ));
+                    }
+                  }
+                  return Text('Null');
+                }),
           ),
         ));
   }

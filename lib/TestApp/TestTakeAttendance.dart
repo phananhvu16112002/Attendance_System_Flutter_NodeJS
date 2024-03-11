@@ -371,7 +371,9 @@ class _AttendancePageState extends State<TestTakeAttendance> {
                     context,
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          SmartCamera(),
+                          SmartCamera(
+                        checkQR: false,
+                      ),
                       transitionDuration: const Duration(milliseconds: 300),
                       transitionsBuilder:
                           (context, animation, secondaryAnimation, child) {

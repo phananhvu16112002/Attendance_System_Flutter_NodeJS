@@ -27,7 +27,7 @@ class AttendanceDetail {
       required this.url});
 
   factory AttendanceDetail.fromJson(Map<String, dynamic> json) {
-    print('AttendanceDetail.fromJson: $json');
+    // print('AttendanceDetail.fromJson: $json');
     final dynamic attendanceFormJson = json['attendanceForm'];
     final AttendanceForm tempAttendanceForm = attendanceFormJson is String
         ? AttendanceForm(

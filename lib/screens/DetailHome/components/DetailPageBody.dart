@@ -97,11 +97,11 @@ class _DetailPageBodyState extends State<DetailPageBody> {
           );
         } else if (snapshot.hasData) {
           if (snapshot.data != null) {
-            List<AttendanceDetail> attendanceDetail = snapshot.data!;
-            Future.delayed(Duration.zero, () {
-              attendanceDetailDataProvider
-                  .setAttendanceDetailList(attendanceDetail);
-            });
+            // List<AttendanceDetail> attendanceDetail = snapshot.data!;
+            // Future.delayed(Duration.zero, () {
+            //   attendanceDetailDataProvider
+            //       .setAttendanceDetailList(attendanceDetail);
+            // }); // khong can thiet
             return Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
@@ -262,7 +262,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                       '',
                                       '',
                                       data.status,
-                                      data);
+                                      data,
+                                      attendanceFormDataProvider);
                                 } else {
                                   return const Text('Data is null');
                                 }
@@ -276,11 +277,11 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                           height: 10,
                         ),
                         ListView.builder(
-                            itemCount: attendanceDetail.length,
+                            itemCount: snapshot.data!.length,
                             shrinkWrap: true,
                             controller: _controller,
                             itemBuilder: (BuildContext context, int index) {
-                              var data = attendanceDetail[index];
+                              var data = snapshot.data![index];
                               return Padding(
                                 padding: const EdgeInsets.only(
                                     bottom: 15, left: 10, right: 10),
@@ -301,7 +302,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                         : 'null',
                                     data.url,
                                     data.attendanceForm.status,
-                                    data.attendanceForm),
+                                    data.attendanceForm,
+                                    attendanceFormDataProvider),
                               );
                             }),
                       ],
@@ -326,10 +328,11 @@ class _DetailPageBodyState extends State<DetailPageBody> {
       String location,
       String url,
       bool statusForm,
-      AttendanceForm attendanceForm) {
+      AttendanceForm attendanceForm,
+      AttendanceFormDataProvider attendanceFormDataProvider) {
     return Container(
       width: 405,
-      height: 240,
+      height: 230,
       decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -441,18 +444,20 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             color: const Color.fromARGB(105, 190, 188, 188),
           ),
           const SizedBox(
-            height: 8,
+            height: 20,
           ),
           if (statusForm)
             InkWell(
               onTap: () {
+                attendanceFormDataProvider
+                    .setAttendanceFormData(attendanceForm);
                 Navigator.push(
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         AttendanceFormPage(
-                      attendanceForm: attendanceForm,
-                    ),
+                            // attendanceForm: attendanceForm,
+                            ),
                     transitionDuration: const Duration(milliseconds: 1000),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {

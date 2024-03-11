@@ -1,14 +1,38 @@
+import 'package:hive/hive.dart';
+
+@HiveType(typeId: 5)
 class AttendanceForm {
+  @HiveField(0)
   String formID;
+
+  @HiveField(0)
   String classes;
+
+  @HiveField(0)
   String startTime;
+
+  @HiveField(0)
   String endTime;
+
+  @HiveField(0)
   String dateOpen;
+
+  @HiveField(0)
   bool status;
+
+  @HiveField(0)
   int typeAttendance;
+
+  @HiveField(0)
   String location;
+
+  @HiveField(0)
   double latitude;
+
+  @HiveField(0)
   double longtitude;
+
+  @HiveField(0)
   double radius;
 
   AttendanceForm({

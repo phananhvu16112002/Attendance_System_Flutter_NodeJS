@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:attendance_system_nodejs/common/bases/CustomAppBar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomRichText.dart';
@@ -12,10 +14,13 @@ import 'package:attendance_system_nodejs/providers/studentClass_data_provider.da
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPageQR.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -37,8 +42,11 @@ class _HomePageBodyState extends State<HomePageBody> {
   bool activeForm = false;
   Barcode? result;
   String? address;
-  final ScrollController _controller = ScrollController();
   final SecureStorage secureStorage = SecureStorage();
+  late Box<StudentClasses> studentClassesBox;
+  late Timer _timer;
+  bool _showDialog = true;
+  bool scanningQR = false;
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
@@ -51,24 +59,33 @@ class _HomePageBodyState extends State<HomePageBody> {
         print(
             'JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
         var temp = jsonDecode(result!.code.toString());
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AttendanceFormPage(
-                    attendanceForm: AttendanceForm(
-                        formID: temp['formID'],
-                        classes: temp['classes'],
-                        startTime: '',
-                        endTime: '',
-                        dateOpen: '',
-                        status: false,
-                        typeAttendance: 0,
-                        location: '',
-                        latitude: 0.0,
-                        longtitude: 0.0,
-                        radius: 0),
-                  )),
-        );
+        //dựa theo typeAttendance để 1 là điều hướng tới trang AttendanceForm hoặc là send Request.
+        if (temp['typeAttendanced'] == 0) {
+          controller.dispose();
+          controller.stopCamera();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AttendanceFormPageQR(
+                      attendanceForm: AttendanceForm(
+                          formID: temp['formID'],
+                          classes: temp['classID'],
+                          startTime: temp['startTime'],
+                          endTime: temp['endTime'],
+                          dateOpen: temp['dateOpen'],
+                          status: false,
+                          typeAttendance: temp['typeAttendanced'],
+                          location: '',
+                          latitude: 0.0,
+                          longtitude: 0.0,
+                          radius: 0.0),
+                    )),
+          );
+
+          //Send request(formid, classID, dateAttendanced, studentID, image, location, latitude, longitude)
+        } else {
+          print('Send Request---------');
+        }
       } else {
         print('Data is not available');
       }
@@ -77,8 +94,8 @@ class _HomePageBodyState extends State<HomePageBody> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
+    _timer.cancel();
   }
 
   @override
@@ -96,6 +113,13 @@ class _HomePageBodyState extends State<HomePageBody> {
         );
       }
     });
+
+    _timer = Timer(const Duration(minutes: 5), () {
+      setState(() {
+        _showDialog = false;
+      });
+    });
+    // openBox();
   }
 
   void getAddress() {
@@ -146,11 +170,32 @@ class _HomePageBodyState extends State<HomePageBody> {
     );
   }
 
+  //----Hive----
+  // Future<void> openBox() async {
+  //   await Hive.initFlutter();
+  //   studentClassesBox = await Hive.openBox<StudentClasses>('student_classes');
+  //   print('Create Box successfully ---------------');
+  // }
+
+  // void saveListStudentClasses(List<StudentClasses> listData) async {
+  //   if (studentClassesBox.isOpen) {
+  //     for (var temp in listData) {
+  //       await studentClassesBox.put(temp.classes.classID, temp);
+  //     }
+  //     print('Successfully');
+  //   } else {
+  //     print('Box is not open');
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     final classDataProvider =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
+    print('Size Width: ${MediaQuery.of(context).size.width}');
+    print('Size Height: ${MediaQuery.of(context).size.height}');
+
     return SingleChildScrollView(
         // controller: _controller,
         //Column Tổng body
@@ -341,6 +386,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                               List<StudentClasses> studentClasses =
                                   snapshot.data!;
                               // Cập nhật dữ liệu vào Provider
+                              // saveListStudentClasses(studentClasses); Hive
                               Future.delayed(Duration.zero, () {
                                 classDataProvider
                                     .setStudentClassesList(studentClasses);
@@ -421,39 +467,11 @@ class _HomePageBodyState extends State<HomePageBody> {
                           return const Text('null');
                         },
                       );
-                    } else {
-                      return Center(
-                        child: Container(
-                          width: 200,
-                          height: 350,
-                          child: Center(
-                            child: Column(
-                              children: [
-                                const SizedBox(
-                                  height: 100,
-                                ),
-                                Opacity(
-                                  opacity: 0.3,
-                                  child: Image.asset(
-                                      'assets/images/nointernet.png'),
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                CustomText(
-                                    message: "Please check your internet!",
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color:
-                                        AppColors.primaryText.withOpacity(0.5))
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                    } else if (result == ConnectivityResult.none) {
+                      return noInternet();
                     }
                   }
-                  return loading();
+                  return noInternet();
                 }),
           )
         else
@@ -503,6 +521,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                       left: 160,
                       right: 160,
                       child: Container(
+                        width: 60,
                         decoration: BoxDecoration(
                             color: Colors.white24,
                             borderRadius: BorderRadius.circular(8)),
@@ -523,6 +542,91 @@ class _HomePageBodyState extends State<HomePageBody> {
           ),
       ],
     ));
+  }
+
+  Widget noInternet() {
+    return Stack(
+      children: [
+        Center(
+          child: Container(
+            width: 200,
+            height: 350,
+            child: Center(
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  Opacity(
+                    opacity: 0.5,
+                    child: Image.asset('assets/images/nointernet.png'),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "Please check your internet!",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey.withOpacity(0.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (_showDialog)
+          Center(
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.9, // test width
+              height: MediaQuery.of(context).size.height * 0.3, // test height
+              child: Stack(
+                children: [
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                    child: AlertDialog(
+                      backgroundColor: AppColors.primaryButton.withOpacity(0.2),
+                      title: const Text(
+                        'No Internet',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      content: const Text(
+                        'You can scan QR to take attendance offline',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal),
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _showDialog = false;
+                              // activeQR = true;
+                            });
+                          },
+                          child: const Text(
+                            'OK',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   Widget loading() {

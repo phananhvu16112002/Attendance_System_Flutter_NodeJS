@@ -1,3 +1,11 @@
+import 'package:attendance_system_nodejs/TestApp/TestConnection.dart';
+import 'package:attendance_system_nodejs/adapter/AttendanceFormAdapter.dart';
+import 'package:attendance_system_nodejs/adapter/CourseAdapter.dart';
+import 'package:attendance_system_nodejs/adapter/StudentAdapter.dart';
+import 'package:attendance_system_nodejs/adapter/StudentClassesAdapter.dart';
+import 'package:attendance_system_nodejs/adapter/TeacherAdapter.dart';
+import 'package:attendance_system_nodejs/adapter/ClassAdapter.dart';
+import 'package:attendance_system_nodejs/models/Class.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
@@ -11,26 +19,37 @@ import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dar
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
-import 'package:attendance_system_nodejs/screens/Home/AfterAttendance.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
+// import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
+// import 'package:attendance_system_nodejs/screens/Home/AfterAttendance.dart';
+// import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/screens/Home/Profile.dart';
-import 'package:attendance_system_nodejs/TestApp/Test.dart';
-import 'package:attendance_system_nodejs/TestApp/TestAvatar.dart';
-import 'package:attendance_system_nodejs/TestApp/TestConnection.dart';
-import 'package:attendance_system_nodejs/TestApp/TestCustomLoading.dart';
-import 'package:attendance_system_nodejs/TestApp/TestTakeAttendance.dart';
+import 'package:attendance_system_nodejs/services/SmartCamera.dart';
+// import 'package:attendance_system_nodejs/TestApp/Test.dart';
+// import 'package:attendance_system_nodejs/TestApp/TestAvatar.dart';
+// import 'package:attendance_system_nodejs/TestApp/TestConnection.dart';
+// import 'package:attendance_system_nodejs/TestApp/TestCustomLoading.dart';
+// import 'package:attendance_system_nodejs/TestApp/TestTakeAttendance.dart';
 import 'package:face_camera/face_camera.dart';
-import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
+// import 'package:attendance_system_nodejs/screens/Home/ReportPage.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); //Add this
+  WidgetsFlutterBinding.ensureInitialized();
+  // await FaceCamera.initialize(); //Add this
+  Hive.registerAdapter(ClassAdapter());
+  Hive.registerAdapter(TeacherAdapter());
+  Hive.registerAdapter(CourseAdapter());
+  Hive.registerAdapter(StudentClassesAdapter());
+  Hive.registerAdapter(StudentAdapter());
+  Hive.registerAdapter(AttendanceFormAdapter());
 
-  await FaceCamera.initialize(); //Add this
+  await Hive.initFlutter();
+
   runApp(
     MultiProvider(
       providers: [
@@ -55,7 +74,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-  print('Hope to my code and my essay will success and get a high score in 2024. And i want to have a job in the next month. Hope so');
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(

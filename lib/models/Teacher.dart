@@ -1,14 +1,36 @@
+import 'package:hive/hive.dart';
+
+@HiveType(typeId: 1)
 class Teacher {
-  final String teacherID ;
-  final String teacherName ;
-  final String teacherHashedPassword ;
-  final String teacherEmail ;
-  final String teacherHashedOTP ;
-  final String timeToLiveOTP ;
-  final String accessToken ;
+  @HiveField(0)
+  final String teacherID;
+
+  @HiveField(1)
+  final String teacherName;
+
+  @HiveField(2)
+  final String teacherHashedPassword;
+
+  @HiveField(3)
+  final String teacherEmail;
+
+  @HiveField(4)
+  final String teacherHashedOTP;
+
+  @HiveField(5)
+  final String timeToLiveOTP;
+
+  @HiveField(6)
+  final String accessToken;
+
+  @HiveField(7)
   final String refreshToken;
-  final String resetToken ;
-  final bool active ;
+
+  @HiveField(8)
+  final String resetToken;
+
+  @HiveField(9)
+  final bool active;
 
   Teacher({
     required this.teacherID,
@@ -35,5 +57,20 @@ class Teacher {
         refreshToken: json['refreshToken'] ?? "",
         resetToken: json['resetToken'] ?? "",
         active: json['active'] ?? false);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'teacherID': teacherID,
+      'teacherName': teacherName,
+      'teacherHashedPassword': teacherHashedPassword,
+      'teacherEmail': teacherEmail,
+      'teacherHashedOTP': teacherHashedOTP,
+      'timeToLiveOTP': timeToLiveOTP,
+      'accessToken': accessToken,
+      'refreshToken': refreshToken,
+      'resetToken': resetToken,
+      'active': active,
+    };
   }
 }

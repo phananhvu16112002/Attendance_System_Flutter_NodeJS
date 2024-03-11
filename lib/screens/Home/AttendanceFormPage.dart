@@ -23,8 +23,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class AttendanceFormPage extends StatefulWidget {
-  const AttendanceFormPage({super.key, required this.attendanceForm});
-  final AttendanceForm attendanceForm;
+  const AttendanceFormPage({super.key});
+  // final AttendanceForm attendanceForm;
 
   @override
   State<AttendanceFormPage> createState() => _AttendancePageState();
@@ -32,6 +32,7 @@ class AttendanceFormPage extends StatefulWidget {
 
 class _AttendancePageState extends State<AttendanceFormPage> {
   XFile? file;
+  // late AttendanceForm attendanceForm;
   final ImagePicker _picker = ImagePicker();
   // late StreamController<String> _durationController;
 
@@ -39,9 +40,8 @@ class _AttendancePageState extends State<AttendanceFormPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getImage();
-    //  _durationController = StreamController<String>();
-    // startCountdown();
+    // attendanceForm = widget.attendanceForm;
+    getImage(); //avoid rebuild
   }
 
   Future<void> getImage() async {
@@ -60,6 +60,8 @@ class _AttendancePageState extends State<AttendanceFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('-------------------');
+    print('Rebuild-------');
     final studentDataProvider =
         Provider.of<StudentDataProvider>(context, listen: true);
     final studentClassesDataProvider =
@@ -115,6 +117,15 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             const SizedBox(
               height: 20,
             ),
+            // Container(
+            //   height: 100,
+            //   width: 400,
+            //   child: Text(
+            //       'FormID: ${attendanceFormDataProvider.attendanceFormData.formID}'),
+            // ),
+            // const SizedBox(
+            //   height: 20,
+            // ),
             infoClass(attendanceFormDataProvider, studentClassesDataProvider,
                 attendanceDetailDataProvider, studentDataProvider),
             const SizedBox(
@@ -175,63 +186,68 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 0),
-              child: CustomButton(
-                  buttonName: 'Attendance',
-                  colorShadow: AppColors.colorShadow,
-                  backgroundColorButton: AppColors.primaryButton,
-                  borderColor: Colors.transparent,
-                  textColor: Colors.white,
-                  function: () async {
-                    AttendanceDetail? data = await API(context).takeAttendance(
-                        studentDataProvider.userData.studentID,
-                        attendanceFormDataProvider.attendanceFormData.classes,
-                        attendanceFormDataProvider.attendanceFormData.formID,
-                        DateTime.now().toString(),
-                        studentDataProvider.userData.location,
-                        studentDataProvider.userData.latitude,
-                        studentDataProvider.userData.longtitude,
-                        file!);
-                    if (data != null) {
-                      print('Take Attendance Successfully');
-                      socketServerProvider.takeAttendance(
-                          data.studentDetail,
-                          data.classDetail,
-                          data.attendanceForm.formID,
-                          data.dateAttendanced,
-                          data.location,
-                          data.latitude,
-                          data.longitude,
-                          data.result,
-                          data.url);
-                      if (mounted) {
-                        Navigator.pushReplacement(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    AfterAttendance(
-                              attendanceDetail: data,
-                            ),
-                            transitionDuration:
-                                const Duration(milliseconds: 200),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              return ScaleTransition(
-                                scale: animation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                      }
-                    } else {
-                      print('Failed take attendance');
-                    }
-                    SecureStorage().deleteSecureData('image');
-                  },
-                  height: 55,
-                  width: 400,
-                  fontSize: 20),
+              child: file != null
+                  ? CustomButton(
+                      buttonName: 'Attendance',
+                      colorShadow: AppColors.colorShadow,
+                      backgroundColorButton: AppColors.primaryButton,
+                      borderColor: Colors.transparent,
+                      textColor: Colors.white,
+                      function: () async {
+                        AttendanceDetail? data = await API(context)
+                            .takeAttendance(
+                                studentDataProvider.userData.studentID,
+                                attendanceFormDataProvider
+                                    .attendanceFormData.classes,
+                                attendanceFormDataProvider
+                                    .attendanceFormData.formID,
+                                DateTime.now().toString(),
+                                studentDataProvider.userData.location,
+                                studentDataProvider.userData.latitude,
+                                studentDataProvider.userData.longtitude,
+                                file!);
+                        if (data != null) {
+                          print('Take Attendance Successfully');
+                          socketServerProvider.takeAttendance(
+                              data.studentDetail,
+                              data.classDetail,
+                              data.attendanceForm.formID,
+                              data.dateAttendanced,
+                              data.location,
+                              data.latitude,
+                              data.longitude,
+                              data.result,
+                              data.url);
+                          if (mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        AfterAttendance(
+                                  attendanceDetail: data,
+                                ),
+                                transitionDuration:
+                                    const Duration(milliseconds: 200),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return ScaleTransition(
+                                    scale: animation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+                          }
+                        } else {
+                          print('Failed take attendance');
+                        }
+                        SecureStorage().deleteSecureData('image');
+                      },
+                      height: 55,
+                      width: 400,
+                      fontSize: 20)
+                  : Container(),
             )
           ],
         ),
@@ -267,14 +283,6 @@ class _AttendancePageState extends State<AttendanceFormPage> {
       StudentDataProvider studentDataProvider) {
     StudentClasses? studentClasses = studentClassesDataProvider
         .getDataForClass(attendanceFormDataProvider.attendanceFormData.classes);
-    StudentClasses? studentClassesQRScan =
-        studentClassesDataProvider.getDataForClass(
-            widget.attendanceForm.classes); // data use for scanning QR
-    AttendanceDetail? attendanceDetailQRScan =
-        attendanceDetailDataProvider.getDataFormAndStudent(
-            widget.attendanceForm.formID,
-            widget.attendanceForm.classes,
-            studentDataProvider.userData.studentID);
     return Container(
       width: 405,
       height: 220,
@@ -289,19 +297,15 @@ class _AttendancePageState extends State<AttendanceFormPage> {
           ]),
       child: Column(
         children: [
-          // //AttendanceForm Scan QR
-
-          // //AttendanceForm Normal
-          // CustomText(
-          //     message: attendanceFormDataProvider.attendanceFormData.dateOpen !=
-          //             ''
-          //         ? formatDate(
-          //             attendanceFormDataProvider.attendanceFormData.dateOpen)
-          //         : 'null',
-          //     fontSize: 16,
-          //     fontWeight: FontWeight.w600,
-          //     color: AppColors.primaryText),
-          dateOpen(attendanceDetailQRScan, attendanceFormDataProvider),
+          CustomText(
+              message: attendanceFormDataProvider.attendanceFormData.dateOpen !=
+                      ''
+                  ? formatDate(
+                      attendanceFormDataProvider.attendanceFormData.dateOpen)
+                  : 'null',
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryText),
           const SizedBox(
             height: 2,
           ),
@@ -320,77 +324,69 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // customRichText(
-                      //     'Class: ',
-                      //     studentClasses!.classes.course.courseName,
-                      //     FontWeight.bold,
-                      //     FontWeight.w500,
-                      //     AppColors.primaryText,
-                      //     AppColors.primaryText),
-                      classes(studentClasses!, studentClassesQRScan!),
+                      customRichText(
+                          'Class: ',
+                          studentClasses!.classes.course.courseName,
+                          FontWeight.bold,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
                       const SizedBox(
                         height: 10,
                       ),
-                      // customRichText(
-                      //     'Status: ',
-                      //     getResult(0),
-                      //     FontWeight.bold,
-                      //     FontWeight.w500,
-                      //     AppColors.primaryText,
-                      //     AppColors.importantText),
-                      status(attendanceDetailQRScan!),
+                      customRichText(
+                          'Status: ',
+                          getResult(0),
+                          FontWeight.bold,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.importantText),
                       const SizedBox(
                         height: 10,
                       ),
                       Row(
                         children: [
-                          // customRichText(
-                          //     'Shift: ',
-                          //     '${studentClasses.classes.shiftNumber}',
-                          //     FontWeight.bold,
-                          //     FontWeight.w500,
-                          //     AppColors.primaryText,
-                          //     AppColors.primaryText),
-                          shift(studentClasses, studentClassesQRScan),
+                          customRichText(
+                              'Shift: ',
+                              '${studentClasses.classes.shiftNumber}',
+                              FontWeight.bold,
+                              FontWeight.w500,
+                              AppColors.primaryText,
+                              AppColors.primaryText),
                           const SizedBox(
                             width: 10,
                           ),
-                          // customRichText(
-                          //     'Room: ',
-                          //     studentClasses.classes.roomNumber,
-                          //     FontWeight.bold,
-                          //     FontWeight.w500,
-                          //     AppColors.primaryText,
-                          //     AppColors.primaryText),
-                          room(studentClasses, studentClassesQRScan)
+                          customRichText(
+                              'Room: ',
+                              studentClasses.classes.roomNumber,
+                              FontWeight.bold,
+                              FontWeight.w500,
+                              AppColors.primaryText,
+                              AppColors.primaryText),
                         ],
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      // customRichText(
-                      //     'Start Time: ',
-                      //     formatTime(attendanceFormDataProvider
-                      //         .attendanceFormData.startTime),
-                      //     FontWeight.bold,
-                      //     FontWeight.w500,
-                      //     AppColors.primaryText,
-                      //     AppColors.primaryText),
-                      startTime(
-                          attendanceFormDataProvider, attendanceDetailQRScan),
+                      customRichText(
+                          'Start Time: ',
+                          formatTime(attendanceFormDataProvider
+                              .attendanceFormData.startTime),
+                          FontWeight.bold,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
                       const SizedBox(
                         height: 10,
                       ),
-                      // customRichText(
-                      //     'End Time: ',
-                      //     formatTime(attendanceFormDataProvider
-                      //         .attendanceFormData.endTime),
-                      //     FontWeight.bold,
-                      //     FontWeight.w500,
-                      //     AppColors.primaryText,
-                      //     AppColors.primaryText),
-                      endTime(
-                          attendanceFormDataProvider, attendanceDetailQRScan),
+                      customRichText(
+                          'End Time: ',
+                          formatTime(attendanceFormDataProvider
+                              .attendanceFormData.endTime),
+                          FontWeight.bold,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
                       const SizedBox(
                         height: 10,
                       ),
@@ -405,24 +401,23 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                   ),
                 ),
               ),
-              // attendanceFormDataProvider.attendanceFormData.typeAttendance == 0
-              //     ? Container(
-              //         margin: const EdgeInsets.only(right: 10, top: 10),
-              //         height: 140,
-              //         width: 140,
-              //         color: Colors.amber,
-              //         child: Center(
-              //           child: Text(attendanceFormDataProvider
-              //               .attendanceFormData.formID),
-              //         ),
-              //       )
-              //     : Container(
-              //         margin: const EdgeInsets.only(right: 10, top: 10),
-              //         height: 140,
-              //         width: 140,
-              //         color: Colors.black,
-              //       )
-              typeAttendance(attendanceFormDataProvider, attendanceDetailQRScan)
+              attendanceFormDataProvider.attendanceFormData.typeAttendance == 0
+                  ? Container(
+                      margin: const EdgeInsets.only(right: 10, top: 10),
+                      height: 140,
+                      width: 140,
+                      color: Colors.amber,
+                      child: Center(
+                        child: Text(attendanceFormDataProvider
+                            .attendanceFormData.formID),
+                      ),
+                    )
+                  : Container(
+                      margin: const EdgeInsets.only(right: 10, top: 10),
+                      height: 140,
+                      width: 140,
+                      color: Colors.black,
+                    )
             ],
           )
         ],
@@ -481,7 +476,9 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                     context,
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          SmartCamera(),
+                          const SmartCamera(
+                        checkQR: false,
+                      ),
                       transitionDuration: const Duration(milliseconds: 300),
                       transitionsBuilder:
                           (context, animation, secondaryAnimation, child) {
@@ -556,250 +553,5 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     DateTime serverDateTime = DateTime.parse(time).toLocal();
     String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
     return formattedTime;
-  }
-
-  Widget dateOpen(AttendanceDetail? attendanceDetailQRScan,
-      AttendanceFormDataProvider attendanceFormDataProvider) {
-    if (attendanceDetailQRScan!.attendanceForm.formID.isNotEmpty ||
-        attendanceDetailQRScan.attendanceForm.formID != '') {
-      return CustomText(
-          message: attendanceDetailQRScan.attendanceForm.dateOpen != ''
-              ? formatDate(attendanceDetailQRScan.attendanceForm.dateOpen)
-              : 'null',
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: AppColors.primaryText);
-    } else {
-      if (attendanceFormDataProvider.attendanceFormData.formID.isNotEmpty ||
-          attendanceFormDataProvider.attendanceFormData.formID != '') {
-        return CustomText(
-            message:
-                attendanceFormDataProvider.attendanceFormData.dateOpen != ''
-                    ? formatDate(
-                        attendanceFormDataProvider.attendanceFormData.dateOpen)
-                    : 'null',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.primaryText);
-      } else {
-        return const CustomText(
-            message: 'null',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.primaryText);
-      }
-    }
-  }
-
-  Widget classes(
-      StudentClasses studentClasses, StudentClasses studentClassesDataScanQR) {
-    if (studentClassesDataScanQR.classes.classID.isNotEmpty ||
-        studentClassesDataScanQR.classes.classID.isNotEmpty != '') {
-      return customRichText(
-          'Class: ',
-          studentClassesDataScanQR.classes.course.courseName,
-          FontWeight.bold,
-          FontWeight.w500,
-          AppColors.primaryText,
-          AppColors.primaryText);
-    } else {
-      if (studentClasses.classes.classID.isNotEmpty ||
-          studentClasses.classes.classID.isNotEmpty != '') {
-        return customRichText(
-            'Class: ',
-            studentClassesDataScanQR.classes.course.courseName,
-            FontWeight.bold,
-            FontWeight.w500,
-            AppColors.primaryText,
-            AppColors.primaryText);
-      } else {
-        return customRichText('Class: ', 'null', FontWeight.bold,
-            FontWeight.w500, AppColors.primaryText, AppColors.primaryText);
-      }
-    }
-  }
-
-  Widget shift(
-      StudentClasses studentClasses, StudentClasses studentClassesDataScanQR) {
-    if (studentClassesDataScanQR.classes.classID.isNotEmpty ||
-        studentClassesDataScanQR.classes.classID.isNotEmpty != '') {
-      return customRichText(
-          'Shift: ',
-          studentClassesDataScanQR.classes.shiftNumber.toString(),
-          FontWeight.bold,
-          FontWeight.w500,
-          AppColors.primaryText,
-          AppColors.primaryText);
-    } else {
-      if (studentClasses.classes.classID.isNotEmpty ||
-          studentClasses.classes.classID.isNotEmpty != '') {
-        return customRichText(
-            'Shift: ',
-            studentClasses.classes.shiftNumber.toString(),
-            FontWeight.bold,
-            FontWeight.w500,
-            AppColors.primaryText,
-            AppColors.primaryText);
-      } else {
-        return customRichText('Shift: ', 'null', FontWeight.bold,
-            FontWeight.w500, AppColors.primaryText, AppColors.primaryText);
-      }
-    }
-  }
-
-  Widget room(
-      StudentClasses studentClasses, StudentClasses studentClassesDataScanQR) {
-    if (studentClassesDataScanQR.classes.classID.isNotEmpty ||
-        studentClassesDataScanQR.classes.classID.isNotEmpty != '') {
-      return customRichText(
-          'Room: ',
-          studentClassesDataScanQR.classes.roomNumber,
-          FontWeight.bold,
-          FontWeight.w500,
-          AppColors.primaryText,
-          AppColors.primaryText);
-    } else {
-      if (studentClasses.classes.classID.isNotEmpty ||
-          studentClasses.classes.classID.isNotEmpty != '') {
-        return customRichText(
-            'Room: ',
-            studentClasses.classes.roomNumber,
-            FontWeight.bold,
-            FontWeight.w500,
-            AppColors.primaryText,
-            AppColors.primaryText);
-      } else {
-        return customRichText('Room: ', 'null', FontWeight.bold,
-            FontWeight.w500, AppColors.primaryText, AppColors.primaryText);
-      }
-    }
-  }
-
-  Widget status(AttendanceDetail attendanceDetailScanQR) {
-    if (attendanceDetailScanQR.attendanceForm.formID.isNotEmpty ||
-        attendanceDetailScanQR.attendanceForm.formID != '') {
-      return customRichText(
-          'Status: ',
-          getResult(attendanceDetailScanQR.result),
-          FontWeight.bold,
-          FontWeight.w500,
-          AppColors.primaryText,
-          AppColors.importantText);
-    } else {
-      return customRichText('Status: ', getResult(0), FontWeight.bold,
-          FontWeight.w500, AppColors.primaryText, AppColors.importantText);
-    }
-  }
-
-  Widget startTime(AttendanceFormDataProvider attendanceFormDataProvider,
-      AttendanceDetail attendanceDetailScanQR) {
-    if (attendanceDetailScanQR.attendanceForm.formID.isNotEmpty ||
-        attendanceDetailScanQR.attendanceForm.formID != '') {
-      return customRichText(
-          'Start Time: ',
-          formatTime(attendanceDetailScanQR.attendanceForm.startTime),
-          FontWeight.bold,
-          FontWeight.w500,
-          AppColors.primaryText,
-          AppColors.primaryText);
-    } else {
-      if (attendanceFormDataProvider.attendanceFormData.formID.isNotEmpty ||
-          attendanceFormDataProvider.attendanceFormData.formID != '') {
-        return customRichText(
-            'Start Time: ',
-            formatTime(attendanceFormDataProvider.attendanceFormData.startTime),
-            FontWeight.bold,
-            FontWeight.w500,
-            AppColors.primaryText,
-            AppColors.primaryText);
-      } else {
-        return customRichText('Start Time: ', 'null', FontWeight.bold,
-            FontWeight.w500, AppColors.primaryText, AppColors.primaryText);
-      }
-    }
-  }
-
-  Widget endTime(AttendanceFormDataProvider attendanceFormDataProvider,
-      AttendanceDetail attendanceDetailScanQR) {
-    if (attendanceDetailScanQR.attendanceForm.formID.isNotEmpty ||
-        attendanceDetailScanQR.attendanceForm.formID != '') {
-      return customRichText(
-          'End Time: ',
-          formatTime(attendanceDetailScanQR.attendanceForm.endTime),
-          FontWeight.bold,
-          FontWeight.w500,
-          AppColors.primaryText,
-          AppColors.primaryText);
-    } else {
-      if (attendanceFormDataProvider.attendanceFormData.formID.isNotEmpty ||
-          attendanceFormDataProvider.attendanceFormData.formID != '') {
-        return customRichText(
-            'End Time: ',
-            formatTime(attendanceFormDataProvider.attendanceFormData.endTime),
-            FontWeight.bold,
-            FontWeight.w500,
-            AppColors.primaryText,
-            AppColors.primaryText);
-      } else {
-        return customRichText('End Time: ', 'null', FontWeight.bold,
-            FontWeight.w500, AppColors.primaryText, AppColors.primaryText);
-      }
-    }
-  }
-
-  Widget typeAttendance(AttendanceFormDataProvider attendanceFormDataProvider,
-      AttendanceDetail attendanceDetailScanQR) {
-    if (attendanceDetailScanQR.attendanceForm.formID.isNotEmpty ||
-        attendanceDetailScanQR.attendanceForm.formID != '') {
-      if (attendanceDetailScanQR.attendanceForm.typeAttendance == 0) {
-        return Container(
-          margin: const EdgeInsets.only(right: 10, top: 10),
-          height: 140,
-          width: 140,
-          color: Colors.amber,
-          child: Center(
-            child: Text(attendanceDetailScanQR.attendanceForm.formID),
-          ),
-        );
-      } else {
-        Container(
-          margin: const EdgeInsets.only(right: 10, top: 10),
-          height: 140,
-          width: 140,
-          color: Colors.black,
-          child: Center(
-            child: Text(attendanceDetailScanQR.attendanceForm.formID),
-          ),
-        );
-      }
-    } else {
-      if (attendanceFormDataProvider.attendanceFormData.formID.isNotEmpty ||
-          attendanceFormDataProvider.attendanceFormData.formID != '') {
-        if (attendanceFormDataProvider.attendanceFormData.typeAttendance == 0) {
-          return Container(
-            margin: const EdgeInsets.only(right: 10, top: 10),
-            height: 140,
-            width: 140,
-            color: Colors.amber,
-            child: Center(
-              child: Text(attendanceFormDataProvider.attendanceFormData.formID),
-            ),
-          );
-        } else {
-          return Container(
-            margin: const EdgeInsets.only(right: 10, top: 10),
-            height: 140,
-            width: 140,
-            color: Colors.black,
-            child: Center(
-              child: Text(attendanceFormDataProvider.attendanceFormData.formID),
-            ),
-          );
-        }
-      } else {
-        return Container();
-      }
-    }
-    return Container();
   }
 }
