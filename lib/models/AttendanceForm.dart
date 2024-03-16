@@ -1,3 +1,4 @@
+import 'package:attendance_system_nodejs/models/Class.dart';
 import 'package:hive/hive.dart';
 
 @HiveType(typeId: 5)
@@ -5,34 +6,34 @@ class AttendanceForm {
   @HiveField(0)
   String formID;
 
-  @HiveField(0)
+  @HiveField(1)
   String classes;
 
-  @HiveField(0)
+  @HiveField(2)
   String startTime;
 
-  @HiveField(0)
+  @HiveField(3)
   String endTime;
 
-  @HiveField(0)
+  @HiveField(4)
   String dateOpen;
 
-  @HiveField(0)
+  @HiveField(5)
   bool status;
 
-  @HiveField(0)
+  @HiveField(6)
   int typeAttendance;
 
-  @HiveField(0)
+  @HiveField(7)
   String location;
 
-  @HiveField(0)
+  @HiveField(8)
   double latitude;
 
-  @HiveField(0)
+  @HiveField(9)
   double longtitude;
 
-  @HiveField(0)
+  @HiveField(10)
   double radius;
 
   AttendanceForm({

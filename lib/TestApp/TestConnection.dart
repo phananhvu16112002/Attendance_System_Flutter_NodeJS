@@ -11,8 +11,8 @@ class TestConnection extends StatefulWidget {
 }
 
 class _TestConnectionState extends State<TestConnection> {
-  late Box<Class> box;
-  List<Class> listTemp = Class.listTest();
+  late Box<Classes> box;
+  List<Classes> listTemp = Classes.listTest();
   @override
   void dispose() {
     // TODO: implement dispose
@@ -28,10 +28,10 @@ class _TestConnectionState extends State<TestConnection> {
 
   Future<void> openBox() async {
     await Hive.initFlutter();
-    box = await Hive.openBox<Class>('class');
+    box = await Hive.openBox<Classes>('class');
   }
 
-  void saveListClass(List<Class> classes) async {
+  void saveListClass(List<Classes> classes) async {
     if (box.isOpen) {
       for (var temp in classes) {
         await box.put(temp.classID, temp);
@@ -41,7 +41,7 @@ class _TestConnectionState extends State<TestConnection> {
     }
   }
 
-  Future<List<Class>> getClasses() async {
+  Future<List<Classes>> getClasses() async {
     listTemp = box.values.toList();
     return listTemp;
   }
@@ -111,7 +111,7 @@ class _TestConnectionState extends State<TestConnection> {
                             ),
                             ElevatedButton(
                                 onPressed: () async {
-                                  List<Class> listTemp = await getClasses();
+                                  List<Classes> listTemp = await getClasses();
                                   for (var c in listTemp) {
                                     print(c.teacher.teacherEmail);
                                   }

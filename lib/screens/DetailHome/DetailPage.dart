@@ -1,6 +1,7 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/Classroom.dart';
@@ -13,9 +14,11 @@ import 'package:provider/provider.dart';
 class DetailPage extends StatefulWidget {
   const DetailPage({
     super.key,
-    required this.studentClasses,
+    required this.classesStudent,
+    // required this.studentClasses,
   });
-  final StudentClasses studentClasses;
+  // final StudentClasses studentClasses;
+  final ClassesStudent classesStudent;
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -29,18 +32,20 @@ class _DetailPageState extends State<DetailPage> {
     Icons.notifications_none_outlined,
     Icons.people
   ];
-  late StudentClasses studentClasses;
+  // late StudentClasses studentClasses;
+  late ClassesStudent classesStudent;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    studentClasses = widget.studentClasses;
+    // studentClasses = widget.studentClasses;
+    classesStudent = widget.classesStudent;
     Future.delayed(Duration.zero, () {
       if (mounted) {
         var socketServerDataProvider =
             Provider.of<SocketServerProvider>(context, listen: false);
         socketServerDataProvider
-            .connectToSocketServer(studentClasses.classes.classID);
+            .connectToSocketServer(classesStudent.classID);
       }
     });
   }
@@ -80,7 +85,7 @@ class _DetailPageState extends State<DetailPage> {
 
   PreferredSize customAppbar(SocketServerProvider socketServerProvider) {
     return PreferredSize(
-      preferredSize: const Size.fromHeight(100),
+      preferredSize: const Size.fromHeight(160),
       child: AppBar(
         leading: GestureDetector(
           onTap: () {
@@ -101,40 +106,42 @@ class _DetailPageState extends State<DetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CustomText(
-                  message: studentClasses.classes.course.courseName,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+              Expanded(
+                child: CustomText(
+                    message: classesStudent.courseName,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
               Row(
                 children: [
                   CustomText(
                       message:
-                          'CourseID: ${studentClasses.classes.course.courseID}',
+                          'CourseID: ${classesStudent.courseID}',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: Colors.white),
                   const SizedBox(
-                    width: 10,
+                    width: 5,
                   ),
                   Container(height: 10, width: 1, color: Colors.white),
                   const SizedBox(
-                    width: 10,
+                    width: 5,
                   ),
                   CustomText(
-                      message: 'Room: ${studentClasses.classes.roomNumber}',
+                      message: 'Room: ${classesStudent.roomNumber}',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: Colors.white),
                   const SizedBox(
-                    width: 10,
+                    width: 5,
                   ),
                   Container(height: 10, width: 1, color: Colors.white),
                   const SizedBox(
-                    width: 10,
+                    width: 5,
                   ),
                   CustomText(
-                      message: 'Shift: ${studentClasses.classes.shiftNumber}',
+                      message: 'Shift: ${classesStudent.shiftNumber}',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: Colors.white),
@@ -145,7 +152,7 @@ class _DetailPageState extends State<DetailPage> {
               ),
               CustomText(
                   message:
-                      'Lectuer: ${studentClasses.classes.teacher.teacherName}',
+                      'Lectuer: ${classesStudent.teacherName}',
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: Colors.white),
@@ -160,7 +167,7 @@ class _DetailPageState extends State<DetailPage> {
     switch (_bottomNavIndex) {
       case 0:
         return DetailPageBody(
-          studentClasses: widget.studentClasses,
+          classesStudent: widget.classesStudent,
         );
       case 1:
         return const ReportClass();
@@ -170,7 +177,7 @@ class _DetailPageState extends State<DetailPage> {
         return const Classroom();
       default:
         return DetailPageBody(
-          studentClasses: widget.studentClasses,
+          classesStudent: widget.classesStudent,
         );
     }
   }

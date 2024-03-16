@@ -131,7 +131,7 @@ class _ReportPageState extends State<ReportPage> {
             ),
           ),
           const SizedBox(
-            width: 15,
+            width: 5,
           ),
           Container(
             width: 220,
@@ -239,22 +239,43 @@ class _ReportPageState extends State<ReportPage> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
-            child: Container(
-                margin: const EdgeInsets.only(bottom: 25),
-                height: 180,
-                width: 2,
-                color: AppColors.primaryText),
-          ),
-          const SizedBox(
-            width: 15,
-          ),
-          const CustomText(
-              message: 'Detail',
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryButton)
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 20, left: 0, right: 15),
+          //   child: Container(
+          //       margin: const EdgeInsets.only(bottom: 25),
+          //       height: 180,
+          //       width: 2,
+          //       color: AppColors.primaryText),
+          // ),
+          // const SizedBox(
+          //   width: 5,
+          // ),
+          // const CustomText(
+          //     message: 'Detail',
+          //     fontSize: 15,
+          //     fontWeight: FontWeight.bold,
+          //     color: AppColors.primaryButton)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width * 0.2,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                        height: 180, width: 2, color: AppColors.primaryText),
+                    const CustomText(
+                        message: 'Detail',
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryButton)
+                  ],
+                ),
+              )
+            ],
+          )
         ],
       ),
     );

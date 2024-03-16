@@ -5,10 +5,12 @@ import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
-import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
+import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/attendanceFormForDetailPage_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/classesStudent_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
@@ -21,10 +23,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
 class AttendanceFormPage extends StatefulWidget {
-  const AttendanceFormPage({super.key});
+  const AttendanceFormPage({super.key, required this.classesStudent});
   // final AttendanceForm attendanceForm;
+  final ClassesStudent classesStudent;
 
   @override
   State<AttendanceFormPage> createState() => _AttendancePageState();
@@ -35,6 +39,8 @@ class _AttendancePageState extends State<AttendanceFormPage> {
   // late AttendanceForm attendanceForm;
   final ImagePicker _picker = ImagePicker();
   // late StreamController<String> _durationController;
+  late ProgressDialog _progressDialog;
+  late ClassesStudent classesStudent;
 
   @override
   void initState() {
@@ -42,6 +48,8 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     super.initState();
     // attendanceForm = widget.attendanceForm;
     getImage(); //avoid rebuild
+    _progressDialog = ProgressDialog(context);
+    classesStudent = widget.classesStudent;
   }
 
   Future<void> getImage() async {
@@ -64,14 +72,19 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     print('Rebuild-------');
     final studentDataProvider =
         Provider.of<StudentDataProvider>(context, listen: true);
-    final studentClassesDataProvider =
-        Provider.of<StudentClassesDataProvider>(context, listen: false);
-    final attendanceFormDataProvider =
-        Provider.of<AttendanceFormDataProvider>(context, listen: false);
+    // final studentClassesDataProvider =
+    //     Provider.of<StudentClassesDataProvider>(context, listen: false);
+    // final attendanceFormDataProvider =
+    //     Provider.of<AttendanceFormDataProvider>(context, listen: false);
+    final attendanceFormDataForDetailPageProvider =
+        Provider.of<AttendanceFormDataForDetailPageProvider>(context,
+            listen: false);
     final attendanceDetailDataProvider =
         Provider.of<AttendanceDetailDataProvider>(context, listen: false);
     final socketServerDataProvider =
         Provider.of<SocketServerProvider>(context, listen: false);
+    // final classesStudentDataProvider =
+    //     Provider.of<ClassesStudentProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -94,8 +107,10 @@ class _AttendancePageState extends State<AttendanceFormPage> {
       ),
       body: bodyAttendance(
           studentDataProvider,
-          attendanceFormDataProvider,
-          studentClassesDataProvider,
+          // attendanceFormDataProvider,
+          // classesStudentDataProvider,
+          attendanceFormDataForDetailPageProvider,
+          classesStudent,
           attendanceDetailDataProvider,
           socketServerDataProvider),
     );
@@ -103,8 +118,12 @@ class _AttendancePageState extends State<AttendanceFormPage> {
 
   SingleChildScrollView bodyAttendance(
       StudentDataProvider studentDataProvider,
-      AttendanceFormDataProvider attendanceFormDataProvider,
-      StudentClassesDataProvider studentClassesDataProvider,
+      // AttendanceFormDataProvider attendanceFormDataProvider,
+      // StudentClassesDataProvider studentClassesDataProvider,
+      // ClassesStudentProvider classesStudentProvider,
+      AttendanceFormDataForDetailPageProvider
+          attendanceFormDataForDetailPageProvider,
+      ClassesStudent classesStudent,
       AttendanceDetailDataProvider attendanceDetailDataProvider,
       SocketServerProvider socketServerProvider) {
     return SingleChildScrollView(
@@ -126,7 +145,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             // const SizedBox(
             //   height: 20,
             // ),
-            infoClass(attendanceFormDataProvider, studentClassesDataProvider,
+            infoClass(classesStudent, attendanceFormDataForDetailPageProvider,
                 attendanceDetailDataProvider, studentDataProvider),
             const SizedBox(
               height: 15,
@@ -138,7 +157,10 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             GestureDetector(
               onTap: () {
                 showModalBottomSheet(
-                    context: context, builder: (builder) => bottomSheet());
+                    context: context,
+                    builder: (builder) => bottomSheet(
+                        attendanceFormDataForDetailPageProvider,
+                        classesStudent));
               },
               child: Container(
                 height: 40,
@@ -194,12 +216,12 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                       borderColor: Colors.transparent,
                       textColor: Colors.white,
                       function: () async {
+                        _progressDialog.show();
                         AttendanceDetail? data = await API(context)
                             .takeAttendance(
                                 studentDataProvider.userData.studentID,
-                                attendanceFormDataProvider
-                                    .attendanceFormData.classes,
-                                attendanceFormDataProvider
+                                classesStudent.classID,
+                                attendanceFormDataForDetailPageProvider
                                     .attendanceFormData.formID,
                                 DateTime.now().toString(),
                                 studentDataProvider.userData.location,
@@ -219,13 +241,14 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                               data.result,
                               data.url);
                           if (mounted) {
-                            Navigator.pushReplacement(
+                            await Navigator.pushReplacement(
                               context,
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation, secondaryAnimation) =>
                                         AfterAttendance(
                                   attendanceDetail: data,
+                                  classesStudent: classesStudent,
                                 ),
                                 transitionDuration:
                                     const Duration(milliseconds: 200),
@@ -242,7 +265,9 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                         } else {
                           print('Failed take attendance');
                         }
-                        SecureStorage().deleteSecureData('image');
+                        await SecureStorage().deleteSecureData('image');
+                        await SecureStorage().deleteSecureData('imageOffline');
+                        _progressDialog.hide();
                       },
                       height: 55,
                       width: 400,
@@ -277,12 +302,16 @@ class _AttendancePageState extends State<AttendanceFormPage> {
   }
 
   Container infoClass(
-      AttendanceFormDataProvider attendanceFormDataProvider,
-      StudentClassesDataProvider studentClassesDataProvider,
+      // AttendanceFormDataProvider attendanceFormDataProvider,
+      // StudentClassesDataProvider studentClassesDataProvider,
+      // ClassesStudentProvider classesStudentDataProvider,
+      ClassesStudent classesStudent,
+      AttendanceFormDataForDetailPageProvider
+          attendanceFormDataForDetailPageProvider,
       AttendanceDetailDataProvider attendanceDetailDataProvider,
       StudentDataProvider studentDataProvider) {
-    StudentClasses? studentClasses = studentClassesDataProvider
-        .getDataForClass(attendanceFormDataProvider.attendanceFormData.classes);
+    // StudentClasses? studentClasses = studentClassesDataProvider
+    //     .getDataForClass(attendanceFormDataProvider.attendanceFormData.classes);
     return Container(
       width: 405,
       height: 220,
@@ -298,10 +327,11 @@ class _AttendancePageState extends State<AttendanceFormPage> {
       child: Column(
         children: [
           CustomText(
-              message: attendanceFormDataProvider.attendanceFormData.dateOpen !=
+              message: attendanceFormDataForDetailPageProvider
+                          .attendanceFormData.dateOpen !=
                       ''
-                  ? formatDate(
-                      attendanceFormDataProvider.attendanceFormData.dateOpen)
+                  ? formatDate(attendanceFormDataForDetailPageProvider
+                      .attendanceFormData.dateOpen)
                   : 'null',
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -326,7 +356,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                     children: [
                       customRichText(
                           'Class: ',
-                          studentClasses!.classes.course.courseName,
+                          classesStudent.courseName,
                           FontWeight.bold,
                           FontWeight.w500,
                           AppColors.primaryText,
@@ -348,7 +378,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                         children: [
                           customRichText(
                               'Shift: ',
-                              '${studentClasses.classes.shiftNumber}',
+                              '${classesStudent.shiftNumber}',
                               FontWeight.bold,
                               FontWeight.w500,
                               AppColors.primaryText,
@@ -358,7 +388,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                           ),
                           customRichText(
                               'Room: ',
-                              studentClasses.classes.roomNumber,
+                              classesStudent.roomNumber,
                               FontWeight.bold,
                               FontWeight.w500,
                               AppColors.primaryText,
@@ -370,7 +400,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                       ),
                       customRichText(
                           'Start Time: ',
-                          formatTime(attendanceFormDataProvider
+                          formatTime(attendanceFormDataForDetailPageProvider
                               .attendanceFormData.startTime),
                           FontWeight.bold,
                           FontWeight.w500,
@@ -381,7 +411,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                       ),
                       customRichText(
                           'End Time: ',
-                          formatTime(attendanceFormDataProvider
+                          formatTime(attendanceFormDataForDetailPageProvider
                               .attendanceFormData.endTime),
                           FontWeight.bold,
                           FontWeight.w500,
@@ -401,14 +431,15 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                   ),
                 ),
               ),
-              attendanceFormDataProvider.attendanceFormData.typeAttendance == 0
+              attendanceFormDataForDetailPageProvider.attendanceFormData.type ==
+                      0
                   ? Container(
                       margin: const EdgeInsets.only(right: 10, top: 10),
                       height: 140,
                       width: 140,
                       color: Colors.amber,
                       child: Center(
-                        child: Text(attendanceFormDataProvider
+                        child: Text(attendanceFormDataForDetailPageProvider
                             .attendanceFormData.formID),
                       ),
                     )
@@ -453,7 +484,9 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     ]));
   }
 
-  Widget bottomSheet() {
+  Widget bottomSheet(
+      AttendanceFormDataForDetailPageProvider attendanceFormDataProvider,
+      ClassesStudent classesStudent) {
     return Container(
       height: 100,
       width: MediaQuery.of(context).size.width,
@@ -470,39 +503,50 @@ class _AttendancePageState extends State<AttendanceFormPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const SmartCamera(
-                        checkQR: false,
-                      ),
-                      transitionDuration: const Duration(milliseconds: 300),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return ScaleTransition(
-                          scale: animation,
-                          child: child,
+              attendanceFormDataProvider.attendanceFormData.type == 0
+                  ? ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    SmartCamera(
+                              page: 'AttendanceNormal',
+                              classesStudent: classesStudent,
+                            ),
+                            transitionDuration:
+                                const Duration(milliseconds: 300),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              return ScaleTransition(
+                                scale: animation,
+                                child: child,
+                              );
+                            },
+                          ),
                         );
                       },
+                      icon: const Icon(Icons.camera),
+                      label: const Text('Camera'),
+                    )
+                  : ElevatedButton.icon(
+                      onPressed: () {
+                        takePhoto(ImageSource.gallery);
+                      },
+                      icon: const Icon(Icons.camera),
+                      label: const Text('Gallery'),
                     ),
-                  );
-                },
-                icon: const Icon(Icons.camera),
-                label: const Text('Camera'),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  takePhoto(ImageSource.gallery);
-                },
-                icon: const Icon(Icons.camera),
-                label: const Text('Gallery'),
-              ),
+              // const SizedBox(
+              //   width: 10,
+              // ),
+              // ElevatedButton.icon(
+              //   onPressed: () {
+              //     takePhoto(ImageSource.gallery);
+              //   },
+              //   icon: const Icon(Icons.camera),
+              //   label: const Text('Gallery'),
+              // ),
             ],
           )
         ],

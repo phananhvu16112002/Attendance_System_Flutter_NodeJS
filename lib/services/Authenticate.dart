@@ -79,7 +79,7 @@ class Authenticate {
   }
 
   Future<bool> forgotPassword(String email) async {
-    final URL = 'http://10.0.2.2:8080/api/student/forgotPassword';
+    final URL = 'http://192.168.1.13:8080/api/student/forgotPassword';
     var request = {'email': email};
     var body = jsonEncode(request);
     var headers = {
@@ -99,7 +99,7 @@ class Authenticate {
 
   Future<bool> verifyForgotPassword(String email, String otp) async {
     final response = await http.post(
-        Uri.parse('http://10.0.2.2:8080/api/student/verifyForgotPassword'),
+        Uri.parse('http://192.168.1.13:8080/api/student/verifyForgotPassword'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Accept': 'application/json',
@@ -119,7 +119,7 @@ class Authenticate {
   Future<bool> resetPassword(String email, String newPassword) async {
     final resetToken = await SecureStorage().readSecureData("resetToken");
     final response = await http.post(
-        Uri.parse('http://10.0.2.2:8080/api/student/resetPassword'),
+        Uri.parse('http://192.168.1.13:8080/api/student/resetPassword'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Accept': 'application/json',
@@ -136,7 +136,7 @@ class Authenticate {
   }
 
   Future<bool> resendOTP(String email) async {
-    final URL = 'http://10.0.2.2:8080/api/student/resendOTP';
+    final URL = 'http://192.168.1.13:8080/api/student/resendOTP';
     var request = {'email': email};
     var body = jsonEncode(request);
     var headers = {

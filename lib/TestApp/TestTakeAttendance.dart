@@ -367,23 +367,7 @@ class _AttendancePageState extends State<TestTakeAttendance> {
             children: <Widget>[
               ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          SmartCamera(
-                        checkQR: false,
-                      ),
-                      transitionDuration: const Duration(milliseconds: 300),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return ScaleTransition(
-                          scale: animation,
-                          child: child,
-                        );
-                      },
-                    ),
-                  );
+                  
                 },
                 icon: const Icon(Icons.camera),
                 label: const Text('Camera'),

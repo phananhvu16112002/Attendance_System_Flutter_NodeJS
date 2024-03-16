@@ -4,18 +4,15 @@ import 'dart:io';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/models/Class.dart';
 import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
 import 'package:attendance_system_nodejs/models/DataOffline.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
-import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
+import 'package:attendance_system_nodejs/models/Teacher.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
-import 'package:attendance_system_nodejs/screens/Home/AfterAttendance.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
-import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:attendance_system_nodejs/services/SmartCamera.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
@@ -24,42 +21,40 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
-import 'package:provider/provider.dart';
 
-class AttendanceFormPageQR extends StatefulWidget {
-  const AttendanceFormPageQR({super.key, required this.attendanceForm});
+class AttendanceFormPageOffline extends StatefulWidget {
+  const AttendanceFormPageOffline({super.key, required this.attendanceForm});
   final AttendanceForm attendanceForm;
 
   @override
-  State<AttendanceFormPageQR> createState() => _AttendancePageState();
+  State<AttendanceFormPageOffline> createState() => _AttendancePageState();
 }
 
-class _AttendancePageState extends State<AttendanceFormPageQR> {
+class _AttendancePageState extends State<AttendanceFormPageOffline> {
   XFile? file;
   late AttendanceForm attendanceForm;
   final ImagePicker _picker = ImagePicker();
+  late Box<DataOffline> boxDataOffline;
   // late Box<StudentClasses> studentClassesBox;
-  late Box<AttendanceForm> attendanceFormBox;
   late Box<ClassesStudent> classesStudentBox;
+  late Box<AttendanceForm> attendanceFormBox;
+  SecureStorage secureStorage = SecureStorage();
   late ClassesStudent classesStudent;
-
   // late Classes classes;
-  late ProgressDialog _progressDialog;
 
   @override
   void initState() {
     super.initState();
     attendanceForm = widget.attendanceForm;
-    // studentClassesBox = Hive.box<StudentClasses>('student_classes');
+    boxDataOffline = Hive.box<DataOffline>('DataOfflineBoxes');
     attendanceFormBox = Hive.box<AttendanceForm>('AttendanceFormBoxes');
     saveValue(widget.attendanceForm);
     openBox();
     getImage(); //avoid rebuild
-    _progressDialog = ProgressDialog(context);
   }
 
   Future<void> getImage() async {
-    var value = await SecureStorage().readSecureData('image');
+    var value = await SecureStorage().readSecureData('imageOffline');
     if (value.isNotEmpty && value != 'No Data Found') {
       print(value);
       setState(() {
@@ -73,7 +68,7 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
   }
 
   Future<void> saveValue(AttendanceForm attendanceForm) async {
-    await attendanceFormBox.put('AttendanceQR', attendanceForm);
+    await attendanceFormBox.put('AttendanceOffline', attendanceForm);
   }
 
   Future<void> openBox() async {
@@ -97,10 +92,6 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
   Widget build(BuildContext context) {
     print('-------------------');
     print('Rebuild-------');
-    final studentDataProvider =
-        Provider.of<StudentDataProvider>(context, listen: true);
-    final socketDataProvider =
-        Provider.of<SocketServerProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -119,7 +110,7 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
           ),
         ),
         title: const Text(
-          'Attendance Form QR',
+          'Attendance Form Offline',
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
         ),
@@ -292,7 +283,7 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
                   padding: const EdgeInsets.only(left: 12, top: 15, bottom: 15),
                   child: customRichText(
                       'Location: ',
-                      studentDataProvider.userData.location,
+                      '',
                       FontWeight.bold,
                       FontWeight.w500,
                       AppColors.primaryText,
@@ -339,7 +330,7 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
               Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: file != null
-                    ? Container(
+                    ? SizedBox(
                         width: 350,
                         height: 320,
                         child: Center(
@@ -363,58 +354,57 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
                         borderColor: Colors.transparent,
                         textColor: Colors.white,
                         function: () async {
-                          _progressDialog.show();
-                          AttendanceDetail? data = await API(context)
-                              .takeAttendance(
-                                  studentDataProvider.userData.studentID,
-                                  attendanceForm.classes,
-                                  attendanceForm.formID,
-                                  DateTime.now().toString(),
-                                  studentDataProvider.userData.location,
-                                  studentDataProvider.userData.latitude,
-                                  studentDataProvider.userData.longtitude,
-                                  file!);
-                          if (data != null) {
-                            print('Take Attendance Successfully');
-                            socketDataProvider.takeAttendance(
-                                data.studentDetail,
-                                data.classDetail,
-                                data.attendanceForm.formID,
-                                data.dateAttendanced,
-                                data.location,
-                                data.latitude,
-                                data.longitude,
-                                data.result,
-                                data.url);
-                            if (mounted) {
-                              await Navigator.pushReplacement(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation,
-                                          secondaryAnimation) =>
-                                      AfterAttendance(
-                                    attendanceDetail: data,
-                                    classesStudent: classesStudent,
-                                  ),
-                                  transitionDuration:
-                                      const Duration(milliseconds: 200),
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    return ScaleTransition(
-                                      scale: animation,
-                                      child: child,
-                                    );
-                                  },
-                                ),
-                              );
-                            }
-                          } else {
-                            print('Failed take attendance');
+                          String dateTime = DateTime.now().toString();
+                          String studentID =
+                              await SecureStorage().readSecureData('studentID');
+                          String latitude =
+                              await SecureStorage().readSecureData('latitude');
+                          String longitude =
+                              await SecureStorage().readSecureData('longitude');
+
+                          await boxDataOffline.put(
+                              'dataOffline',
+                              DataOffline(
+                                studentID: studentID,
+                                classID: attendanceForm.classes,
+                                formID: attendanceForm.formID,
+                                dateAttendanced: dateTime,
+                                location: '',
+                                latitude: double.parse(latitude.toString()),
+                                longitude: double.parse(longitude.toString()),
+                              ));
+                          if (mounted) {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  print(
+                                      'BoxData: ${boxDataOffline.get('dataOffline')}');
+                                  return AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    title: const Text('Attendance Pending'),
+                                    content: const Text(
+                                        'The system has recorded attendance data. When there is a network, data will be sent.'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const HomePage()),
+                                          );
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                });
                           }
+
                           await SecureStorage().deleteSecureData('image');
-                          await SecureStorage()
-                              .deleteSecureData('imageOffline');
-                          _progressDialog.hide();
+                          // await SecureStorage()
+                          //     .deleteSecureData('imageOffline');
                         },
                         height: 55,
                         width: 400,
@@ -504,7 +494,7 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
                             pageBuilder:
                                 (context, animation, secondaryAnimation) =>
                                     SmartCamera(
-                              page: 'AttendanceQR',
+                              page: 'AttendanceOffline',
                               classesStudent: classesStudent,
                             ),
                             transitionDuration:

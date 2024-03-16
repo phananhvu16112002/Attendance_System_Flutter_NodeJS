@@ -23,7 +23,7 @@ class _OTPPageState extends State<OTPPage> {
   OtpFieldController otpController = OtpFieldController();
   String description =
       "Please enter the verification code we just sent on your email address.";
-  int secondsRemaining = 60; // Initial value for 1 minute
+  int secondsRemaining = 60;
   bool canResend = false;
   late Timer _timer;
 
@@ -54,7 +54,7 @@ class _OTPPageState extends State<OTPPage> {
             Container(
               height: MediaQuery.of(context).size.height,
               child: Padding(
-                padding: const EdgeInsets.only(top: 15, left: 15,right: 15),
+                padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -108,6 +108,9 @@ class _OTPPageState extends State<OTPPage> {
                             bool checkLogin = await Authenticate().verifyOTP(
                                 studentDataProvider.userData.studentEmail,
                                 studentDataProvider.userData.hashedOTP);
+                            // bool checkLogin = await Authenticate().verifyOTP(
+                            //     studentDataProvider.userData.studentEmail,
+                            //     otpController.toString());
                             if (checkLogin == true) {
                               // ignore: use_build_context_synchronously
                               Navigator.pushAndRemoveUntil(
@@ -138,13 +141,13 @@ class _OTPPageState extends State<OTPPage> {
                               Flushbar(
                                 title: "Successfully",
                                 message: "Login to use the app",
-                                duration: Duration(seconds: 5),
+                                duration: const Duration(seconds: 5),
                               ).show(context);
                             } else {
                               Flushbar(
                                 title: "Failed",
                                 message: "OTP is not valid",
-                                duration: Duration(seconds: 5),
+                                duration: const Duration(seconds: 5),
                               ).show(context);
                             }
                           } catch (e) {
@@ -205,40 +208,6 @@ class _OTPPageState extends State<OTPPage> {
       ),
     );
   }
-
-  // void startTimer() {
-  //   Timer.periodic(Duration(seconds: 1), (timer) {
-  //     setState(() {
-  //       if (secondsRemaining > 0) {
-  //         secondsRemaining--;
-  //       } else {
-  //         canResend = true;
-  //         timer.cancel(); // Stop the timer when it reaches 0
-  //       }
-  //     });
-  //   });
-
-  //   // Disable the button during the countdown
-  //   setState(() {
-  //     canResend = false;
-  //     secondsRemaining = 60; // Reset the timer to 1 minute
-  //   });
-  // }
-
-  // void startTimer() {
-  //   Timer.periodic(const Duration(seconds: 1), (timer) {
-  //     if (secondsRemaining > 0) {
-  //       setState(() {
-  //         secondsRemaining--;
-  //       });
-  //     } else {
-  //       setState(() {
-  //         canResend = true;
-  //       });
-  //       timer.cancel(); // Stop the timer when it reaches 0
-  //     }
-  //   });
-  // }
 
   void startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {

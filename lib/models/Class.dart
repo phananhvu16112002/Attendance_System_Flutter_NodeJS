@@ -66,7 +66,7 @@ import 'package:attendance_system_nodejs/models/Teacher.dart';
 import 'package:attendance_system_nodejs/models/Course.dart';
 
 @HiveType(typeId: 0)
-class Class {
+class Classes {
   @HiveField(0)
   final String classID;
 
@@ -97,7 +97,7 @@ class Class {
   @HiveField(9)
   final Course course;
 
-  Class({
+  Classes({
     required this.classID,
     required this.roomNumber,
     required this.shiftNumber,
@@ -110,8 +110,8 @@ class Class {
     required this.course,
   });
 
-  factory Class.fromJson(Map<String, dynamic> json) {
-    return Class(
+  factory Classes.fromJson(Map<String, dynamic> json) {
+    return Classes(
       classID: json['classID'],
       roomNumber: json['roomNumber'] ?? "",
       shiftNumber: int.tryParse(json['shiftNumber'].toString()) ?? 0,
@@ -140,11 +140,11 @@ class Class {
     };
   }
 
-  static List<Class> listTest() {
-    List<Class> listTemp = [];
+  static List<Classes> listTest() {
+    List<Classes> listTemp = [];
 
     for (int i = 0; i < 5; i++) {
-      listTemp.add(Class(
+      listTemp.add(Classes(
           classID: 'classID$i',
           roomNumber: 'roomNumber$i',
           shiftNumber: i,

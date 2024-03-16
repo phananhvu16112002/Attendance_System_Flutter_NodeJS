@@ -127,7 +127,7 @@ class _MapState extends State<FloatingButtonMap> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           Position position = await GetLocation().determinePosition();
-          var address = await GetLocation().getAddressFromLatLong(position);
+          // var address = await GetLocation().getAddressFromLatLong(position);
           googleMapController.animateCamera(CameraUpdate.newCameraPosition(
               CameraPosition(
                   target: LatLng(position.latitude, position.longitude),

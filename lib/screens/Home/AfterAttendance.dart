@@ -2,6 +2,7 @@ import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
+import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
@@ -9,8 +10,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class AfterAttendance extends StatefulWidget {
-  const AfterAttendance({super.key, required this.attendanceDetail});
+  const AfterAttendance({super.key, required this.attendanceDetail, required this.classesStudent});
   final AttendanceDetail attendanceDetail;
+  final ClassesStudent classesStudent;
 
   @override
   State<AfterAttendance> createState() => _AfterAttendanceState();
@@ -18,11 +20,13 @@ class AfterAttendance extends StatefulWidget {
 
 class _AfterAttendanceState extends State<AfterAttendance> {
   late AttendanceDetail data;
+  late ClassesStudent classStudentData;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     data = widget.attendanceDetail;
+    classStudentData = widget.classesStudent;
   }
 
   @override
@@ -79,7 +83,7 @@ class _AfterAttendanceState extends State<AfterAttendance> {
                     fontWeight: FontWeight.w700,
                     color: AppColors.secondaryText),
                 CustomText(
-                    message: temp!.classes.course.courseName,
+                    message: classStudentData.courseName,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryText)

@@ -12,6 +12,7 @@ import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -25,10 +26,12 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController password = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isCheckPassword = true;
+  late ProgressDialog _progressDialog;
 
   @override
   void initState() {
     super.initState();
+    _progressDialog = ProgressDialog(context);
   }
 
   @override
@@ -144,33 +147,40 @@ class _SignInPageState extends State<SignInPage> {
                       height: 10,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 240),
-                      child: GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        const ForgotPassword(),
-                                transitionDuration:
-                                    const Duration(milliseconds: 300),
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  return ScaleTransition(
-                                    scale: animation,
-                                    child: child,
-                                  );
-                                },
+                        padding: const EdgeInsets.only(left: 0),
+                        child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      const ForgotPassword(),
+                                  transitionDuration:
+                                      const Duration(milliseconds: 300),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return ScaleTransition(
+                                      scale: animation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  CustomText(
+                                      message: 'Forgot Password?',
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.importantText),
+                                ],
                               ),
-                            );
-                          },
-                          child: const CustomText(
-                              message: 'Forgot Password?',
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.importantText)),
-                    ),
+                            ))),
 
                     const SizedBox(
                       height: 20,
@@ -188,14 +198,17 @@ class _SignInPageState extends State<SignInPage> {
                           textColor: Colors.white,
                           function: () async {
                             if (_formKey.currentState!.validate()) {
+                              _progressDialog.show();
                               try {
                                 String check = await Authenticate()
                                     .login(emailAddress.text, password.text);
                                 if (check == '' || check.isEmpty) {
-                                  var studentID = await SecureStorage() //520h0380
-                                      .readSecureData('studentID');
-                                  var studentEmail = await SecureStorage() //520h3080@student.tdtu.edu
-                                      .readSecureData('studentEmail');
+                                  var studentID =
+                                      await SecureStorage() //520h0380
+                                          .readSecureData('studentID');
+                                  var studentEmail =
+                                      await SecureStorage() //520h3080@student.tdtu.edu
+                                          .readSecureData('studentEmail');
                                   var studentName = await SecureStorage()
                                       .readSecureData('studentName');
                                   studentDataProvider.setStudentID(studentID);
@@ -203,13 +216,14 @@ class _SignInPageState extends State<SignInPage> {
                                       .setStudentEmail(studentEmail);
                                   studentDataProvider
                                       .setStudentName(studentName);
+
                                   // ignore: use_build_context_synchronously
-                                  Navigator.pushAndRemoveUntil(
+                                  await Navigator.pushAndRemoveUntil(
                                     context,
                                     PageRouteBuilder(
                                       pageBuilder: (context, animation,
                                               secondaryAnimation) =>
-                                          HomePage(),
+                                          const HomePage(),
                                       transitionDuration:
                                           const Duration(milliseconds: 1000),
                                       transitionsBuilder: (context, animation,
@@ -237,6 +251,8 @@ class _SignInPageState extends State<SignInPage> {
                                     duration: const Duration(seconds: 3),
                                   ).show(context);
                                 } else {
+                                  _progressDialog.hide();
+
                                   // ignore: use_build_context_synchronously
                                   Flushbar(
                                     title: "Failed",
@@ -246,6 +262,8 @@ class _SignInPageState extends State<SignInPage> {
                                 }
                               } catch (e) {
                                 print(e);
+                              } finally {
+                                _progressDialog.hide();
                               }
                             } else {
                               Flushbar(

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/AttendanceFormForDetailPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:async';
@@ -13,10 +14,10 @@ class SocketServerProvider with ChangeNotifier {
   IO.Socket get socket => _socket;
   bool get isConnected => _isConnected;
 
-  final StreamController<AttendanceForm> _attendanceFormController =
-      StreamController<AttendanceForm>.broadcast();
+  final StreamController<AttendanceFormForDetailPage> _attendanceFormController =
+      StreamController<AttendanceFormForDetailPage>.broadcast();
 
-  Stream<AttendanceForm> get attendanceFormStream =>
+  Stream<AttendanceFormForDetailPage> get attendanceFormStream =>
       _attendanceFormController.stream.asBroadcastStream();
 
   @override
@@ -54,8 +55,8 @@ class SocketServerProvider with ChangeNotifier {
       var temp1 = temp['classes'];
       if (temp1 == classRoom) {
         print('Attendance Form Detail:' + data);
-        _attendanceFormController.add(AttendanceForm.fromJson(temp));
-        AttendanceForm attendanceForm = AttendanceForm.fromJson(temp);
+        _attendanceFormController.add(AttendanceFormForDetailPage.fromJson(temp));
+        AttendanceFormForDetailPage attendanceForm = AttendanceFormForDetailPage.fromJson(temp);
         return attendanceForm;
       } else {
         print('Error ClassRoom not feat');

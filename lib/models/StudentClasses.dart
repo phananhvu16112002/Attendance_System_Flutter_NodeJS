@@ -10,7 +10,7 @@ class StudentClasses {
   Student studentID;
 
   @HiveField(1)
-  Class classes;
+  Classes classes;
 
   @HiveField(2)
   double progress;
@@ -56,8 +56,8 @@ class StudentClasses {
         : Student.fromJson(studentJson ?? {});
 
     final dynamic classJson = json['classDetail'];
-    final Class classDetail = classJson is String
-        ? Class(
+    final Classes classDetail = classJson is String
+        ? Classes(
             classID: classJson,
             roomNumber: '',
             shiftNumber: 0,
@@ -83,7 +83,7 @@ class StudentClasses {
                 totalWeeks: 0,
                 requiredWeeks: 0,
                 credit: 0))
-        : Class.fromJson(classJson ?? {});
+        : Classes.fromJson(classJson ?? {});
     print(json['totalLate'].runtimeType);
     return StudentClasses(
       studentID: studentDetail,

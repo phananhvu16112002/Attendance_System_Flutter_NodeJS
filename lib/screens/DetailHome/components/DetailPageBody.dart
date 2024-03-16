@@ -2,8 +2,11 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
+import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/AttendanceFormForDetailPage.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
+import 'package:attendance_system_nodejs/providers/attendanceFormForDetailPage_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
@@ -17,8 +20,9 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class DetailPageBody extends StatefulWidget {
-  const DetailPageBody({super.key, required this.studentClasses});
-  final StudentClasses studentClasses;
+  const DetailPageBody({super.key, required this.classesStudent});
+  // final StudentClasses studentClasses;
+  final ClassesStudent classesStudent;
 
   @override
   State<DetailPageBody> createState() => _DetailPageBodyState();
@@ -29,7 +33,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   bool activePresent = false;
   bool activeAbsent = false;
   bool activeLate = false;
-  late StudentClasses studentClasses;
+  // late StudentClasses studentClasses;
+  late ClassesStudent classesStudent;
   int totalPresence = 0;
   int totalAbsence = 0;
   int totalLate = 0;
@@ -44,7 +49,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    studentClasses = widget.studentClasses;
+    classesStudent = widget.classesStudent;
   }
 
   @override
@@ -55,21 +60,22 @@ class _DetailPageBodyState extends State<DetailPageBody> {
 
   @override
   Widget build(BuildContext context) {
-    final attendanceDetailDataProvider =
-        Provider.of<AttendanceDetailDataProvider>(context, listen: false);
-    final studentClassesDataProvider =
-        Provider.of<StudentClassesDataProvider>(context, listen: false);
-    StudentClasses? dataStudentClasses = studentClassesDataProvider
-        .getDataForClass(widget.studentClasses.classes.classID);
+    // final studentClassesDataProvider =
+    //     Provider.of<StudentClassesDataProvider>(context, listen: false);
+    // StudentClasses? dataStudentClasses = studentClassesDataProvider
+    //     .getDataForClass(widget.classesStudent.classID);
     final attendanceFormDataProvider =
         Provider.of<AttendanceFormDataProvider>(context, listen: false);
+    final attendanceFormDataForDetailPageProvider =
+        Provider.of<AttendanceFormDataForDetailPageProvider>(context,
+            listen: false);
     final socketServerDataProvider =
         Provider.of<SocketServerProvider>(context, listen: false);
-    final studentDataProvider =
-        Provider.of<StudentDataProvider>(context, listen: false);
+    // final studentDataProvider =
+    //     Provider.of<StudentDataProvider>(context, listen: false);
     return FutureBuilder(
-      future: API(context).getAttendanceDetail(studentClasses.classes.classID,
-          studentDataProvider.userData.studentID),
+      future:
+          API(context).getAttendanceDetailForDetailPage(classesStudent.classID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -147,7 +153,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               child: Center(
                                 child: CustomText(
                                     message:
-                                        'Total: ${dataStudentClasses!.total.ceil()}',
+                                        'Total: ${classesStudent.total.ceil()}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -174,7 +180,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               child: Center(
                                 child: CustomText(
                                     message:
-                                        'Present: ${dataStudentClasses.totalPresence.ceil()}',
+                                        'Present: ${classesStudent.totalPresence.ceil()}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -201,7 +207,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               child: Center(
                                 child: CustomText(
                                     message:
-                                        'Absent: ${dataStudentClasses.totalAbsence.ceil()}',
+                                        'Absent: ${classesStudent.totalAbsence.ceil()}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -228,7 +234,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                               child: Center(
                                 child: CustomText(
                                     message:
-                                        'Late: ${dataStudentClasses.totalLate.ceil()}',
+                                        'Late: ${classesStudent.totalLate.ceil()}',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryText),
@@ -248,9 +254,10 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 if (snapshot.data != null) {
-                                  AttendanceForm? data = snapshot.data;
+                                  AttendanceFormForDetailPage? data =
+                                      snapshot.data;
                                   Future.delayed(Duration.zero, () {
-                                    attendanceFormDataProvider
+                                    attendanceFormDataForDetailPageProvider
                                         .setAttendanceFormData(data!);
                                   });
                                   return customCard(
@@ -263,7 +270,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                       '',
                                       data.status,
                                       data,
-                                      attendanceFormDataProvider);
+                                      attendanceFormDataForDetailPageProvider);
                                 } else {
                                   return const Text('Data is null');
                                 }
@@ -289,21 +296,19 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                     formatTime(data.attendanceForm.startTime),
                                     formatTime(data.attendanceForm.endTime),
                                     data.dateAttendanced != ''
-                                        ? formatDate(
-                                            data.dateAttendanced.toString())
-                                        : formatDate(
-                                            data.attendanceForm.dateOpen),
+                                        ? formatDate(data.dateAttendanced!)
+                                        : '',
                                     data.dateAttendanced != ''
-                                        ? formatTime(data.dateAttendanced)
+                                        ? formatTime(data.dateAttendanced!)
                                         : 'null',
-                                    getResult(data.result),
+                                    getResult(data.result.toDouble()),
                                     data.dateAttendanced != ''
                                         ? data.location
                                         : 'null',
                                     data.url,
                                     data.attendanceForm.status,
                                     data.attendanceForm,
-                                    attendanceFormDataProvider),
+                                    attendanceFormDataForDetailPageProvider),
                               );
                             }),
                       ],
@@ -328,11 +333,12 @@ class _DetailPageBodyState extends State<DetailPageBody> {
       String location,
       String url,
       bool statusForm,
-      AttendanceForm attendanceForm,
-      AttendanceFormDataProvider attendanceFormDataProvider) {
+      AttendanceFormForDetailPage attendanceFormForDetailPage,
+      AttendanceFormDataForDetailPageProvider
+          attendanceFormDataForDetailPageProvider) {
     return Container(
-      width: 405,
-      height: 230,
+      width: MediaQuery.of(context).size.width * 0.5,
+      height: location.isNotEmpty ? MediaQuery.of(context).size.width * 0.65 : MediaQuery.of(context).size.width * 0.55,
       decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -365,9 +371,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                margin: const EdgeInsets.only(left: 15),
+                margin: const EdgeInsets.only(left: 5, right: 5),
                 child: Container(
-                  width: 230,
+                  width: 220,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -427,8 +433,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
               ),
               Container(
                 margin: const EdgeInsets.only(right: 10, top: 10),
-                height: 130,
-                width: 130,
+                height: 120,
+                width: 120,
                 child: url.isEmpty || url == ''
                     ? Image.asset('assets/images/logo.png')
                     : Image.network(url),
@@ -444,20 +450,20 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             color: const Color.fromARGB(105, 190, 188, 188),
           ),
           const SizedBox(
-            height: 20,
+            height: 15,
           ),
           if (statusForm)
             InkWell(
               onTap: () {
-                attendanceFormDataProvider
-                    .setAttendanceFormData(attendanceForm);
+                attendanceFormDataForDetailPageProvider
+                    .setAttendanceFormData(attendanceFormForDetailPage);
                 Navigator.push(
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         AttendanceFormPage(
-                            // attendanceForm: attendanceForm,
-                            ),
+                      classesStudent: classesStudent,
+                    ),
                     transitionDuration: const Duration(milliseconds: 1000),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {

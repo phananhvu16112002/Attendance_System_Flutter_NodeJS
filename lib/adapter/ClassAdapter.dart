@@ -3,13 +3,13 @@ import 'package:attendance_system_nodejs/models/Teacher.dart';
 import 'package:hive/hive.dart';
 import 'package:attendance_system_nodejs/models/Class.dart'; // Import Class class
 
-class ClassAdapter extends TypeAdapter<Class> {
+class ClassAdapter extends TypeAdapter<Classes> {
   @override
   final int typeId = 0;
 
   @override
-  Class read(BinaryReader reader) {
-    return Class(
+  Classes read(BinaryReader reader) {
+    return Classes(
         classID: reader.readString(),
         roomNumber: reader.readString(),
         shiftNumber: reader.readInt(),
@@ -23,7 +23,7 @@ class ClassAdapter extends TypeAdapter<Class> {
   }
 
   @override
-  void write(BinaryWriter writer, Class obj) {
+  void write(BinaryWriter writer, Classes obj) {
     writer.writeString(obj.classID);
     writer.writeString(obj.roomNumber);
     writer.writeInt(obj.shiftNumber);

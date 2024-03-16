@@ -1,26 +1,29 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ui';
-
 import 'package:attendance_system_nodejs/common/bases/CustomAppBar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomRichText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
+import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
+import 'package:attendance_system_nodejs/models/DataOffline.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
-
+import 'package:attendance_system_nodejs/providers/classesStudent_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/DetailPage.dart';
-import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
+import 'package:attendance_system_nodejs/screens/DetailHome/DetailPageOffline.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPageOffline.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPageQR.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
+import 'package:attendance_system_nodejs/services/GetLocation.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -43,64 +46,19 @@ class _HomePageBodyState extends State<HomePageBody> {
   Barcode? result;
   String? address;
   final SecureStorage secureStorage = SecureStorage();
+  late Box<DataOffline> dataOfflineBox;
   late Box<StudentClasses> studentClassesBox;
-  late Timer _timer;
-  bool _showDialog = true;
+  late Box<ClassesStudent> classesStudentBox;
   bool scanningQR = false;
-
-  void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        result = scanData;
-      });
-      if (result != null && result!.code != null && result!.code!.isNotEmpty) {
-        print('-------------Result:${result!.code}');
-        print(
-            'JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
-        var temp = jsonDecode(result!.code.toString());
-        //dựa theo typeAttendance để 1 là điều hướng tới trang AttendanceForm hoặc là send Request.
-        if (temp['typeAttendanced'] == 0) {
-          controller.dispose();
-          controller.stopCamera();
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AttendanceFormPageQR(
-                      attendanceForm: AttendanceForm(
-                          formID: temp['formID'],
-                          classes: temp['classID'],
-                          startTime: temp['startTime'],
-                          endTime: temp['endTime'],
-                          dateOpen: temp['dateOpen'],
-                          status: false,
-                          typeAttendance: temp['typeAttendanced'],
-                          location: '',
-                          latitude: 0.0,
-                          longtitude: 0.0,
-                          radius: 0.0),
-                    )),
-          );
-
-          //Send request(formid, classID, dateAttendanced, studentID, image, location, latitude, longitude)
-        } else {
-          print('Send Request---------');
-        }
-      } else {
-        print('Data is not available');
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _timer.cancel();
-  }
+  bool isConnected = false;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
+    studentClassesBox = Hive.box<StudentClasses>('student_classes');
+    dataOfflineBox = Hive.box<DataOffline>('DataOfflineBoxes');
+    classesStudentBox = Hive.box<ClassesStudent>('classes_student_box');
     checkLocationService();
     Future.delayed(Duration.zero, () {
       if (mounted) {
@@ -113,13 +71,191 @@ class _HomePageBodyState extends State<HomePageBody> {
         );
       }
     });
-
-    _timer = Timer(const Duration(minutes: 5), () {
-      setState(() {
-        _showDialog = false;
-      });
+    _connectivitySubscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      if (mounted) {
+        setState(() {
+          isConnected = result != ConnectivityResult.none;
+          if (isConnected) {
+            sendDataToServer();
+          } else {
+            print('no internet');
+          }
+        });
+      }
     });
-    // openBox();
+  }
+
+  void sendDataToServer() async {
+    DataOffline? dataOffline = dataOfflineBox.get('dataOffline');
+    String xFile = await SecureStorage().readSecureData('imageOffline');
+    if (xFile.isNotEmpty && xFile != 'No Data Found' && dataOffline != null) {
+      String? location = await GetLocation()
+          .getAddressFromLatLongWithoutInternet(
+              dataOffline.latitude, dataOffline.longitude);
+      print('location: $location');
+      bool check = await API(context).takeAttendanceOffline(
+          dataOffline.studentID,
+          dataOffline.classID,
+          dataOffline.formID,
+          dataOffline.dateAttendanced,
+          location ?? '',
+          dataOffline.latitude,
+          dataOffline.longitude,
+          XFile(xFile));
+      if (check) {
+        print('Successfully take attendance offline');
+        await dataOfflineBox.delete('dataOffline');
+        if (dataOfflineBox.isEmpty) {
+          print('Delete ok');
+        } else {
+          print('No ok');
+        }
+      } else {
+        print('Failed take attendance offline');
+      }
+    } else {
+      print('Data is not available');
+    }
+  }
+
+  // void _onQRViewCreated(QRViewController controller) {
+  //   this.controller = controller;
+  //   controller.scannedDataStream.listen((scanData) {
+  //     setState(() {
+  //       result = scanData;
+  //     });
+  //     if (result != null && result!.code != null && result!.code!.isNotEmpty) {
+  //       print('-------------Result:${result!.code}');
+  //       print(
+  //           'JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
+  //       var temp = jsonDecode(result!.code.toString());
+  //       if (isConnected) {
+  //         // check connection(internet)
+  //         if (temp['typeAttendanced'] == 0 || temp['typeAttendanced'] == 1) {
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(
+  //                 builder: (context) => AttendanceFormPageQR(
+  //                       attendanceForm: AttendanceForm(
+  //                           formID: temp['formID'],
+  //                           classes: temp['classID'],
+  //                           startTime: temp['startTime'],
+  //                           endTime: temp['endTime'],
+  //                           dateOpen: temp['dateOpen'],
+  //                           status: false,
+  //                           typeAttendance: temp['typeAttendanced'],
+  //                           location: '',
+  //                           latitude: 0.0,
+  //                           longtitude: 0.0,
+  //                           radius: 0.0),
+  //                     )),
+  //           );
+
+  //           //Send request(formid, classID, dateAttendanced, studentID, location, latitude, longitude)
+  //         } else {
+  //           print('Send Request---------');
+  //         }
+  //       } else {
+  //         controller.pauseCamera();
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) => AttendanceFormPageOffline(
+  //                     attendanceForm: AttendanceForm(
+  //                         formID: temp['formID'],
+  //                         classes: temp['classID'],
+  //                         startTime: temp['startTime'],
+  //                         endTime: temp['endTime'],
+  //                         dateOpen: temp['dateOpen'],
+  //                         status: false,
+  //                         typeAttendance:
+  //                             0, //0 vì không có mạng mặc định là quét mặt
+  //                         location: '',
+  //                         latitude: 0.0,
+  //                         longtitude: 0.0,
+  //                         radius: 0.0),
+  //                   )),
+  //         );
+  //       }
+  //     } else {
+  //       print('Data is not available');
+  //     }
+  //   });
+  // }\
+
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) {
+      if (mounted) {
+        setState(() {
+          result = scanData;
+        });
+        if (result != null &&
+            result!.code != null &&
+            result!.code!.isNotEmpty) {
+          print('-------------Result:${result!.code}');
+          print(
+              'JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
+          var temp = jsonDecode(result!.code.toString());
+          if (isConnected) {
+            // check connection(internet)
+            print('isConnected QR: $isConnected');
+            if (temp['typeAttendanced'] == 0 || temp['typeAttendanced'] == 1) {
+              controller.pauseCamera();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AttendanceFormPageQR(
+                          attendanceForm: AttendanceForm(
+                              formID: temp['formID'],
+                              classes: temp['classID'],
+                              startTime: temp['startTime'],
+                              endTime: temp['endTime'],
+                              dateOpen: temp['dateOpen'],
+                              status: false,
+                              typeAttendance: temp['typeAttendanced'],
+                              location: '',
+                              latitude: 0.0,
+                              longtitude: 0.0,
+                              radius: 0.0),
+                        )),
+              );
+
+              //Send request(formid, classID, dateAttendanced, studentID, location, latitude, longitude)
+            } else {
+              print('Send Request---------');
+            }
+          } else {
+            print('isConnected offline: $isConnected');
+
+            controller.pauseCamera();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AttendanceFormPageOffline(
+                        attendanceForm: AttendanceForm(
+                            formID: temp['formID'],
+                            classes: temp['classID'],
+                            startTime: temp['startTime'],
+                            endTime: temp['endTime'],
+                            dateOpen: temp['dateOpen'],
+                            status: false,
+                            typeAttendance:
+                                0, //0 vì không có mạng mặc định là quét mặt
+                            location: '',
+                            latitude: 0.0,
+                            longtitude: 0.0,
+                            radius: 0.0),
+                      )),
+            );
+          }
+        } else {
+          print('Data is not available');
+        }
+      }
+    });
   }
 
   void getAddress() {
@@ -170,29 +306,63 @@ class _HomePageBodyState extends State<HomePageBody> {
     );
   }
 
-  //----Hive----
+  //--Hive--
+  // Future<void> openDataOfflineBox() async {
+  //   await Hive.initFlutter();
+  //   if (!Hive.isBoxOpen('DataOfflineBoxes')) {
+  //     dataOfflineBox = await Hive.openBox<DataOffline>('DataOfflineBoxes');
+  //     print('Successfully opened DataOfflineBoxes');
+  //   } else {
+  //     dataOfflineBox = Hive.box<DataOffline>('DataOfflineBoxes');
+  //     print('DataOfflineBoxes is already open');
+  //   }
+  // }
   // Future<void> openBox() async {
   //   await Hive.initFlutter();
-  //   studentClassesBox = await Hive.openBox<StudentClasses>('student_classes');
-  //   print('Create Box successfully ---------------');
+  //   if (!Hive.isBoxOpen('student_classes')) {
+  //     studentClassesBox = await Hive.openBox<StudentClasses>('student_classes');
+  //     print('Successfully opened student_classes');
+  //   } else {
+  //     studentClassesBox = Hive.box<StudentClasses>('student_classes');
+  //     print('student_classes is already open');
+  //   }
   // }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _connectivitySubscription.cancel();
+  }
+
   // void saveListStudentClasses(List<StudentClasses> listData) async {
-  //   if (studentClassesBox.isOpen) {
+  //   if (studentClassesBox!.isOpen) {
   //     for (var temp in listData) {
-  //       await studentClassesBox.put(temp.classes.classID, temp);
+  //       await studentClassesBox!.put(temp.classes.classID, temp);
   //     }
-  //     print('Successfully');
+  //     print('Successfully Save List StudentClasses');
   //   } else {
   //     print('Box is not open');
   //   }
   // }
 
+  void saveListClassesStudent(List<ClassesStudent> listData) async {
+    if (classesStudentBox.isOpen) {
+      for (var temp in listData) {
+        await classesStudentBox.put(temp.classID, temp);
+      }
+      print('Successfully Save List ClassesStudent');
+    } else {
+      print('Box is not open');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final classDataProvider =
-        Provider.of<StudentClassesDataProvider>(context, listen: false);
+    // final classDataProvider =
+    //     Provider.of<StudentClassesDataProvider>(context, listen: false);
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
+    final classesStudentDataProvider =
+        Provider.of<ClassesStudentProvider>(context, listen: false);
     print('Size Width: ${MediaQuery.of(context).size.width}');
     print('Size Height: ${MediaQuery.of(context).size.height}');
 
@@ -320,158 +490,28 @@ class _HomePageBodyState extends State<HomePageBody> {
                     ConnectivityResult? result = snapshot.data;
                     if (result == ConnectivityResult.wifi ||
                         result == ConnectivityResult.mobile) {
-                      return FutureBuilder(
-                        future:
-                            API(context).getStudentClass(), //Chinh parameter
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 5, right: 10, bottom: 10, top: 10),
-                                child: Column(
-                                  children: [
-                                    customLoading(),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    customLoading(),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    customLoading(),
-                                  ],
-                                ));
-                          } else if (snapshot.hasError) {
-                            print('Error');
-                            return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else if (snapshot.hasData) {
-                            if (snapshot.data == [] ||
-                                snapshot.data!.isEmpty ||
-                                snapshot.data == null) {
-                              return Center(
-                                child: Container(
-                                  width: 200,
-                                  height: 350,
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        const SizedBox(
-                                          height: 100,
-                                        ),
-                                        Opacity(
-                                          opacity: 0.3,
-                                          child: Image.asset(
-                                              'assets/images/nodata.png'),
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        CustomText(
-                                            message:
-                                                "You haven't joint any classes yet!",
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.primaryText
-                                                .withOpacity(0.5))
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            } else if (snapshot.data != null ||
-                                snapshot.data != []) {
-                              print('snapshot is null or []: ${snapshot.data}');
-                              List<StudentClasses> studentClasses =
-                                  snapshot.data!;
-                              // Cập nhật dữ liệu vào Provider
-                              // saveListStudentClasses(studentClasses); Hive
-                              Future.delayed(Duration.zero, () {
-                                classDataProvider
-                                    .setStudentClassesList(studentClasses);
-                              });
-                              return SizedBox(
-                                height: 500,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ListView.builder(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      shrinkWrap: true,
-                                      itemCount: studentClasses.length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        var data = studentClasses[index];
-                                        return Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 5, right: 5, bottom: 10),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              // Navigator.pushNamed(context,'/DetailPage',arguments: {'studentClasses': data});
-                                              Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                          animation,
-                                                          secondaryAnimation) =>
-                                                      DetailPage(
-                                                    studentClasses: data,
-                                                  ),
-                                                  transitionDuration:
-                                                      const Duration(
-                                                          milliseconds: 200),
-                                                  transitionsBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation,
-                                                      child) {
-                                                    return ScaleTransition(
-                                                      scale: animation,
-                                                      child: child,
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 5,
-                                                right: 5,
-                                              ),
-                                              child: classInformation(
-                                                data.classes.course.totalWeeks,
-                                                data.classes.course.courseName,
-                                                data.classes.teacher
-                                                    .teacherName,
-                                                data.classes.course.courseID,
-                                                data.classes.classType,
-                                                data.classes.group,
-                                                data.classes.subGroup,
-                                                data.classes.shiftNumber,
-                                                data.classes.roomNumber,
-                                                data.totalPresence,
-                                                data.totalLate,
-                                                data.totalAbsence,
-                                                data.progress,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          }
-                          return const Text('null');
-                        },
-                      );
-                    } else if (result == ConnectivityResult.none) {
-                      return noInternet();
+                      print('----------------------------asdsadsad');
+                      return callAPI(context, classesStudentDataProvider);
+                    } else if (result == ConnectivityResult.none ||
+                        isConnected == false) {
+                      print(
+                          '----------------------------asdsadasdasdsadasdassad');
+
+                      return noInternetWithHive();
                     }
                   }
-                  return noInternet();
+                  // print('before StreamBuilder:$isConnected');
+                  // return snapshot.data callAPI(context, classDataProvider);
+                  // return snapshot.data == ConnectivityResult.mobile ||
+                  //         snapshot.data == ConnectivityResult.wifi
+                  //     ? callAPI(context, classDataProvider)
+                  //     : noInternetWithHive();
+                  if (isConnected) {
+                    // Sử dụng isConnected để kiểm tra kết nối mạng
+                    return callAPI(context, classesStudentDataProvider);
+                  } else {
+                    return noInternetWithHive();
+                  }
                 }),
           )
         else
@@ -544,90 +584,514 @@ class _HomePageBodyState extends State<HomePageBody> {
     ));
   }
 
-  Widget noInternet() {
-    return Stack(
-      children: [
-        Center(
-          child: Container(
-            width: 200,
-            height: 350,
-            child: Center(
+  FutureBuilder<List<ClassesStudent>> callAPI(
+      BuildContext context, ClassesStudentProvider classDataProvider) {
+    return FutureBuilder(
+      future: API(context).getClassesStudent(), //Chinh parameter
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Padding(
+              padding:
+                  const EdgeInsets.only(left: 5, right: 5, bottom: 10, top: 10),
               child: Column(
                 children: [
+                  customLoading(),
                   const SizedBox(
-                    height: 100,
+                    height: 10,
                   ),
-                  Opacity(
-                    opacity: 0.5,
-                    child: Image.asset('assets/images/nointernet.png'),
-                  ),
+                  customLoading(),
                   const SizedBox(
-                    height: 5,
+                    height: 10,
                   ),
-                  Text(
-                    "Please check your internet!",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey.withOpacity(0.5),
-                    ),
-                  ),
+                  customLoading(),
                 ],
+              ));
+        } else if (snapshot.hasError) {
+          print('Error');
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          if (snapshot.data == [] ||
+              snapshot.data!.isEmpty ||
+              snapshot.data == null) {
+            return Center(
+              child: Container(
+                width: 200,
+                height: 350,
+                child: Center(
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 100,
+                      ),
+                      Opacity(
+                        opacity: 0.3,
+                        child: Image.asset('assets/images/nodata.png'),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      CustomText(
+                          message: "You haven't joint any classes yet!",
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryText.withOpacity(0.5))
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
-        if (_showDialog)
-          Center(
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.9, // test width
-              height: MediaQuery.of(context).size.height * 0.3, // test height
-              child: Stack(
+            );
+          } else if (snapshot.data != null || snapshot.data != []) {
+            print('snapshot is null or []: ${snapshot.data}');
+            List<ClassesStudent> studentClasses = snapshot.data!;
+            // Cập nhật dữ liệu vào Provider
+            // saveListStudentClasses(studentClasses); //Hive
+            saveListClassesStudent(studentClasses);
+            Future.delayed(Duration.zero, () {
+              classDataProvider.setClassesStudentList(studentClasses);
+            });
+            return SizedBox(
+              height: 500,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                    child: AlertDialog(
-                      backgroundColor: AppColors.primaryButton.withOpacity(0.2),
-                      title: const Text(
-                        'No Internet',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      content: const Text(
-                        'You can scan QR to take attendance offline',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal),
-                      ),
-                      actions: [
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _showDialog = false;
-                              // activeQR = true;
-                            });
+                  ListView.builder(
+                    padding: const EdgeInsets.only(top: 20),
+                    shrinkWrap: true,
+                    itemCount: studentClasses.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      var data = studentClasses[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                            left: 5, right: 5, bottom: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            // Navigator.pushNamed(context,'/DetailPage',arguments: {'studentClasses': data});
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        DetailPage(
+                                  classesStudent: data,
+                                ),
+                                transitionDuration:
+                                    const Duration(milliseconds: 200),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return ScaleTransition(
+                                    scale: animation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
                           },
-                          child: const Text(
-                            'OK',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 5,
+                              right: 5,
+                            ),
+                            child: classInformation(
+                              data.totalWeeks,
+                              data.courseName,
+                              data.teacherName,
+                              data.courseID,
+                              data.classType,
+                              data.group,
+                              data.subGroup,
+                              data.shiftNumber,
+                              data.roomNumber,
+                              data.totalPresence,
+                              data.totalLate,
+                              data.totalAbsence,
+                              data.progress,
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ],
               ),
-            ),
-          ),
-      ],
+            );
+          }
+        }
+        return const Text('null');
+      },
     );
   }
+
+  // FutureBuilder<List<StudentClasses>> callAPI(
+  //     BuildContext context, StudentClassesDataProvider classDataProvider) {
+  //   return FutureBuilder(
+  //     future: API(context).getStudentClass(), //Chinh parameter
+  //     builder: (context, snapshot) {
+  //       if (snapshot.connectionState == ConnectionState.waiting) {
+  //         return Padding(
+  //             padding:
+  //                 const EdgeInsets.only(left: 5, right: 5, bottom: 10, top: 10),
+  //             child: Column(
+  //               children: [
+  //                 customLoading(),
+  //                 const SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 customLoading(),
+  //                 const SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 customLoading(),
+  //               ],
+  //             ));
+  //       } else if (snapshot.hasError) {
+  //         print('Error');
+  //         return Center(child: Text('Error: ${snapshot.error}'));
+  //       } else if (snapshot.hasData) {
+  //         if (snapshot.data == [] ||
+  //             snapshot.data!.isEmpty ||
+  //             snapshot.data == null) {
+  //           return Center(
+  //             child: Container(
+  //               width: 200,
+  //               height: 350,
+  //               child: Center(
+  //                 child: Column(
+  //                   children: [
+  //                     const SizedBox(
+  //                       height: 100,
+  //                     ),
+  //                     Opacity(
+  //                       opacity: 0.3,
+  //                       child: Image.asset('assets/images/nodata.png'),
+  //                     ),
+  //                     const SizedBox(
+  //                       height: 5,
+  //                     ),
+  //                     CustomText(
+  //                         message: "You haven't joint any classes yet!",
+  //                         fontSize: 11,
+  //                         fontWeight: FontWeight.w500,
+  //                         color: AppColors.primaryText.withOpacity(0.5))
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //         } else if (snapshot.data != null || snapshot.data != []) {
+  //           print('snapshot is null or []: ${snapshot.data}');
+  //           List<StudentClasses> studentClasses = snapshot.data!;
+  //           // Cập nhật dữ liệu vào Provider
+  //           saveListStudentClasses(studentClasses); //Hive
+  //           Future.delayed(Duration.zero, () {
+  //             classDataProvider.setStudentClassesList(studentClasses);
+  //           });
+  //           return SizedBox(
+  //             height: 500,
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 ListView.builder(
+  //                   padding: const EdgeInsets.only(top: 20),
+  //                   shrinkWrap: true,
+  //                   itemCount: studentClasses.length,
+  //                   itemBuilder: (BuildContext context, int index) {
+  //                     var data = studentClasses[index];
+  //                     return Padding(
+  //                       padding: const EdgeInsets.only(
+  //                           left: 5, right: 5, bottom: 10),
+  //                       child: GestureDetector(
+  //                         onTap: () {
+  //                           // Navigator.pushNamed(context,'/DetailPage',arguments: {'studentClasses': data});
+  //                           Navigator.push(
+  //                             context,
+  //                             PageRouteBuilder(
+  //                               pageBuilder:
+  //                                   (context, animation, secondaryAnimation) =>
+  //                                       DetailPage(
+  //                                 studentClasses: data,
+  //                               ),
+  //                               transitionDuration:
+  //                                   const Duration(milliseconds: 200),
+  //                               transitionsBuilder: (context, animation,
+  //                                   secondaryAnimation, child) {
+  //                                 return ScaleTransition(
+  //                                   scale: animation,
+  //                                   child: child,
+  //                                 );
+  //                               },
+  //                             ),
+  //                           );
+  //                         },
+  //                         child: Padding(
+  //                           padding: const EdgeInsets.only(
+  //                             left: 5,
+  //                             right: 5,
+  //                           ),
+  //                           child: classInformation(
+  //                             data.classes.course.totalWeeks,
+  //                             data.classes.course.courseName,
+  //                             data.classes.teacher.teacherName,
+  //                             data.classes.course.courseID,
+  //                             data.classes.classType,
+  //                             data.classes.group,
+  //                             data.classes.subGroup,
+  //                             data.classes.shiftNumber,
+  //                             data.classes.roomNumber,
+  //                             data.totalPresence,
+  //                             data.totalLate,
+  //                             data.totalAbsence,
+  //                             data.progress,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     );
+  //                   },
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         }
+  //       }
+  //       return const Text('null');
+  //     },
+  //   );
+  // }
+
+  // Widget noInternet() {
+  //   return Stack(
+  //     children: [
+  //       Center(
+  //         child: Container(
+  //           width: 200,
+  //           height: 350,
+  //           child: Center(
+  //             child: Column(
+  //               children: [
+  //                 const SizedBox(
+  //                   height: 100,
+  //                 ),
+  //                 Opacity(
+  //                   opacity: 0.5,
+  //                   child: Image.asset('assets/images/nointernet.png'),
+  //                 ),
+  //                 const SizedBox(
+  //                   height: 5,
+  //                 ),
+  //                 Text(
+  //                   "Please check your internet!",
+  //                   style: TextStyle(
+  //                     fontSize: 12,
+  //                     fontWeight: FontWeight.w500,
+  //                     color: Colors.grey.withOpacity(0.5),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //       if (_showDialog)
+  //         Center(
+  //           child: Container(
+  //             width: MediaQuery.of(context).size.width * 0.9, // test width
+  //             height: MediaQuery.of(context).size.height * 0.25, // test height
+  //             child: Stack(
+  //               children: [
+  //                 BackdropFilter(
+  //                   filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+  //                   child: AlertDialog(
+  //                     backgroundColor: AppColors.primaryButton.withOpacity(0.2),
+  //                     title: const Text(
+  //                       'No Internet',
+  //                       style: TextStyle(
+  //                           color: Colors.black,
+  //                           fontSize: 20,
+  //                           fontWeight: FontWeight.bold),
+  //                     ),
+  //                     content: const Text(
+  //                       'You can scan QR to take attendance offline',
+  //                       style: TextStyle(
+  //                           color: Colors.black,
+  //                           fontSize: 14,
+  //                           fontWeight: FontWeight.normal),
+  //                     ),
+  //                     actions: [
+  //                       ElevatedButton(
+  //                         onPressed: () {
+  //                           setState(() {
+  //                             _showDialog = false;
+  //                             // activeQR = true;
+  //                           });
+  //                         },
+  //                         child: const Text(
+  //                           'OK',
+  //                           style: TextStyle(
+  //                               color: Colors.black,
+  //                               fontSize: 14,
+  //                               fontWeight: FontWeight.normal),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //     ],
+  //   );
+  // }
+  Widget noInternet() {
+    return Center(
+      child: Container(
+        width: 200,
+        height: 350,
+        child: Center(
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 100,
+              ),
+              Opacity(
+                opacity: 0.5,
+                child: Image.asset('assets/images/nointernet.png'),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Text(
+                "Please check your internet!",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.withOpacity(0.5),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget noInternetWithHive() {
+    if (classesStudentBox.isOpen || classesStudentBox.isNotEmpty) {
+      return SizedBox(
+        height: 500,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListView.builder(
+              padding: const EdgeInsets.only(top: 20),
+              shrinkWrap: true,
+              itemCount: classesStudentBox.values.length,
+              itemBuilder: (BuildContext context, int index) {
+                var data = classesStudentBox.getAt(index);
+                return Padding(
+                  padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  DetailPageOffline(
+                            classesStudent: data,
+                          ),
+                          transitionDuration: const Duration(milliseconds: 200),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            return ScaleTransition(
+                              scale: animation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 5,
+                        right: 5,
+                      ),
+                      child: classInformation(
+                        data!.totalWeeks,
+                        data.courseName,
+                        data.teacherName,
+                        data.courseID,
+                        data.classType,
+                        data.group,
+                        data.subGroup,
+                        data.shiftNumber,
+                        data.roomNumber,
+                        data.totalPresence,
+                        data.totalLate,
+                        data.totalAbsence,
+                        double.parse(data.progress.toString()),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    } else {
+      return noInternet();
+    }
+  }
+
+  // Widget noInternetWithHive() {
+  //   if (studentClassesBox.isOpen || studentClassesBox.isNotEmpty) {
+  //     return SizedBox(
+  //       height: 500,
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           ListView.builder(
+  //             padding: const EdgeInsets.only(top: 20),
+  //             shrinkWrap: true,
+  //             itemCount: studentClassesBox.values.length,
+  //             itemBuilder: (BuildContext context, int index) {
+  //               var data = studentClassesBox.getAt(index);
+  //               return Padding(
+  //                 padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
+  //                 child: GestureDetector(
+  //                   onTap: () {},
+  //                   child: Padding(
+  //                     padding: const EdgeInsets.only(
+  //                       left: 5,
+  //                       right: 5,
+  //                     ),
+  //                     child: classInformation(
+  //                       data!.classes.course.totalWeeks,
+  //                       data.classes.course.courseName,
+  //                       data.classes.teacher.teacherName,
+  //                       data.classes.course.courseID,
+  //                       data.classes.classType,
+  //                       data.classes.group,
+  //                       data.classes.subGroup,
+  //                       data.classes.shiftNumber,
+  //                       data.classes.roomNumber,
+  //                       data.totalPresence,
+  //                       data.totalLate,
+  //                       data.totalAbsence,
+  //                       data.progress,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               );
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   } else {
+  //     return noInternet();
+  //   }
+  // }
 
   Widget loading() {
     return const Center(
@@ -653,7 +1117,7 @@ class _HomePageBodyState extends State<HomePageBody> {
     double progress,
   ) {
     return Container(
-        width: 410,
+        width: MediaQuery.of(context).size.width * 0.5,
         height: 150,
         decoration: const BoxDecoration(
             color: Colors.white,
@@ -689,7 +1153,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                 ),
               ),
               const SizedBox(
-                width: 25,
+                width: 24,
               ),
               Container(
                 width: 165,
@@ -795,10 +1259,10 @@ class _HomePageBodyState extends State<HomePageBody> {
               Container(
                   margin: const EdgeInsets.only(bottom: 25),
                   height: 90,
-                  width: 2,
+                  width: 1.5,
                   color: Colors.black),
               const SizedBox(
-                width: 10,
+                width: 5,
               ),
               Padding(
                 padding: !activeForm
@@ -879,7 +1343,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                 ),
               ),
               const SizedBox(
-                width: 15,
+                width: 10,
               ),
               Container(
                 width: 150,
@@ -930,7 +1394,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                             child: Container(
                                 width: 50, height: 5, color: Colors.white)),
                         const SizedBox(
-                          width: 10,
+                          width: 5,
                         ),
                         Shimmer.fromColors(
                             baseColor: const Color.fromARGB(78, 158, 158, 158),
@@ -947,14 +1411,14 @@ class _HomePageBodyState extends State<HomePageBody> {
                 ),
               ),
               const SizedBox(
-                width: 10,
+                width: 5,
               ),
               Shimmer.fromColors(
                   baseColor: const Color.fromARGB(78, 158, 158, 158),
                   highlightColor: const Color.fromARGB(146, 255, 255, 255),
                   child: Container(width: 2, height: 90, color: Colors.white)),
               const SizedBox(
-                width: 10,
+                width: 5,
               ),
               Padding(
                 padding: !activeForm

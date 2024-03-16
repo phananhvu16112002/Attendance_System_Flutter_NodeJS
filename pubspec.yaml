@@ -73,6 +73,7 @@ dependencies:
   maps_toolkit: ^3.0.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  progress_dialog_null_safe: ^2.0.0
 
 dev_dependencies:
   flutter_test:

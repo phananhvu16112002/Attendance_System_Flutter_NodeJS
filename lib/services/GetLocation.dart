@@ -1,4 +1,5 @@
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -52,6 +53,18 @@ class GetLocation {
     return address;
   }
 
+  Future<String?> getAddressFromLatLongWithoutInternet(
+      double latitude, double longitude) async {
+    List<Placemark> placemark =
+        await placemarkFromCoordinates(latitude, longitude);
+    Placemark place = placemark[0];
+    var temp =
+        '${place.street},${place.locality},${place.subAdministrativeArea},${place.administrativeArea},${place.country}';
+    address = processAddress(temp);
+    // print('address $address');
+    return address;
+  }
+
   String processAddress(String address) {
     List<String> components = address.split(',');
     List<String> filteredComponents =
@@ -84,6 +97,10 @@ class GetLocation {
     if (!(await hasNetworkConnection())) {
       provider.setLatitude(position.latitude);
       provider.setLongtitude(position.longitude);
+      await SecureStorage()
+          .writeSecureData('latitude', position.latitude.toString());
+      await SecureStorage()
+          .writeSecureData('longitude', position.longitude.toString());
       print(position.latitude);
       print(position.longitude);
       return false;
@@ -97,6 +114,7 @@ class GetLocation {
     if (provider.userData.latitude != 0 &&
         provider.userData.longtitude != 0 &&
         provider.userData.location.isNotEmpty) {
+      print(address);
       return true;
     }
     return false;

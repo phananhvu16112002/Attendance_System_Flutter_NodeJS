@@ -9,6 +9,7 @@ import 'package:attendance_system_nodejs/screens/Authentication/OTPPage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -27,6 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   RegExp upperCaseRegex = RegExp(r'[A-Z]');
   RegExp digitRegex = RegExp(r'[0-9]');
+  late ProgressDialog _progressDialog;
 
   bool isTDTUEmail(String email) {
     // Biểu thức chính quy để kiểm tra phần sau ký tự '@'
@@ -34,6 +36,13 @@ class _RegisterPageState extends State<RegisterPage> {
         RegExp(r'^[0-9A-Z]+@(student\.)?tdtu\.edu\.vn$', caseSensitive: false);
 
     return tdtuEmailRegExp.hasMatch(email);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _progressDialog = ProgressDialog(context);
   }
 
   @override
@@ -240,6 +249,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           textColor: Colors.white,
                           function: () async {
                             if (_formKey.currentState!.validate()) {
+                              _progressDialog.show();
                               try {
                                 if (password.text == confirmPassword.text) {
                                   String check = await Authenticate()
@@ -247,7 +257,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           emailAddress.text, password.text);
                                   if (check == '' || check.isEmpty) {
                                     // ignore: use_build_context_synchronously
-                                    Navigator.pushReplacement(
+                                    await Navigator.pushReplacement(
                                       context,
                                       PageRouteBuilder(
                                         pageBuilder: (context, animation,
@@ -292,6 +302,9 @@ class _RegisterPageState extends State<RegisterPage> {
                               } catch (e) {
                                 // ignore: avoid_print
                                 print(e);
+                              }
+                              finally{
+                                _progressDialog.hide();
                               }
                             } else {
                               showFlushBarNotification(context, "Invalid Form",

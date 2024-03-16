@@ -1,47 +1,44 @@
 import 'dart:io';
 
-import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
-import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.dart';
+import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
+import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPageOffline.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPageQR.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 
 class SmartCamera extends StatefulWidget {
-  const SmartCamera({super.key, required this.checkQR});
-  final bool checkQR;
+  const SmartCamera(
+      {super.key, required this.page, required this.classesStudent});
+
+  final String page;
+  final ClassesStudent classesStudent;
 
   @override
   State<SmartCamera> createState() => _SmartCameraState();
 }
 
 class _SmartCameraState extends State<SmartCamera> {
-  File? _imageTest;
+  late File _imageTest;
   late Box<AttendanceForm> boxAttendanceForm;
+  late ClassesStudent classStudents;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     openCamera();
-    openBox();
+    boxAttendanceForm = Hive.box<AttendanceForm>('AttendanceFormBoxes');
+    classStudents = widget.classesStudent!;
   }
-
 
   Future<void> openCamera() async {
     await FaceCamera.initialize();
     print('ákdasjdlasjdlkasjdskas');
-  }
-
-  Future<void> openBox() async {
-    await Hive.initFlutter();
-    boxAttendanceForm = await Hive.openBox<AttendanceForm>('attendanceFormBox');
   }
 
   @override
@@ -69,25 +66,36 @@ class _SmartCameraState extends State<SmartCamera> {
             setState(() {
               _imageTest = image;
             });
-            await SecureStorage().writeSecureData('image', _imageTest!.path);
-            var a = await SecureStorage().readSecureData('image');
-            print('Successfully: ${a}');
+            await SecureStorage().writeSecureData('image', _imageTest.path);
+            await SecureStorage()
+                .writeSecureData('imageOffline', _imageTest.path);
+
             if (mounted) {
-              if (widget.checkQR != true) {
+              if (widget.page.contains('AttendanceNormal')) {
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                        builder: (builder) => const AttendanceFormPage()),
+                        builder: (builder) => AttendanceFormPage(
+                              classesStudent: classStudents,
+                            )),
                     (route) => false);
-              } else {
+              } else if (widget.page.contains('AttendanceQR')) {
                 AttendanceForm? attendanceForm =
-                    boxAttendanceForm.get('AttendanceFormTemp');
+                    boxAttendanceForm.get('AttendanceQR');
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
                         builder: (builder) => AttendanceFormPageQR(
-                              attendanceForm: attendanceForm!,
-                            )),
+                            attendanceForm: attendanceForm!)),
+                    (route) => false);
+              } else {
+                AttendanceForm? attendanceForm =
+                    boxAttendanceForm.get('AttendanceOffline');
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => AttendanceFormPageOffline(
+                            attendanceForm: attendanceForm!)),
                     (route) => false);
               }
             }
@@ -101,10 +109,11 @@ class _SmartCameraState extends State<SmartCamera> {
           if (!face.wellPositioned) {
             return _message('Center your face in the square');
           }
+          print('alo alo');
           return const SizedBox.shrink();
         },
-        showFlashControl: true,
-        showCameraLensControl: true,
+        showFlashControl: false,
+        showCameraLensControl: false,
         autoCapture: true,
         defaultCameraLens: CameraLens.front,
         captureControlIcon: CircleAvatar(

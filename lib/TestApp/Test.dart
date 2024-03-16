@@ -1,10 +1,7 @@
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
-import 'package:attendance_system_nodejs/services/GetLocation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as map_tool;
 
 class TestApp extends StatefulWidget {
