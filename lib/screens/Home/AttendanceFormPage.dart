@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/AttendanceFormDataForDetailPage.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/attendanceFormForDetailPage_data_provider.dart';
@@ -30,6 +32,7 @@ class AttendanceFormPage extends StatefulWidget {
   // final AttendanceForm attendanceForm;
   final ClassesStudent classesStudent;
 
+
   @override
   State<AttendanceFormPage> createState() => _AttendancePageState();
 }
@@ -48,7 +51,33 @@ class _AttendancePageState extends State<AttendanceFormPage> {
     super.initState();
     // attendanceForm = widget.attendanceForm;
     getImage(); //avoid rebuild
-    _progressDialog = ProgressDialog(context);
+    _progressDialog = ProgressDialog(context,
+        customBody: Container(
+          width: 200,
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Colors.white),
+          child: const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppColors.primaryButton,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          )),
+        ));
     classesStudent = widget.classesStudent;
   }
 
@@ -261,13 +290,19 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                                 },
                               ),
                             );
+                            await _progressDialog.hide();
                           }
                         } else {
-                          print('Failed take attendance');
+                          await _progressDialog.hide();
+                          await Flushbar(
+                            title: "Failed",
+                            message: "Please check and take attendance again!",
+                            duration: const Duration(seconds: 3),
+                          ).show(context);
                         }
                         await SecureStorage().deleteSecureData('image');
                         await SecureStorage().deleteSecureData('imageOffline');
-                        _progressDialog.hide();
+                        await _progressDialog.hide();
                       },
                       height: 55,
                       width: 400,

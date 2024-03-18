@@ -52,6 +52,7 @@ class _HomePageBodyState extends State<HomePageBody> {
   bool scanningQR = false;
   bool isConnected = false;
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  final ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -651,67 +652,69 @@ class _HomePageBodyState extends State<HomePageBody> {
             });
             return SizedBox(
               height: 500,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ListView.builder(
-                    padding: const EdgeInsets.only(top: 20),
-                    shrinkWrap: true,
-                    itemCount: studentClasses.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      var data = studentClasses[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                            left: 5, right: 5, bottom: 10),
-                        child: GestureDetector(
-                          onTap: () {
-                            // Navigator.pushNamed(context,'/DetailPage',arguments: {'studentClasses': data});
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        DetailPage(
-                                  classesStudent: data,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListView.builder(
+                      padding: const EdgeInsets.only(top: 20),
+                      shrinkWrap: true,
+                      itemCount: studentClasses.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var data = studentClasses[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              left: 5, right: 5, bottom: 10),
+                          child: GestureDetector(
+                            onTap: () {
+                              // Navigator.pushNamed(context,'/DetailPage',arguments: {'studentClasses': data});
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation, secondaryAnimation) =>
+                                          DetailPage(
+                                    classesStudent: data,
+                                  ),
+                                  transitionDuration:
+                                      const Duration(milliseconds: 200),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return ScaleTransition(
+                                      scale: animation,
+                                      child: child,
+                                    );
+                                  },
                                 ),
-                                transitionDuration:
-                                    const Duration(milliseconds: 200),
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  return ScaleTransition(
-                                    scale: animation,
-                                    child: child,
-                                  );
-                                },
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 5,
+                                right: 5,
                               ),
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 5,
-                              right: 5,
-                            ),
-                            child: classInformation(
-                              data.totalWeeks,
-                              data.courseName,
-                              data.teacherName,
-                              data.courseID,
-                              data.classType,
-                              data.group,
-                              data.subGroup,
-                              data.shiftNumber,
-                              data.roomNumber,
-                              data.totalPresence,
-                              data.totalLate,
-                              data.totalAbsence,
-                              data.progress,
+                              child: classInformation(
+                                data.totalWeeks,
+                                data.courseName,
+                                data.teacherName,
+                                data.courseID,
+                                data.classType,
+                                data.group,
+                                data.subGroup,
+                                data.shiftNumber,
+                                data.roomNumber,
+                                data.totalPresence,
+                                data.totalLate,
+                                data.totalAbsence,
+                                data.progress,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             );
           }
@@ -978,64 +981,67 @@ class _HomePageBodyState extends State<HomePageBody> {
     if (classesStudentBox.isOpen || classesStudentBox.isNotEmpty) {
       return SizedBox(
         height: 500,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListView.builder(
-              padding: const EdgeInsets.only(top: 20),
-              shrinkWrap: true,
-              itemCount: classesStudentBox.values.length,
-              itemBuilder: (BuildContext context, int index) {
-                var data = classesStudentBox.getAt(index);
-                return Padding(
-                  padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  DetailPageOffline(
-                            classesStudent: data,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListView.builder(
+                padding: const EdgeInsets.only(top: 20),
+                shrinkWrap: true,
+                controller: _controller,
+                itemCount: classesStudentBox.values.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var data = classesStudentBox.getAt(index);
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    DetailPageOffline(
+                              classesStudent: data,
+                            ),
+                            transitionDuration: const Duration(milliseconds: 200),
+                            transitionsBuilder:
+                                (context, animation, secondaryAnimation, child) {
+                              return ScaleTransition(
+                                scale: animation,
+                                child: child,
+                              );
+                            },
                           ),
-                          transitionDuration: const Duration(milliseconds: 200),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            return ScaleTransition(
-                              scale: animation,
-                              child: child,
-                            );
-                          },
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 5,
+                          right: 5,
                         ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 5,
-                        right: 5,
-                      ),
-                      child: classInformation(
-                        data!.totalWeeks,
-                        data.courseName,
-                        data.teacherName,
-                        data.courseID,
-                        data.classType,
-                        data.group,
-                        data.subGroup,
-                        data.shiftNumber,
-                        data.roomNumber,
-                        data.totalPresence,
-                        data.totalLate,
-                        data.totalAbsence,
-                        double.parse(data.progress.toString()),
+                        child: classInformation(
+                          data!.totalWeeks,
+                          data.courseName,
+                          data.teacherName,
+                          data.courseID,
+                          data.classType,
+                          data.group,
+                          data.subGroup,
+                          data.shiftNumber,
+                          data.roomNumber,
+                          data.totalPresence,
+                          data.totalLate,
+                          data.totalAbsence,
+                          double.parse(data.progress.toString()),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       );
     } else {
@@ -1118,7 +1124,7 @@ class _HomePageBodyState extends State<HomePageBody> {
   ) {
     return Container(
         width: MediaQuery.of(context).size.width * 0.5,
-        height: 150,
+        height: MediaQuery.of(context).size.height * 0.18,
         decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -1128,187 +1134,192 @@ class _HomePageBodyState extends State<HomePageBody> {
                   blurRadius: 5,
                   offset: Offset(5.0, 4.0))
             ]),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 20, top: 10),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20, top: 20),
-                child: SizedBox(
-                  width: 55,
-                  height: 80,
-                  child: CircularPercentIndicator(
-                    radius: 40,
-                    lineWidth: 6,
-                    percent: progress, // Thay đổi giá trị tại đây
-                    center: Text(
-                      "$totalWeeks Weeks",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 11),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20, top: 10),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20, top: 20),
+                    child: SizedBox(
+                      width: 55,
+                      height: 80,
+                      child: CircularPercentIndicator(
+                        radius: 40,
+                        lineWidth: 6,
+                        percent: progress, // Thay đổi giá trị tại đây
+                        center: Text(
+                          "$totalWeeks Weeks",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 11),
+                        ),
+                        backgroundColor: AppColors.secondaryText,
+                        progressColor: AppColors.primaryButton,
+                        animation: true,
+                      ),
                     ),
-                    backgroundColor: AppColors.secondaryText,
-                    progressColor: AppColors.primaryButton,
-                    animation: true,
                   ),
-                ),
-              ),
-              const SizedBox(
-                width: 24,
-              ),
-              Container(
-                width: 165,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    customRichText(
-                      title: 'Course: ',
-                      message: courseName,
-                      fontWeightTitle: FontWeight.bold,
-                      fontWeightMessage: FontWeight.w400,
-                      colorText: AppColors.primaryText,
-                      fontSize: 13,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    customRichText(
-                      title: 'Type: ',
-                      message: classType,
-                      fontWeightTitle: FontWeight.bold,
-                      fontWeightMessage: FontWeight.w400,
-                      colorText: AppColors.primaryText,
-                      fontSize: 13,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    customRichText(
-                      title: 'Lectuer: ',
-                      message: teacherName,
-                      fontWeightTitle: FontWeight.bold,
-                      fontWeightMessage: FontWeight.w400,
-                      colorText: AppColors.primaryText,
-                      fontSize: 13,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    customRichText(
-                      title: 'CourseID: ',
-                      message: courseID,
-                      fontWeightTitle: FontWeight.bold,
-                      fontWeightMessage: FontWeight.w400,
-                      colorText: AppColors.primaryText,
-                      fontSize: 13,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
+                  const SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    width: 165,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         customRichText(
-                          title: 'Shift: ',
-                          message: "$shift",
+                          title: 'Course: ',
+                          message: courseName,
                           fontWeightTitle: FontWeight.bold,
                           fontWeightMessage: FontWeight.w400,
                           colorText: AppColors.primaryText,
                           fontSize: 13,
                         ),
                         const SizedBox(
-                          width: 10,
+                          height: 5,
                         ),
                         customRichText(
-                          title: 'Class: ',
-                          message: roomNumber,
-                          fontWeightTitle: FontWeight.bold,
-                          fontWeightMessage: FontWeight.w400,
-                          colorText: AppColors.primaryText,
-                          fontSize: 13,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      children: [
-                        customRichText(
-                          title: 'Group: ',
-                          message: group,
+                          title: 'Type: ',
+                          message: classType,
                           fontWeightTitle: FontWeight.bold,
                           fontWeightMessage: FontWeight.w400,
                           colorText: AppColors.primaryText,
                           fontSize: 13,
                         ),
                         const SizedBox(
-                          width: 10,
+                          height: 5,
                         ),
                         customRichText(
-                          title: 'SubGroup: ',
-                          message: subGroup,
+                          title: 'Lectuer: ',
+                          message: teacherName,
                           fontWeightTitle: FontWeight.bold,
                           fontWeightMessage: FontWeight.w400,
                           colorText: AppColors.primaryText,
                           fontSize: 13,
                         ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        customRichText(
+                          title: 'CourseID: ',
+                          message: courseID,
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          children: [
+                            customRichText(
+                              title: 'Shift: ',
+                              message: "$shift",
+                              fontWeightTitle: FontWeight.bold,
+                              fontWeightMessage: FontWeight.w400,
+                              colorText: AppColors.primaryText,
+                              fontSize: 13,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            customRichText(
+                              title: 'Class: ',
+                              message: roomNumber,
+                              fontWeightTitle: FontWeight.bold,
+                              fontWeightMessage: FontWeight.w400,
+                              colorText: AppColors.primaryText,
+                              fontSize: 13,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          children: [
+                            customRichText(
+                              title: 'Group: ',
+                              message: group,
+                              fontWeightTitle: FontWeight.bold,
+                              fontWeightMessage: FontWeight.w400,
+                              colorText: AppColors.primaryText,
+                              fontSize: 13,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            customRichText(
+                              title: 'SubGroup: ',
+                              message: subGroup,
+                              fontWeightTitle: FontWeight.bold,
+                              fontWeightMessage: FontWeight.w400,
+                              colorText: AppColors.primaryText,
+                              fontSize: 13,
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  Container(
+                      margin: const EdgeInsets.only(bottom: 25),
+                      height: 90,
+                      width: 1.5,
+                      color: Colors.black),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Padding(
+                    padding: !activeForm
+                        ? const EdgeInsets.only(top: 20, bottom: 20)
+                        : const EdgeInsets.only(top: 20, bottom: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        customRichText(
+                          title: 'Total Presence: ',
+                          message: '${totalPresence.ceil()}',
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        customRichText(
+                          title: 'Total Late: ',
+                          message: '${totalLate}',
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        customRichText(
+                          title: 'Total Absent: ',
+                          message: '${totalAbsence.ceil()}',
+                          fontWeightTitle: FontWeight.bold,
+                          fontWeightMessage: FontWeight.w400,
+                          colorText: AppColors.primaryText,
+                          fontSize: 13,
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Container(
-                  margin: const EdgeInsets.only(bottom: 25),
-                  height: 90,
-                  width: 1.5,
-                  color: Colors.black),
-              const SizedBox(
-                width: 5,
-              ),
-              Padding(
-                padding: !activeForm
-                    ? const EdgeInsets.only(top: 20, bottom: 20)
-                    : const EdgeInsets.only(top: 20, bottom: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    customRichText(
-                      title: 'Total Presence: ',
-                      message: '${totalPresence.ceil()}',
-                      fontWeightTitle: FontWeight.bold,
-                      fontWeightMessage: FontWeight.w400,
-                      colorText: AppColors.primaryText,
-                      fontSize: 13,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    customRichText(
-                      title: 'Total Late: ',
-                      message: '${totalLate}',
-                      fontWeightTitle: FontWeight.bold,
-                      fontWeightMessage: FontWeight.w400,
-                      colorText: AppColors.primaryText,
-                      fontSize: 13,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    customRichText(
-                      title: 'Total Absent: ',
-                      message: '${totalAbsence.ceil()}',
-                      fontWeightTitle: FontWeight.bold,
-                      fontWeightMessage: FontWeight.w400,
-                      colorText: AppColors.primaryText,
-                      fontSize: 13,
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ));
   }
 

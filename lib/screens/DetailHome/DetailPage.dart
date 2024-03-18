@@ -44,8 +44,7 @@ class _DetailPageState extends State<DetailPage> {
       if (mounted) {
         var socketServerDataProvider =
             Provider.of<SocketServerProvider>(context, listen: false);
-        socketServerDataProvider
-            .connectToSocketServer(classesStudent.classID);
+        socketServerDataProvider.connectToSocketServer(classesStudent.classID);
       }
     });
   }
@@ -84,8 +83,11 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   PreferredSize customAppbar(SocketServerProvider socketServerProvider) {
+    print(classesStudent.courseName.length);
     return PreferredSize(
-      preferredSize: const Size.fromHeight(160),
+      preferredSize: Size.fromHeight(classesStudent.courseName.length >= 28
+          ? MediaQuery.of(context).size.height * 0.15
+          : MediaQuery.of(context).size.height * 0.12),
       child: AppBar(
         leading: GestureDetector(
           onTap: () {
@@ -101,23 +103,23 @@ class _DetailPageState extends State<DetailPage> {
         ),
         backgroundColor: AppColors.colorAppbar,
         flexibleSpace: Padding(
-          padding: const EdgeInsets.only(left: 50.0, top: 35, bottom: 25),
+          padding: EdgeInsets.only(
+              left: 50.0,
+              top: classesStudent.courseName.length >= 8 ? 50 : 25,
+              bottom: 25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: CustomText(
-                    message: classesStudent.courseName,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
+              CustomText(
+                  message: classesStudent.courseName,
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
               Row(
                 children: [
                   CustomText(
-                      message:
-                          'CourseID: ${classesStudent.courseID}',
+                      message: 'CourseID: ${classesStudent.courseID}',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: Colors.white),
@@ -151,8 +153,7 @@ class _DetailPageState extends State<DetailPage> {
                 height: 5,
               ),
               CustomText(
-                  message:
-                      'Lectuer: ${classesStudent.teacherName}',
+                  message: 'Lectuer: ${classesStudent.teacherName}',
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: Colors.white),

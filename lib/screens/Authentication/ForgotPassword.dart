@@ -4,8 +4,10 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomTextField.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/ForgotPasswordOTPPage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
 
 class ForgotPassword extends StatefulWidget {
@@ -20,6 +22,40 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       "Don’t worry! If occurs. Please enter your email address or mobile number linked with your account!";
   TextEditingController emailAddress = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  late ProgressDialog _progressDialog;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _progressDialog = ProgressDialog(context,
+        customBody: Container(
+          width: 200,
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Colors.white),
+          child: const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppColors.primaryButton,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          )),
+        ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +128,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       height: 15,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 0,left:0),
+                      padding: const EdgeInsets.only(right: 0, left: 0),
                       child: CustomButton(
                           fontSize: 20,
                           height: 60,
@@ -105,22 +141,30 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           function: () async {
                             if (_formKey.currentState!.validate()) {
                               try {
-                                bool check = await Authenticate()
+                                _progressDialog.show();
+                                String check = await Authenticate()
                                     .forgotPassword(emailAddress.text);
-                                if (check) {
-                                  Navigator.pushNamed(
-                                      context, '/ForgotPasswordOTP');
+                                if (check == '') {
+                                  await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (builder) =>
+                                              const ForgotPasswordOTPPage()));
+                                  await _progressDialog.hide();
                                   showFlushBarNotification(
                                       context,
                                       'Verify OTP',
                                       'OTP has been sent to your email',
                                       3);
                                 } else {
-                                  showFlushBarNotification(context, 'Failed',
-                                      'Email is not exist', 3);
+                                  await _progressDialog.hide();
+                                  showFlushBarNotification(
+                                      context, 'Failed', check, 3);
                                 }
                               } catch (e) {
                                 print(e);
+                              } finally {
+                                await _progressDialog.hide();
                               }
                             }
                           }),
@@ -128,30 +172,27 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     const SizedBox(
                       height: 15,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const CustomText(
-                              message: 'Already have an account ? ',
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CustomText(
+                            message: 'Already have an account ? ',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryText),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, "/Login", (route) => false);
+                          },
+                          child: const CustomText(
+                              message: 'Log In',
                               fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.primaryText),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamedAndRemoveUntil(
-                                  context, "/Login", (route) => false);
-                            },
-                            child: const CustomText(
-                                message: 'Log In',
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.importantText),
-                          ),
-                        ],
-                      ),
-                    )
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.importantText),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

@@ -10,6 +10,7 @@ import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
 
 class OTPPage extends StatefulWidget {
@@ -23,15 +24,51 @@ class _OTPPageState extends State<OTPPage> {
   OtpFieldController otpController = OtpFieldController();
   String description =
       "Please enter the verification code we just sent on your email address.";
-  int secondsRemaining = 60;
+  int secondsRemaining = 10;
   bool canResend = false;
   late Timer _timer;
+  late ProgressDialog _progressDialog;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _progressDialog = ProgressDialog(context,
+        customBody: Container(
+          width: 200,
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Colors.white),
+          child: const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppColors.primaryButton,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          )),
+        ));
     startTimer();
+  }
+
+  void restartTimer() {
+    setState(() {
+      secondsRemaining = 10;
+      canResend = false;
+    });
+    startTimer(); // Start the timer again
   }
 
   @override
@@ -105,6 +142,7 @@ class _OTPPageState extends State<OTPPage> {
                         textColor: Colors.white,
                         function: () async {
                           try {
+                            _progressDialog.show();
                             bool checkLogin = await Authenticate().verifyOTP(
                                 studentDataProvider.userData.studentEmail,
                                 studentDataProvider.userData.hashedOTP);
@@ -113,7 +151,7 @@ class _OTPPageState extends State<OTPPage> {
                             //     otpController.toString());
                             if (checkLogin == true) {
                               // ignore: use_build_context_synchronously
-                              Navigator.pushAndRemoveUntil(
+                              await Navigator.pushAndRemoveUntil(
                                 context,
                                 PageRouteBuilder(
                                   pageBuilder: (context, animation,
@@ -138,13 +176,15 @@ class _OTPPageState extends State<OTPPage> {
                                 ),
                                 (route) => false,
                               );
-                              Flushbar(
+                            await _progressDialog.hide();
+                              await Flushbar(
                                 title: "Successfully",
                                 message: "Login to use the app",
                                 duration: const Duration(seconds: 5),
                               ).show(context);
                             } else {
-                              Flushbar(
+                              await _progressDialog.hide();
+                              await Flushbar(
                                 title: "Failed",
                                 message: "OTP is not valid",
                                 duration: const Duration(seconds: 5),
@@ -152,6 +192,9 @@ class _OTPPageState extends State<OTPPage> {
                             }
                           } catch (e) {
                             print(e);
+                          }
+                          finally{
+                            await _progressDialog.hide();
                           }
                         }),
                     const SizedBox(
@@ -170,11 +213,13 @@ class _OTPPageState extends State<OTPPage> {
                           GestureDetector(
                             onTap: () async {
                               if (canResend) {
-                                // Start the countdown timer
-                                bool check = await Authenticate().resendOTP(
+                                _progressDialog.show();
+                                bool check = await Authenticate().resendOTPRegister(
                                     studentDataProvider.userData.studentEmail);
                                 if (check) {
                                   // ignore: use_build_context_synchronously
+                                  restartTimer();
+                                  await _progressDialog.hide();
                                   showFlushBarNotification(
                                       context,
                                       'Resend OTP',
@@ -185,7 +230,7 @@ class _OTPPageState extends State<OTPPage> {
                                   showFlushBarNotification(context,
                                       'Failed resend OTP', 'message', 3);
                                 }
-                                startTimer();
+                               
                               }
                             },
                             child: CustomText(

@@ -42,7 +42,33 @@ class _RegisterPageState extends State<RegisterPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _progressDialog = ProgressDialog(context);
+    _progressDialog = ProgressDialog(context,
+        customBody: Container(
+          width: 200,
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Colors.white),
+          child: const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppColors.primaryButton,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          )),
+        ));
   }
 
   @override
@@ -102,8 +128,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         textInputType: TextInputType.text,
                         obscureText: false,
                         prefixIcon: const Icon(null),
-                        suffixIcon: IconButton(
-                            onPressed: () {}, icon: const Icon(null)),
+                        suffixIcon:
+                            const IconButton(onPressed: null, icon: Icon(null)),
                         hintText: 'Enter your student ID',
                         onChanged: (value) {
                           studentDataProvider.setStudentName(value);
@@ -134,8 +160,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         textInputType: TextInputType.emailAddress,
                         obscureText: false,
                         prefixIcon: const Icon(null),
-                        suffixIcon: IconButton(
-                            onPressed: () {}, icon: const Icon(null)),
+                        suffixIcon:
+                            const IconButton(onPressed: null, icon: Icon(null)),
                         hintText: 'Enter your email',
                         onChanged: (value) {
                           studentDataProvider.setStudentEmail(value);
@@ -212,29 +238,31 @@ class _RegisterPageState extends State<RegisterPage> {
                         height: 10,
                       ),
                       CustomTextField(
-                        readOnly: false,
-                        controller: confirmPassword,
-                        textInputType: TextInputType.visiblePassword,
-                        obscureText: isCheckConfirmPassword,
-                        prefixIcon: const Icon(null),
-                        suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                isCheckConfirmPassword =
-                                    !isCheckConfirmPassword;
-                              });
-                            },
-                            icon: isCheckConfirmPassword
-                                ? const Icon(Icons.visibility)
-                                : const Icon(Icons.visibility_off)),
-                        hintText: 'Confirm your password',
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Confirm password required';
-                          }
-                          return null;
-                        },
-                      ),
+                          readOnly: false,
+                          controller: confirmPassword,
+                          textInputType: TextInputType.visiblePassword,
+                          obscureText: isCheckConfirmPassword,
+                          prefixIcon: const Icon(null),
+                          suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isCheckConfirmPassword =
+                                      !isCheckConfirmPassword;
+                                });
+                              },
+                              icon: isCheckConfirmPassword
+                                  ? const Icon(Icons.visibility)
+                                  : const Icon(Icons.visibility_off)),
+                          hintText: 'Confirm your password',
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Confirm Password is required';
+                            }
+                            if (value != password.text) {
+                              return 'Passwords do not match!';
+                            }
+                            return null;
+                          }),
                       const SizedBox(
                         height: 20,
                       ),
@@ -288,23 +316,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                         "Please enter your OTP",
                                         3);
                                   } else {
+                                    await _progressDialog.hide();
                                     // ignore: use_build_context_synchronously
                                     showFlushBarNotification(
                                         context, "Failed", check, 3);
                                   }
-                                } else {
-                                  showFlushBarNotification(
-                                      context,
-                                      "Failed",
-                                      "Check your password and confirm password",
-                                      3);
                                 }
                               } catch (e) {
                                 // ignore: avoid_print
                                 print(e);
-                              }
-                              finally{
-                                _progressDialog.hide();
+                              } finally {
+                                await _progressDialog.hide();
                               }
                             } else {
                               showFlushBarNotification(context, "Invalid Form",

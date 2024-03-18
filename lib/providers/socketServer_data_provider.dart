@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/AttendanceFormForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/AttendanceFormDataForDetailPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:async';
@@ -14,10 +15,10 @@ class SocketServerProvider with ChangeNotifier {
   IO.Socket get socket => _socket;
   bool get isConnected => _isConnected;
 
-  final StreamController<AttendanceFormForDetailPage> _attendanceFormController =
-      StreamController<AttendanceFormForDetailPage>.broadcast();
+  final StreamController<AttendanceFormDataForDetailPage> _attendanceFormController =
+      StreamController<AttendanceFormDataForDetailPage>.broadcast();
 
-  Stream<AttendanceFormForDetailPage> get attendanceFormStream =>
+  Stream<AttendanceFormDataForDetailPage> get attendanceFormStream =>
       _attendanceFormController.stream.asBroadcastStream();
 
   @override
@@ -29,7 +30,7 @@ class SocketServerProvider with ChangeNotifier {
   }
 
   void connectToSocketServer(data) {
-    _socket = IO.io('http://10.0.2.2:9000', <String, dynamic>{
+    _socket = IO.io('http://192.168.1.13:9000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'headers': {'Content-Type': 'application/json'},
@@ -49,14 +50,14 @@ class SocketServerProvider with ChangeNotifier {
     _socket.emit('joinClassRoom', jsonString);
   }
 
-  AttendanceForm? getAttendanceForm(classRoom) {
+  AttendanceFormDataForDetailPage? getAttendanceForm(classRoom) {
     _socket.on('getAttendanceForm', (data) {
       var temp = jsonDecode(data);
       var temp1 = temp['classes'];
       if (temp1 == classRoom) {
         print('Attendance Form Detail:' + data);
-        _attendanceFormController.add(AttendanceFormForDetailPage.fromJson(temp));
-        AttendanceFormForDetailPage attendanceForm = AttendanceFormForDetailPage.fromJson(temp);
+        _attendanceFormController.add(AttendanceFormDataForDetailPage.fromJson(temp));
+        AttendanceFormDataForDetailPage attendanceForm = AttendanceFormDataForDetailPage.fromJson(temp);
         return attendanceForm;
       } else {
         print('Error ClassRoom not feat');
@@ -88,6 +89,7 @@ class SocketServerProvider with ChangeNotifier {
   void disconnectSocketServer() {
     _socket.disconnect();
     _isConnected = false;
+    print('Disconnect socket');
     notifyListeners();
   }
 }

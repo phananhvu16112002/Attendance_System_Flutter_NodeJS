@@ -1,30 +1,26 @@
 import 'package:attendance_system_nodejs/models/ModelForAPI/AttendanceFormForDetailPage.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/ClassForDetailPage.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/CourseForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/AttendanceFormDataForDetailPage.dart';
 import 'package:flutter/material.dart';
 
 class AttendanceFormDataForDetailPageProvider with ChangeNotifier {
-  AttendanceFormForDetailPage _attendanceFormDataForDetailPage =
-      AttendanceFormForDetailPage(
+  AttendanceFormDataForDetailPage _attendanceFormDataForDetailPage =
+      AttendanceFormDataForDetailPage(
           formID: '',
           startTime: '',
           endTime: '',
           status: false,
+          dateOpen: '',
           type: 0,
-          classes: Classes(
-              roomNumber: '',
-              shiftNumber: 0,
-              startTime: '',
-              endTime: '',
-              classType: '',
-              group: '',
-              subGroup: '',
-              course: Course(courseID: '', courseName: '')), dateOpen: '');
+          latitude: 0.0,
+          longitude: 0.0,
+          radius: 0.0);
 
-  AttendanceFormForDetailPage get attendanceFormData =>
+  AttendanceFormDataForDetailPage get attendanceFormData =>
       _attendanceFormDataForDetailPage;
 
-  void setAttendanceFormData(AttendanceFormForDetailPage attendanceForm) {
+  void setAttendanceFormData(AttendanceFormDataForDetailPage attendanceForm) {
     if (attendanceForm.formID == '') {
       print('Update AttendanceForm Provider Failed');
     } else {

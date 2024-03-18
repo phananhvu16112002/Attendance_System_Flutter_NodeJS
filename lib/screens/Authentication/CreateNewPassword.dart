@@ -7,6 +7,7 @@ import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
 
 class CreateNewPassword extends StatefulWidget {
@@ -24,9 +25,44 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
   final _formKey = GlobalKey<FormState>();
   RegExp upperCaseRegex = RegExp(r'[A-Z]');
   RegExp digitRegex = RegExp(r'[0-9]');
+  late ProgressDialog _progressDialog;
 
   String description =
       'Your new password must be unique from those previously used';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _progressDialog = ProgressDialog(context,
+        customBody: Container(
+          width: 200,
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Colors.white),
+          child: const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppColors.primaryButton,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          )),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final studentDataProvider = Provider.of<StudentDataProvider>(context);
@@ -130,7 +166,9 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                         hintText: "Confirm Password",
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter confirm password";
+                            return "Confirm password is required";
+                          } else if (value != password.text) {
+                            return 'Confirm password is not match';
                           }
                           return null;
                         },
@@ -154,12 +192,15 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                               if (password.text == confirmPassword.text ||
                                   password.text
                                       .contains(confirmPassword.text)) {
-                                bool check = await Authenticate().resetPassword(
-                                    studentDataProvider.userData.studentEmail,
-                                    password.text);
-                                if (check) {
+                                _progressDialog.show();
+                                String check = await Authenticate()
+                                    .resetPassword(
+                                        studentDataProvider
+                                            .userData.studentEmail,
+                                        password.text);
+                                if (check == '') {
                                   // ignore: use_build_context_synchronously
-                                  Navigator.pushAndRemoveUntil(
+                                  await Navigator.pushAndRemoveUntil(
                                     context,
                                     PageRouteBuilder(
                                       pageBuilder: (context, animation,
@@ -184,6 +225,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                                     ),
                                     (route) => false,
                                   );
+                                  _progressDialog.hide();
                                   // ignore: use_build_context_synchronously
                                   showFlushBarNotification(
                                       context,
@@ -191,20 +233,11 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                                       "Updated password successfully",
                                       3);
                                 } else {
+                                  await _progressDialog.hide();
                                   // ignore: use_build_context_synchronously
                                   showFlushBarNotification(
-                                      context,
-                                      "Failed updating",
-                                      "Failed update password",
-                                      3);
+                                      context, "Failed updating", check, 3);
                                 }
-                              } else {
-                                // ignore: use_build_context_synchronously
-                                showFlushBarNotification(
-                                    context,
-                                    "Error",
-                                    "Check your password and confirm password",
-                                    3);
                               }
                             }
                           },

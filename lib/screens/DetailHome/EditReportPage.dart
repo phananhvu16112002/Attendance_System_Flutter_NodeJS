@@ -6,6 +6,8 @@ import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/AttendanceDetailDataForDetailPage.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/AttendanceFormDataForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/ReportDataForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ReportImage.dart';
 import 'package:attendance_system_nodejs/providers/attendanceFormForDetailPage_data_provider.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
@@ -14,28 +16,32 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
-class ReportAttendance extends StatefulWidget {
-  const ReportAttendance(
-      {super.key,
-      required this.classesStudent,
-      required this.attendanceFormDataForDetailPage});
+class EditReportPage extends StatefulWidget {
+  const EditReportPage({
+    super.key,
+    required this.classesStudent,
+    required this.reportData,
+  });
   final ClassesStudent classesStudent;
-  final AttendanceFormDataForDetailPage attendanceFormDataForDetailPage;
+  final ReportData reportData;
 
   @override
-  State<ReportAttendance> createState() => _ReportAttendanceState();
+  State<EditReportPage> createState() => _EditReportPageState();
 }
 
-class _ReportAttendanceState extends State<ReportAttendance> {
+class _EditReportPageState extends State<EditReportPage> {
   final TextEditingController _lectuerController = TextEditingController();
   final TextEditingController _topicController = TextEditingController();
   final TextEditingController _message = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   XFile? _imageFile;
   late ClassesStudent classesStudent;
-  late AttendanceFormDataForDetailPage attendanceFormDataForDetailPage;
+  late ReportData reportData;
   late ProgressDialog _progressDialog;
   final _formKey = GlobalKey<FormState>();
+
+  late Future<ReportData?> _fetchReport;
+  List<String> deleteList = [];
 
   // Initial Selected Value
 
@@ -45,14 +51,15 @@ class _ReportAttendanceState extends State<ReportAttendance> {
     'Personal reason',
     'Others',
   ];
+  List<ReportImage> listReportImage = [];
 
-  List<XFile?> _imageFiles = [];
+  final List<XFile?> _imageFiles = [];
   String dropdownvalue = 'Device failure';
   @override
   void initState() {
     super.initState();
     classesStudent = widget.classesStudent;
-    attendanceFormDataForDetailPage = widget.attendanceFormDataForDetailPage;
+    reportData = widget.reportData;
     _progressDialog = ProgressDialog(context,
         customBody: Container(
           width: 200,
@@ -80,6 +87,32 @@ class _ReportAttendanceState extends State<ReportAttendance> {
             ],
           )),
         ));
+    _fetchData();
+  }
+
+  void _fetchData() async {
+    _fetchReport = API(context).viewReport(reportData.reportID);
+    _fetchReport.then((value) {
+      setState(() {
+        listReportImage = value!.reportImage;
+        _topicController.text = value.topic;
+        _message.text = value.message;
+      });
+    });
+    print('FetchData');
+  }
+
+  void _changeImageFromURL(int index) async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        listReportImage[index].imageURL = pickedFile;
+        if (listReportImage[index].imageURL is XFile) {
+          _imageFiles.add(listReportImage[index].imageURL);
+        }
+        deleteList.add(listReportImage[index].imageID);
+      });
+    }
   }
 
   @override
@@ -233,7 +266,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                 height: 5,
                               ),
                               customFormField(
-                                  'Attendance Form ${formatDate(attendanceFormDataForDetailPage.dateOpen)}',
+                                  'Topic',
                                   370,
                                   50,
                                   _topicController,
@@ -362,31 +395,32 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: _imageFiles
+                                    children: listReportImage
                                         .asMap()
                                         .entries
                                         .map((entry) {
-                                      final index = entry.key;
-                                      final XFile? imageFile = entry.value;
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
-                                        child: InkWell(
-                                          onLongPress: () =>
-                                              _deleteImage(index),
-                                          onTap: () => _changeImage(index),
-                                          child: imageFile != null
-                                              ? Center(
-                                                  child: Image(
-                                                    width: 250,
-                                                    height: 250,
-                                                    fit: BoxFit.cover,
-                                                    image: FileImage(
-                                                        File(imageFile.path)),
-                                                  ),
+                                      final int index = entry.key;
+                                      final ReportImage image = entry.value;
+                                      return GestureDetector(
+                                        onTap: () {
+                                          _changeImageFromURL(index);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: image.imageURL is XFile
+                                              ? Image(
+                                                  width: 250,
+                                                  height: 250,
+                                                  fit: BoxFit.cover,
+                                                  image: FileImage(File(
+                                                      image.imageURL.path)),
                                                 )
-                                              : null,
+                                              : Image.network(
+                                                  image.imageURL,
+                                                  width: 250,
+                                                  height: 250,
+                                                  fit: BoxFit.cover,
+                                                ),
                                         ),
                                       );
                                     }).toList(),
@@ -400,7 +434,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(right: 0),
                                   child: CustomButton(
-                                      buttonName: 'Send',
+                                      buttonName: 'Edit',
                                       backgroundColorButton:
                                           AppColors.primaryButton,
                                       colorShadow: AppColors.colorShadow,
@@ -411,34 +445,32 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                           if (_formKey.currentState!
                                               .validate()) {
                                             _progressDialog.show();
-                                            String check = await API(context)
-                                                .submitReport(
-                                                    classesStudent.classID,
-                                                    attendanceFormDataForDetailPage
-                                                        .formID,
-                                                    _topicController
-                                                            .text.isNotEmpty
-                                                        ? _topicController.text
-                                                        : 'Attendance Form ${formatDate(attendanceFormDataForDetailPage.dateOpen)}',
+                                            String result = await API(context)
+                                                .editReport(
+                                                    reportData.reportID,
+                                                    _topicController.text,
                                                     dropdownvalue,
                                                     _message.text,
                                                     _imageFiles);
-                                            if (check == '') {
+                                            if (result == '') {
                                               print('Success');
                                               await _progressDialog.hide();
-                                              await _showDialog(context,
-                                                  "Send successfully report to lectuer");
+                                              await _showDialog(
+                                                  context,
+                                                  "Edit successfully report to lectuer",
+                                                  'Successfully');
                                             } else {
                                               print('failed');
 
                                               await _progressDialog.hide();
-                                              await _showDialog(context, check);
+                                              await _showDialog(
+                                                  context, result, 'Error');
                                             }
                                           }
                                         } catch (e) {
                                           print('Error send report: $e');
                                           await _showDialog(
-                                              context, e.toString());
+                                              context, e.toString(), 'Error');
                                         } finally {
                                           await _progressDialog.hide();
                                         }
@@ -459,7 +491,8 @@ class _ReportAttendanceState extends State<ReportAttendance> {
         ));
   }
 
-  Future<dynamic> _showDialog(BuildContext context, String message) {
+  Future<dynamic> _showDialog(
+      BuildContext context, String message, String title) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -468,8 +501,8 @@ class _ReportAttendanceState extends State<ReportAttendance> {
           width: 200,
           child: AlertDialog(
             backgroundColor: Colors.white,
-            title: const Text(
-              "Successfully",
+            title: Text(
+              title,
               style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,

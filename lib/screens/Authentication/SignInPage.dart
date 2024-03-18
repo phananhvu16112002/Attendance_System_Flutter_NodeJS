@@ -31,7 +31,33 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void initState() {
     super.initState();
-    _progressDialog = ProgressDialog(context);
+    _progressDialog = ProgressDialog(context,
+        customBody: Container(
+          width: 200,
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Colors.white),
+          child: const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppColors.primaryButton,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          )),
+        ));
   }
 
   @override
@@ -175,7 +201,7 @@ class _SignInPageState extends State<SignInPage> {
                                 children: [
                                   CustomText(
                                       message: 'Forgot Password?',
-                                      fontSize: 13,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.importantText),
                                 ],
@@ -198,8 +224,8 @@ class _SignInPageState extends State<SignInPage> {
                           textColor: Colors.white,
                           function: () async {
                             if (_formKey.currentState!.validate()) {
-                              _progressDialog.show();
                               try {
+                                _progressDialog.show();
                                 String check = await Authenticate()
                                     .login(emailAddress.text, password.text);
                                 if (check == '' || check.isEmpty) {
@@ -243,18 +269,19 @@ class _SignInPageState extends State<SignInPage> {
                                     ),
                                     (route) => false,
                                   );
+                                  await _progressDialog.hide();
 
                                   // ignore: use_build_context_synchronously
-                                  Flushbar(
+                                  await Flushbar(
                                     title: "Successfully",
                                     message: "Processing Data...",
                                     duration: const Duration(seconds: 3),
                                   ).show(context);
                                 } else {
-                                  _progressDialog.hide();
-
+                                  await _progressDialog.hide();
                                   // ignore: use_build_context_synchronously
-                                  Flushbar(
+
+                                  await Flushbar(
                                     title: "Failed",
                                     message: "$check",
                                     duration: const Duration(seconds: 3),
@@ -263,10 +290,11 @@ class _SignInPageState extends State<SignInPage> {
                               } catch (e) {
                                 print(e);
                               } finally {
-                                _progressDialog.hide();
+                                await _progressDialog.hide();
                               }
                             } else {
-                              Flushbar(
+                              await _progressDialog.hide();
+                              await Flushbar(
                                 title: "Invalid Form",
                                 message: "Please complete the form property",
                                 duration: const Duration(seconds: 10),

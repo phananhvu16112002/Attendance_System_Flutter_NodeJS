@@ -41,6 +41,10 @@ class CustomTextField extends StatelessWidget {
             fontSize: 15),
         obscureText: obscureText,
         decoration: InputDecoration(
+            border: const OutlineInputBorder(
+              borderSide: BorderSide(width: 1, color: AppColors.primaryButton),
+              borderRadius: BorderRadius.all(Radius.circular(15.0))
+            ),
             contentPadding: const EdgeInsets.all(20),
             suffixIcon: suffixIcon,
             labelText: hintText, // change here hinttext

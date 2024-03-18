@@ -10,6 +10,7 @@ import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
 
 class ForgotPasswordOTPPage extends StatefulWidget {
@@ -23,14 +24,42 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
   OtpFieldController otpController = OtpFieldController();
   String description =
       "Please enter the verification code we just sent on your email address.";
-  int secondsRemaining = 60; // Initial value for 1 minute
+  int secondsRemaining = 10; // Initial value for 1 minute
   bool canResend = false;
+  late ProgressDialog _progressDialog;
   late Timer _timer;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _progressDialog = ProgressDialog(context,
+        customBody: Container(
+          width: 200,
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Colors.white),
+          child: const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppColors.primaryButton,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          )),
+        ));
     startTimer();
   }
 
@@ -40,6 +69,14 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
     print('Forgot dispose');
     _timer.cancel();
     super.dispose();
+  }
+
+  void restartTimer() {
+    setState(() {
+      secondsRemaining = 10;
+      canResend = false;
+    });
+    startTimer(); // Start the timer again
   }
 
   @override
@@ -105,13 +142,14 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                         textColor: Colors.white,
                         function: () async {
                           try {
+                            _progressDialog.show();
                             bool checkLogin = await Authenticate()
                                 .verifyForgotPassword(
                                     studentDataProvider.userData.studentEmail,
                                     studentDataProvider.userData.hashedOTP);
                             if (checkLogin == true) {
                               // ignore: use_build_context_synchronously
-                              Navigator.pushAndRemoveUntil(
+                              await Navigator.pushAndRemoveUntil(
                                 context,
                                 PageRouteBuilder(
                                   pageBuilder: (context, animation,
@@ -136,13 +174,15 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                                 ),
                                 (route) => false,
                               );
+                              await _progressDialog.hide();
                               // ignore: use_build_context_synchronously
-                              Flushbar(
+                              await Flushbar(
                                 title: "Successfully",
                                 message: "Create new password",
                                 duration: const Duration(seconds: 5),
                               ).show(context);
                             } else {
+                              await _progressDialog.hide();
                               // ignore: use_build_context_synchronously
                               Flushbar(
                                 title: "Failed",
@@ -153,6 +193,8 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                           } catch (e) {
                             // ignore: avoid_print
                             print(e);
+                          } finally {
+                            await _progressDialog.hide();
                           }
                         }),
                     const SizedBox(
@@ -171,11 +213,12 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                           GestureDetector(
                             onTap: () async {
                               if (canResend) {
-                                // true
-                                // Start the countdown timer
-                                bool check = await Authenticate().resendOTP(
+                                _progressDialog.show();
+                                String check = await Authenticate().resendOTP(
                                     studentDataProvider.userData.studentEmail);
-                                if (check) {
+                                if (check == '') {
+                                  restartTimer();
+                                  await _progressDialog.hide();
                                   // ignore: use_build_context_synchronously
                                   showFlushBarNotification(
                                       context,
@@ -183,11 +226,11 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                                       "OTP has been sent your email",
                                       3);
                                 } else {
+                                  await _progressDialog.hide();
                                   // ignore: use_build_context_synchronously
                                   showFlushBarNotification(context,
                                       'Failed resend OTP', 'message', 3);
                                 }
-                                startTimer();
                               }
                             },
                             child: CustomText(

@@ -4,6 +4,9 @@ import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/AttendanceForm.dart';
 import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/AttendanceFormForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/AttendanceDetailDataForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/AttendanceFormDataForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/ReportDataForDetailPage.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/providers/attendanceDetail_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/attendanceFormForDetailPage_data_provider.dart';
@@ -11,6 +14,7 @@ import 'package:attendance_system_nodejs/providers/attendanceForm_data_provider.
 import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/DetailHome/EditReportPage.dart';
 import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
 import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
 import 'package:attendance_system_nodejs/services/API.dart';
@@ -254,23 +258,27 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 if (snapshot.data != null) {
-                                  AttendanceFormForDetailPage? data =
+                                  AttendanceFormDataForDetailPage? data =
                                       snapshot.data;
                                   Future.delayed(Duration.zero, () {
                                     attendanceFormDataForDetailPageProvider
                                         .setAttendanceFormData(data!);
                                   });
-                                  return customCard(
-                                      formatTime(data!.startTime),
-                                      formatTime(data.endTime),
-                                      formatDate(data.dateOpen),
-                                      '',
-                                      getResult(0),
-                                      '',
-                                      '',
-                                      data.status,
-                                      data,
-                                      attendanceFormDataForDetailPageProvider);
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 10, right: 10),
+                                    child: customCardStream(
+                                        formatTime(data!.startTime),
+                                        formatTime(data.endTime),
+                                        formatDate(data.dateOpen),
+                                        '',
+                                        getResult(0),
+                                        '',
+                                        '',
+                                        data.status,
+                                        data,
+                                        attendanceFormDataForDetailPageProvider,
+                                        null),
+                                  );
                                 } else {
                                   return const Text('Data is null');
                                 }
@@ -293,22 +301,26 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                 padding: const EdgeInsets.only(
                                     bottom: 15, left: 10, right: 10),
                                 child: customCard(
-                                    formatTime(data.attendanceForm.startTime),
-                                    formatTime(data.attendanceForm.endTime),
+                                    formatTime(data
+                                        .attendanceForm.startTime), //startTime
+                                    formatTime(
+                                        data.attendanceForm.endTime), //Endtime
+                                    formatDate(data
+                                        .attendanceForm.dateOpen), //dateOpen
                                     data.dateAttendanced != ''
-                                        ? formatDate(data.dateAttendanced!)
-                                        : '',
-                                    data.dateAttendanced != ''
-                                        ? formatTime(data.dateAttendanced!)
+                                        ? formatTime(data
+                                            .dateAttendanced) //timeAttendance
                                         : 'null',
-                                    getResult(data.result.toDouble()),
+                                    getResult(data.result
+                                        .toDouble()), //Status attendance
                                     data.dateAttendanced != ''
                                         ? data.location
                                         : 'null',
-                                    data.url,
-                                    data.attendanceForm.status,
-                                    data.attendanceForm,
-                                    attendanceFormDataForDetailPageProvider),
+                                    data.url, //image
+                                    data.attendanceForm.status, //status form
+                                    data.attendanceForm, //attendanceForm
+                                    attendanceFormDataForDetailPageProvider,
+                                    data.report), //provider form
                               );
                             }),
                       ],
@@ -333,12 +345,17 @@ class _DetailPageBodyState extends State<DetailPageBody> {
       String location,
       String url,
       bool statusForm,
-      AttendanceFormForDetailPage attendanceFormForDetailPage,
+      AttendanceFormDataForDetailPage attendanceFormForDetailPage,
       AttendanceFormDataForDetailPageProvider
-          attendanceFormDataForDetailPageProvider) {
+          attendanceFormDataForDetailPageProvider,
+      ReportData? reportData) {
+    DateTime endTimeParse = DateTime.parse(attendanceFormForDetailPage.endTime);
+    var now = DateTime.now();
     return Container(
       width: MediaQuery.of(context).size.width * 0.5,
-      height: location.isNotEmpty ? MediaQuery.of(context).size.width * 0.65 : MediaQuery.of(context).size.width * 0.55,
+      height: location.isNotEmpty && location.length >= 50
+          ? MediaQuery.of(context).size.height * 0.30
+          : MediaQuery.of(context).size.height * 0.23,
       decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -452,7 +469,9 @@ class _DetailPageBodyState extends State<DetailPageBody> {
           const SizedBox(
             height: 15,
           ),
-          if (statusForm)
+          if (statusForm == true &&
+              endTimeParse.isBefore(now) &&
+              timeAttendance == "")
             InkWell(
               onTap: () {
                 attendanceFormDataForDetailPageProvider
@@ -486,14 +505,18 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryButton),
             )
-          else
+          else if (reportData == null)
             InkWell(
               onTap: () {
                 Navigator.push(
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        ReportAttendance(),
+                        ReportAttendance(
+                      classesStudent: classesStudent,
+                      attendanceFormDataForDetailPage:
+                          attendanceFormForDetailPage,
+                    ),
                     transitionDuration: const Duration(milliseconds: 1000),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
@@ -516,6 +539,208 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                   fontWeight: FontWeight.bold,
                   color: AppColors.importantText),
             )
+          else
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        EditReportPage(
+                      classesStudent: classesStudent,
+                      reportData: reportData,
+                    ),
+                    transitionDuration: const Duration(milliseconds: 1000),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      var curve = Curves.easeInOutCubic;
+                      var tween =
+                          Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                              .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              },
+              child: const CustomText(
+                  message: 'Edit',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.importantText),
+            )
+        ],
+      ),
+    );
+  }
+
+  Container customCardStream(
+      String startTime,
+      String endTime,
+      String date,
+      String timeAttendance,
+      String status,
+      String location,
+      String url,
+      bool statusForm,
+      AttendanceFormDataForDetailPage attendanceFormForDetailPage,
+      AttendanceFormDataForDetailPageProvider
+          attendanceFormDataForDetailPageProvider,
+      ReportData? reportData) {
+    DateTime endTimeParse = DateTime.parse(attendanceFormForDetailPage.endTime);
+    var now = DateTime.now();
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.23,
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+                color: Color.fromARGB(195, 190, 188, 188),
+                blurRadius: 5.0,
+                offset: Offset(2.0, 1.0))
+          ]),
+      child: Column(
+        children: [
+          CustomText(
+              message: date.toString(),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryText),
+          const SizedBox(
+            height: 2,
+          ),
+          Container(
+            height: 1,
+            width: 405,
+            color: const Color.fromARGB(105, 190, 188, 188),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 5, right: 5),
+                child: Container(
+                  width: 220,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      customRichText(
+                          'Start Time: ',
+                          startTime,
+                          FontWeight.w600,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      customRichText(
+                          'End Time: ',
+                          endTime,
+                          FontWeight.w600,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      customRichText(
+                          'Location: ',
+                          location,
+                          FontWeight.w600,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      customRichText(
+                          'Time Attendance: ',
+                          timeAttendance.toString(),
+                          FontWeight.w600,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          AppColors.primaryText),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      customRichText(
+                          'Status: ',
+                          status,
+                          FontWeight.w600,
+                          FontWeight.w500,
+                          AppColors.primaryText,
+                          getColorBasedOnStatus(status)),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(right: 10, top: 10),
+                height: 120,
+                width: 120,
+                child: url.isEmpty || url == ''
+                    ? Image.asset('assets/images/logo.png')
+                    : Image.network(url),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Container(
+            height: 1,
+            width: 405,
+            color: const Color.fromARGB(105, 190, 188, 188),
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          InkWell(
+            onTap: () {
+              attendanceFormDataForDetailPageProvider
+                  .setAttendanceFormData(attendanceFormForDetailPage);
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      AttendanceFormPage(
+                    classesStudent: classesStudent,
+                  ),
+                  transitionDuration: const Duration(milliseconds: 1000),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    var curve = Curves.easeInOutCubic;
+                    var tween =
+                        Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                            .chain(CurveTween(curve: curve));
+                    var offsetAnimation = animation.drive(tween);
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
+            child: const CustomText(
+                message: 'Take Attendance',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryButton),
+          )
         ],
       ),
     );
@@ -534,7 +759,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
         text: title,
         style: TextStyle(
           fontWeight: fontWeightTitle,
-          fontSize: 15,
+          fontSize: 14,
           color: colorTextTitle,
         ),
       ),

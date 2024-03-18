@@ -78,7 +78,7 @@ class Authenticate {
     }
   }
 
-  Future<bool> forgotPassword(String email) async {
+  Future<String> forgotPassword(String email) async {
     final URL = 'http://192.168.1.13:8080/api/student/forgotPassword';
     var request = {'email': email};
     var body = jsonEncode(request);
@@ -90,10 +90,12 @@ class Authenticate {
         await http.post(Uri.parse(URL), headers: headers, body: body);
     if (response.statusCode == 200) {
       print('Successfully...');
-      return true;
+      return '';
     } else {
       print('Failed');
-      return false;
+      dynamic data = jsonDecode(response.body);
+      String message = data['message'];
+      return message;
     }
   }
 
@@ -116,7 +118,7 @@ class Authenticate {
     }
   }
 
-  Future<bool> resetPassword(String email, String newPassword) async {
+  Future<String> resetPassword(String email, String newPassword) async {
     final resetToken = await SecureStorage().readSecureData("resetToken");
     final response = await http.post(
         Uri.parse('http://192.168.1.13:8080/api/student/resetPassword'),
@@ -129,14 +131,16 @@ class Authenticate {
             <String, String>{'email': email, 'newPassword': newPassword}));
 
     if (response.statusCode == 200) {
-      return true;
+      return '';
     } else {
-      return false;
+      dynamic data = jsonDecode(response.body);
+      String message = data['message'];
+      return message;
     }
   }
 
-  Future<bool> resendOTP(String email) async {
-    final URL = 'http://192.168.1.13:8080/api/student/resendOTP';
+  Future<bool> resendOTPRegister(String email) async {
+    final URL = 'http://192.168.1.13:8080/api/student/resendOTPRegister';
     var request = {'email': email};
     var body = jsonEncode(request);
     var headers = {
@@ -151,6 +155,28 @@ class Authenticate {
     } else {
       print('Failed');
       return false;
+    }
+  }
+
+
+    Future<String> resendOTP(String email) async {
+    final URL = 'http://192.168.1.13:8080/api/student/resendOTP';
+    var request = {'email': email};
+    var body = jsonEncode(request);
+    var headers = {
+      'Content-type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+    };
+    final response =
+        await http.post(Uri.parse(URL), headers: headers, body: body);
+    if (response.statusCode == 200) {
+      print('Successfully...');
+      return '';
+    } else {
+      print('Failed');
+      dynamic data = jsonDecode(response.body);
+      String message = data['message'];
+      return message;
     }
   }
 }

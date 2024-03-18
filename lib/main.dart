@@ -23,6 +23,7 @@ import 'package:attendance_system_nodejs/screens/Authentication/ForgotPasswordOT
 import 'package:attendance_system_nodejs/screens/Authentication/OTPPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
+// import 'package:attendance_system_nodejs/screens/Authentication/SplashScreen.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 // import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
@@ -41,6 +42,7 @@ import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,9 +71,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SocketServerProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceFormDataProvider()),
         ChangeNotifierProvider(create: (_) => ClassesStudentProvider()),
-        ChangeNotifierProvider(create: (_) => AttendanceFormDataForDetailPageProvider())
-
-
+        ChangeNotifierProvider(
+            create: (_) => AttendanceFormDataForDetailPageProvider())
       ],
       child: const MyApp(),
     ),

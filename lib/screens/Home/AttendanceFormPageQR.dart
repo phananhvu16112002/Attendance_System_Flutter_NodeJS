@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomButton.dart';
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
@@ -55,7 +56,33 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
     saveValue(widget.attendanceForm);
     openBox();
     getImage(); //avoid rebuild
-    _progressDialog = ProgressDialog(context);
+    _progressDialog = ProgressDialog(context,
+        customBody: Container(
+          width: 200,
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Colors.white),
+          child: const Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppColors.primaryButton,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          )),
+        ));
   }
 
   Future<void> getImage() async {
@@ -407,14 +434,21 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
                                   },
                                 ),
                               );
+                              await _progressDialog.hide();
                             }
                           } else {
-                            print('Failed take attendance');
+                            await _progressDialog.hide();
+                            await Flushbar(
+                              title: "Failed",
+                              message:
+                                  "Please check and take attendance again!",
+                              duration: const Duration(seconds: 10),
+                            ).show(context);
                           }
                           await SecureStorage().deleteSecureData('image');
                           await SecureStorage()
                               .deleteSecureData('imageOffline');
-                          _progressDialog.hide();
+                          await _progressDialog.hide();
                         },
                         height: 55,
                         width: 400,
