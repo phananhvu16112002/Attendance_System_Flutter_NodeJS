@@ -75,6 +75,7 @@ dependencies:
   hive_flutter: ^1.1.0
   progress_dialog_null_safe: ^2.0.0
   flutter_native_splash: ^2.3.9
+  camera: ^0.10.5+9
 
 dev_dependencies:
   flutter_test:

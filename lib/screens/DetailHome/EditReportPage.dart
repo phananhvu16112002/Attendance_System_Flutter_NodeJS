@@ -451,7 +451,7 @@ class _EditReportPageState extends State<EditReportPage> {
                                                     _topicController.text,
                                                     dropdownvalue,
                                                     _message.text,
-                                                    _imageFiles);
+                                                    _imageFiles,deleteList);
                                             if (result == '') {
                                               print('Success');
                                               await _progressDialog.hide();

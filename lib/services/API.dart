@@ -90,96 +90,6 @@ class API {
     }
   }
 
-  // Future<List<StudentClasses>> getStudentClass() async {
-  //   const URL = 'http://192.168.1.13:8080/api/student/classes'; //10.0.2.2
-
-  //   var accessToken = await getAccessToken();
-  //   var headers = {'authorization': accessToken};
-  //   try {
-  //     final response = await http.get(Uri.parse(URL), headers: headers);
-  //     if (response.statusCode == 200) {
-  //       // print('Response.body ${response.body}');
-  //       // print('JsonDecode:${jsonDecode(response.body)}');
-  //       dynamic responseData = jsonDecode(response.body);
-  //       List<StudentClasses> data = [];
-
-  //       if (responseData is List) {
-  //         for (var temp in responseData) {
-  //           if (temp is Map<String, dynamic>) {
-  //             try {
-  //               data.add(StudentClasses.fromJson(temp));
-  //             } catch (e) {
-  //               print('Error parsing data: $e');
-  //             }
-  //           } else {
-  //             print('Invalid data type: $temp');
-  //           }
-  //         }
-  //       } else if (responseData is Map<String, dynamic>) {
-  //         try {
-  //           data.add(StudentClasses.fromJson(responseData));
-  //         } catch (e) {
-  //           print('Error parsing data: $e');
-  //         }
-  //       } else {
-  //         print('Unexpected data type: $responseData');
-  //       }
-  //       print('Data $data');
-  //       return data;
-  //     } else if (response.statusCode == 498 || response.statusCode == 401) {
-  //       print('Status code: ${response.statusCode}');
-  //       var refreshToken = await SecureStorage().readSecureData('refreshToken');
-  //       var newAccessToken = await refreshAccessToken(refreshToken);
-  //       if (newAccessToken.isNotEmpty) {
-  //         headers['authorization'] = newAccessToken;
-  //         final retryResponse =
-  //             await http.get(Uri.parse(URL), headers: headers);
-  //         if (retryResponse.statusCode == 200) {
-  //           // print('-- RetryResponse.body ${retryResponse.body}');
-  //           // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
-  //           dynamic responseData = jsonDecode(retryResponse.body);
-  //           List<StudentClasses> data = [];
-
-  //           if (responseData is List) {
-  //             for (var temp in responseData) {
-  //               if (temp is Map<String, dynamic>) {
-  //                 try {
-  //                   data.add(StudentClasses.fromJson(temp));
-  //                 } catch (e) {
-  //                   print('Error parsing data: $e');
-  //                 }
-  //               } else {
-  //                 print('Invalid data type: $temp');
-  //               }
-  //             }
-  //           } else if (responseData is Map<String, dynamic>) {
-  //             try {
-  //               data.add(StudentClasses.fromJson(responseData));
-  //             } catch (e) {
-  //               print('Error parsing data: $e');
-  //             }
-  //           } else {
-  //             print('Unexpected data type: $responseData');
-  //           }
-
-  //           // print('Data $data');
-  //           return data;
-  //         } else {
-  //           return [];
-  //         }
-  //       } else {
-  //         print('New Access Token is empty');
-  //         return [];
-  //       }
-  //     } else {
-  //       print('Failed to load data. Status code: ${response.statusCode}');
-  //       return [];
-  //     }
-  //   } catch (e) {
-  //     print('Error: $e');
-  //     return [];
-  //   }
-  // }
 
   Future<List<ClassesStudent>> getClassesStudent() async {
     const URL = 'http://192.168.1.13:8080/api/student/classes'; //10.0.2.2
@@ -590,7 +500,7 @@ class API {
   }
 
   Future<String> editReport(int reportID, String topic, String problem,
-      String message, List<XFile?> listXFile) async {
+      String message, List<XFile?> listXFile, List<String> listDelete) async {
     final URL =
         'http://192.168.1.13:8080/api/student/report/edit/$reportID'; //10.0.2.2
     // var imageBytes = await fileImage.readAsBytes();
@@ -603,6 +513,7 @@ class API {
       request.fields['topic'] = topic;
       request.fields['problem'] = problem;
       request.fields['message'] = message;
+      request.fields['listDelete'] = jsonEncode(listDelete);
 
       for (var k = 0; k < listXFile.length; k++) {
         if (listXFile[k] != null) {
