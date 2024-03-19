@@ -5,7 +5,7 @@ class AttendanceDetailDataForDetailPage {
   final String studentDetail;
   final String classDetail;
   final AttendanceFormDataForDetailPage attendanceForm;
-  final int result;
+  final double result;
   final String dateAttendanced;
   final String location;
   final String note;
@@ -32,12 +32,13 @@ class AttendanceDetailDataForDetailPage {
 
   factory AttendanceDetailDataForDetailPage.fromJson(
       Map<String, dynamic> json) {
+        print(json['result'].runtimeType);
     return AttendanceDetailDataForDetailPage(
       studentDetail: json['studentDetail'],
       classDetail: json['classDetail'],
       attendanceForm:
           AttendanceFormDataForDetailPage.fromJson(json['attendanceForm']),
-      result: json['result'],
+      result: double.parse(json['result'].toString()),
       dateAttendanced: json['dateAttendanced'] ?? '',
       location: json['location'],
       note: json['note'],
