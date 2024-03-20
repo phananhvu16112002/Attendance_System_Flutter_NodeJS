@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/AttendanceDataForDetailPage.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/AttendanceDetailDataForDetailPage.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/ReportDataForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelForAPI_ReportPage_Version1/ReportModel.dart';
 import 'package:attendance_system_nodejs/models/StudentClasses.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
@@ -89,7 +91,6 @@ class API {
       return '';
     }
   }
-
 
   Future<List<ClassesStudent>> getClassesStudent() async {
     const URL = 'http://192.168.1.13:8080/api/student/classes'; //10.0.2.2
@@ -267,6 +268,94 @@ class API {
   //   }
   // }
 
+  Future<List<ReportModel>> getReportDataForStudent() async {
+    final URL = 'http://192.168.1.13:8080/api/student/reports'; //10.0.2.2
+
+    var accessToken = await getAccessToken();
+    var headers = {'authorization': accessToken};
+    try {
+      final response = await http.get(Uri.parse(URL), headers: headers);
+      if (response.statusCode == 200) {
+        dynamic responseData = jsonDecode(response.body);
+        List<ReportModel> data = [];
+
+        if (responseData is List) {
+          for (var temp in responseData) {
+            if (temp is Map<String, dynamic>) {
+              try {
+                data.add(ReportModel.fromJson(temp));
+              } catch (e) {
+                print('Error parsing data: $e');
+              }
+            } else {
+              print('Invalid data type: $temp');
+            }
+          }
+        } else if (responseData is Map<String, dynamic>) {
+          try {
+            data.add(ReportModel.fromJson(responseData));
+          } catch (e) {
+            print('Error parsing data: $e');
+          }
+        } else {
+          print('Unexpected data type: $responseData');
+        }
+        print('Data $data');
+        return data;
+      } else if (response.statusCode == 498 || response.statusCode == 401) {
+        var refreshToken = await SecureStorage().readSecureData('refreshToken');
+        var newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          headers['authorization'] = newAccessToken;
+          final retryResponse =
+              await http.get(Uri.parse(URL), headers: headers);
+          if (retryResponse.statusCode == 200) {
+            // print('-- RetryResponse.body ${retryResponse.body}');
+            // print('-- Retry JsonDecode:${jsonDecode(retryResponse.body)}');
+            dynamic responseData = jsonDecode(retryResponse.body);
+            List<ReportModel> data = [];
+
+            if (responseData is List) {
+              for (var temp in responseData) {
+                if (temp is Map<String, dynamic>) {
+                  try {
+                    data.add(ReportModel.fromJson(temp));
+                  } catch (e) {
+                    print('Error parsing data: $e');
+                  }
+                } else {
+                  print('Invalid data type: $temp');
+                }
+              }
+            } else if (responseData is Map<String, dynamic>) {
+              try {
+                data.add(ReportModel.fromJson(responseData));
+              } catch (e) {
+                print('Error parsing data: $e');
+              }
+            } else {
+              print('Unexpected data type: $responseData');
+            }
+
+            // print('Data $data');
+            return data;
+          } else {
+            return [];
+          }
+        } else {
+          print('New Access Token is empty');
+          return [];
+        }
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error: $e');
+      return [];
+    }
+  }
+
   Future<List<AttendanceDetailDataForDetailPage>>
       getAttendanceDetailForDetailPage(String classID) async {
     final URL =
@@ -355,6 +444,28 @@ class API {
     } catch (e) {
       print('Error: $e');
       return [];
+    }
+  }
+
+  Future<bool> uploadMultipleImage(String studentID, List<XFile> images) async {
+    final url = 'http://192.168.1.13:8080/test/uploadMultipleFiles';
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+    request.fields['studentID'] = studentID;
+    for (var image in images) {
+      var stream = http.ByteStream(image.openRead());
+      var length = await image.length();
+      var multipartFile = http.MultipartFile('files', stream, length,
+          filename: image.path.split('/').last);
+      request.files.add(multipartFile);
+    }
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      print('Uploaded successfully');
+      return true;
+    } else {
+      print('Upload failed with status code: ${response.statusCode}');
+      return false;
     }
   }
 

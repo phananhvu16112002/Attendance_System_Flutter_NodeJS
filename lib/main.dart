@@ -27,6 +27,7 @@ import 'package:attendance_system_nodejs/screens/Authentication/UploadImage.dart
 // import 'package:attendance_system_nodejs/screens/Authentication/SplashScreen.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/WelcomePage.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/screens/DetailHome/ReportClass.dart';
 // import 'package:attendance_system_nodejs/screens/DetailHome/ReportAttendance.dart';
 // import 'package:attendance_system_nodejs/screens/Home/AfterAttendance.dart';
 // import 'package:attendance_system_nodejs/screens/Home/AttendanceFormPage.dart';
@@ -107,9 +108,9 @@ class _MyAppState extends State<MyApp> {
         '/OTP': (context) => const OTPPage(),
         '/HomePage': (context) => const HomePage(),
         '/ProfilePage': (context) => const ProfilePage(),
-        '/DetailReport': (context) => const DetailReport(),
+        // '/DetailReport': (context) => const DetailReport(),
       },
-      home: const UploadImage(),
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

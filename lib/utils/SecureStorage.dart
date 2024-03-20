@@ -4,6 +4,7 @@ class SecureStorage {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
 
   Future<void> writeSecureData(String key, String value) async {
+    print('Write local successfully');
     await storage.write(key: key, value: value);
   }
 
@@ -14,6 +15,7 @@ class SecureStorage {
   }
 
   Future<void> deleteSecureData(String key) async {
+    print('Delete successfully');
     await storage.delete(key: key);
   }
 }

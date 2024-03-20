@@ -7,6 +7,7 @@ import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/RegisterPage.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/UploadImage.dart';
 import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
@@ -237,6 +238,15 @@ class _SignInPageState extends State<SignInPage> {
                                           .readSecureData('studentEmail');
                                   var studentName = await SecureStorage()
                                       .readSecureData('studentName');
+                                  var image1 = await SecureStorage()
+                                      .readSecureData('_image1');
+                                  var image2 = await SecureStorage()
+                                      .readSecureData('_image2');
+                                  var image3 = await SecureStorage()
+                                      .readSecureData('_image3');
+                                  print(image2);
+                                  print(image3);
+                                  print(image1);
                                   studentDataProvider.setStudentID(studentID);
                                   studentDataProvider
                                       .setStudentEmail(studentEmail);
@@ -249,7 +259,11 @@ class _SignInPageState extends State<SignInPage> {
                                     PageRouteBuilder(
                                       pageBuilder: (context, animation,
                                               secondaryAnimation) =>
-                                          const HomePage(),
+                                          image1 == 'No Data Found' &&
+                                                  image2 == 'No Data Found' &&
+                                                  image3 == 'No Data Found'
+                                              ? UploadImage()
+                                              : HomePage(),
                                       transitionDuration:
                                           const Duration(milliseconds: 1000),
                                       transitionsBuilder: (context, animation,
