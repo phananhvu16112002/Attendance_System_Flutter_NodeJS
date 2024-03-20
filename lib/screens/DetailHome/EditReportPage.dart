@@ -99,6 +99,9 @@ class _EditReportPageState extends State<EditReportPage> {
         _message.text = value.message;
       });
     });
+    for (int i = 0; i < listReportImage.length; i++) {
+      print(listReportImage[i]!.imageID);
+    }
     print('FetchData');
   }
 

@@ -621,10 +621,17 @@ class API {
     try {
       var request = http.MultipartRequest('PUT', Uri.parse(URL));
       request.headers['Authorization'] = accessToken;
+      request.headers['Content-Type'] =
+          'application/json; charset=UTF-8'; // Thêm Content-Type
+      request.headers['Accept'] = 'application/json'; // Thêm Accept
+
       request.fields['topic'] = topic;
       request.fields['problem'] = problem;
       request.fields['message'] = message;
       request.fields['listDelete'] = jsonEncode(listDelete);
+      for (int i = 0; i < listDelete.length; i++) {
+        print(jsonEncode(listDelete[i]));
+      }
 
       for (var k = 0; k < listXFile.length; k++) {
         if (listXFile[k] != null) {
