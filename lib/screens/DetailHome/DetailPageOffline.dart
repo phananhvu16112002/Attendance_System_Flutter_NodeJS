@@ -291,7 +291,7 @@ class _DetailPageOfflineState extends State<DetailPageOffline> {
 
   PreferredSize customAppbar() {
     return PreferredSize(
-      preferredSize: const Size.fromHeight(160),
+      preferredSize: const Size.fromHeight(120),
       child: AppBar(
         leading: GestureDetector(
           onTap: () {

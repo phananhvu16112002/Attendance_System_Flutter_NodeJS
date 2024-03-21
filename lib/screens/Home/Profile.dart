@@ -1,5 +1,7 @@
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -103,13 +105,21 @@ class _ProfilePageState extends State<ProfilePage> {
             const Padding(
               padding: EdgeInsets.only(left: 10),
               child: CustomText(
-                  message: 'App',
+                  message: 'App', 
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryText),
             ),
             customOptions(context, 'assets/icons/information.png', 'About us'),
-            customOptions(context, 'assets/icons/signout.png', 'Sign out'),
+            InkWell(onTap: () async{
+              await SecureStorage().deleteSecureData('refreshToken');
+              await SecureStorage().deleteSecureData('accessToken');
+              await SecureStorage().deleteSecureData('_image1');
+              await SecureStorage().deleteSecureData('_image2');
+              await SecureStorage().deleteSecureData('_image3');
+              await Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (builder) => SignInPage()), (route) => false);
+
+            },child: customOptions(context, 'assets/icons/signout.png', 'Sign out')),
           ],
         ),
       ),

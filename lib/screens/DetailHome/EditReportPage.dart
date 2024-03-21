@@ -51,7 +51,7 @@ class _EditReportPageState extends State<EditReportPage> {
     'Personal reason',
     'Others',
   ];
-  List<ReportImage> listReportImage = [];
+  List<ReportImage?> listReportImage = [];
 
   final List<XFile?> _imageFiles = [];
   String dropdownvalue = 'Device failure';
@@ -99,6 +99,9 @@ class _EditReportPageState extends State<EditReportPage> {
         _message.text = value.message;
       });
     });
+    for (int i = 0; i < listReportImage.length; i++) {
+      print(listReportImage[i]!.imageID);
+    }
     print('FetchData');
   }
 
@@ -106,11 +109,11 @@ class _EditReportPageState extends State<EditReportPage> {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        listReportImage[index].imageURL = pickedFile;
-        if (listReportImage[index].imageURL is XFile) {
-          _imageFiles.add(listReportImage[index].imageURL);
+        listReportImage[index]?.imageURL = pickedFile;
+        if (listReportImage[index]?.imageURL is XFile) {
+          _imageFiles.add(listReportImage[index]?.imageURL);
         }
-        deleteList.add(listReportImage[index].imageID);
+        deleteList.add(listReportImage[index]!.imageID);
       });
     }
   }
@@ -119,7 +122,7 @@ class _EditReportPageState extends State<EditReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(100.0),
+          preferredSize: const Size.fromHeight(120),
           child: AppBar(
             leading: GestureDetector(
               onTap: () {
@@ -134,10 +137,7 @@ class _EditReportPageState extends State<EditReportPage> {
             ),
             backgroundColor: AppColors.colorAppbar,
             flexibleSpace: Padding(
-              padding: EdgeInsets.only(
-                  left: 50.0,
-                  top: classesStudent.courseName.length >= 8 ? 50 : 25,
-                  bottom: 25),
+              padding: const EdgeInsets.only(left: 50.0, top: 0, bottom: 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -366,23 +366,30 @@ class _EditReportPageState extends State<EditReportPage> {
                                   Row(
                                     children: [
                                       //Call bottom modal imagepicker gallery or camera
-                                      CustomButton(
-                                        buttonName: 'Upload File',
-                                        backgroundColorButton:
-                                            AppColors.cardAttendance,
-                                        borderColor: AppColors.secondaryText,
-                                        textColor: AppColors.primaryButton,
-                                        colorShadow: Colors.transparent,
-                                        function: () {
-                                          showModalBottomSheet(
-                                              context: context,
-                                              builder: (builder) =>
-                                                  bottomSheet());
-                                        },
-                                        height: 35,
-                                        width: 100,
-                                        fontSize: 12,
-                                      ),
+                                      listReportImage.length < 3 ||
+                                              listReportImage.length +
+                                                      _imageFiles.length <
+                                                  3
+                                          ? CustomButton(
+                                              buttonName: 'Upload File',
+                                              backgroundColorButton:
+                                                  AppColors.cardAttendance,
+                                              borderColor:
+                                                  AppColors.secondaryText,
+                                              textColor:
+                                                  AppColors.primaryButton,
+                                              colorShadow: Colors.transparent,
+                                              function: () {
+                                                showModalBottomSheet(
+                                                    context: context,
+                                                    builder: (builder) =>
+                                                        bottomSheet());
+                                              },
+                                              height: 35,
+                                              width: 100,
+                                              fontSize: 12,
+                                            )
+                                          : Container(),
                                     ],
                                   )
                                 ],
@@ -394,37 +401,61 @@ class _EditReportPageState extends State<EditReportPage> {
                                 padding: const EdgeInsets.only(left: 0),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: listReportImage
+                                  child: Row(children: [
+                                    ...listReportImage
                                         .asMap()
                                         .entries
                                         .map((entry) {
                                       final int index = entry.key;
-                                      final ReportImage image = entry.value;
+                                      final ReportImage? image = entry.value;
                                       return GestureDetector(
                                         onTap: () {
                                           _changeImageFromURL(index);
                                         },
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: image.imageURL is XFile
+                                          child: image?.imageURL is XFile
                                               ? Image(
-                                                  width: 250,
-                                                  height: 250,
+                                                  width: 220,
+                                                  height: 220,
                                                   fit: BoxFit.cover,
                                                   image: FileImage(File(
-                                                      image.imageURL.path)),
+                                                      image?.imageURL.path)),
                                                 )
                                               : Image.network(
-                                                  image.imageURL,
-                                                  width: 250,
-                                                  height: 250,
+                                                  image?.imageURL,
+                                                  width: 220,
+                                                  height: 220,
                                                   fit: BoxFit.cover,
                                                 ),
                                         ),
                                       );
                                     }).toList(),
-                                  ),
+                                    ..._imageFiles.asMap().entries.map((entry) {
+                                      final index = entry.key;
+                                      final XFile? imageFile = entry.value;
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 10),
+                                        child: InkWell(
+                                          onLongPress: () =>
+                                              _deleteImage(index),
+                                          onTap: () => _changeImage(index),
+                                          child: imageFile != null
+                                              ? Center(
+                                                  child: Image(
+                                                    width: 240,
+                                                    height: 240,
+                                                    fit: BoxFit.cover,
+                                                    image: FileImage(
+                                                        File(imageFile.path)),
+                                                  ),
+                                                )
+                                              : null,
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ]),
                                 ),
                               ),
                               const SizedBox(
@@ -451,7 +482,8 @@ class _EditReportPageState extends State<EditReportPage> {
                                                     _topicController.text,
                                                     dropdownvalue,
                                                     _message.text,
-                                                    _imageFiles);
+                                                    _imageFiles,
+                                                    deleteList);
                                             if (result == '') {
                                               print('Success');
                                               await _progressDialog.hide();
@@ -503,7 +535,7 @@ class _EditReportPageState extends State<EditReportPage> {
             backgroundColor: Colors.white,
             title: Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 25),

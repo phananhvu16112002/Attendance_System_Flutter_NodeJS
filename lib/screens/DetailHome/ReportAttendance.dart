@@ -86,11 +86,11 @@ class _ReportAttendanceState extends State<ReportAttendance> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(100.0),
+          preferredSize: const Size.fromHeight(150),
           child: AppBar(
             leading: GestureDetector(
               onTap: () {
-                // setState(() {});
+                setState(() {});
                 Navigator.pop(context);
               },
               child: Container(
@@ -379,8 +379,8 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                           child: imageFile != null
                                               ? Center(
                                                   child: Image(
-                                                    width: 250,
-                                                    height: 250,
+                                                    width: 240,
+                                                    height: 240,
                                                     fit: BoxFit.cover,
                                                     image: FileImage(
                                                         File(imageFile.path)),

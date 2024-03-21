@@ -1,6 +1,10 @@
 import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelForAPI_ReportPage_Version1/ReportModel.dart';
+import 'package:attendance_system_nodejs/screens/Home/DetailReport.dart';
+import 'package:attendance_system_nodejs/services/API.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -10,91 +14,83 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
+  String getPathStatus(String status) {
+    if (status == 'Approved') {
+      return 'assets/icons/successfully.png';
+    } else if (status == 'Pending') {
+      return 'assets/icons/pending.png';
+    } else {
+      return 'assets/icons/cancel.png';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.cardAttendance,
-      appBar: AppBar(
-          title: const Text(
-            'Reports',
-            style: TextStyle(
-                color: AppColors.primaryText,
-                fontWeight: FontWeight.bold,
-                fontSize: 25),
-          ),
-          actions: [
-            Image.asset(
-              'assets/icons/garbage.png',
-              width: 30,
-              height: 30,
+        backgroundColor: AppColors.cardAttendance,
+        appBar: AppBar(
+            title: const Text(
+              'Reports',
+              style: TextStyle(
+                  color: AppColors.primaryText,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25),
             ),
-          ]),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 13, right: 13),
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 15,
+            actions: [
+              Image.asset(
+                'assets/icons/garbage.png',
+                width: 30,
+                height: 30,
               ),
-              cardReport(
-                  'assets/icons/successfully.png',
-                  'Quản trị hệ thống thông tin doanh nghiệp',
-                  'Mai Van Manh',
-                  'A0503',
-                  '5',
-                  'Approved',
-                  '20/11/2023',
-                  '10',
-                  '21/11/2023',
-                  '11:43 AM'),
-              const SizedBox(
-                height: 10,
-              ),
-              cardReport(
-                  'assets/icons/pending.png',
-                  'Quản trị hệ thống thông tin doanh nghiệp',
-                  'Mai Van Manh',
-                  'A0503',
-                  '5',
-                  'Pending',
-                  '20/11/2023',
-                  '10',
-                  '21/11/2023',
-                  '11:43 AM'),
-              const SizedBox(
-                height: 10,
-              ),
-              cardReport(
-                  'assets/icons/cancel.png',
-                  'Quản trị hệ thống thông tin doanh nghiệp',
-                  'Mai Van Manh',
-                  'A0503',
-                  '5',
-                  'Denied',
-                  '20/11/2023',
-                  '10',
-                  '21/11/2023',
-                  '11:43 AM'),
-              const SizedBox(
-                height: 10,
-              ),
-              cardReport(
-                  'assets/icons/cancel.png',
-                  'Quản trị hệ thống thông tin doanh nghiệp',
-                  'Mai Van Manh',
-                  'A0503',
-                  '5',
-                  'Denied',
-                  '20/11/2023',
-                  '10',
-                  '21/11/2023',
-                  '11:43 AM'),
-            ],
-          ),
-        ),
-      ),
-    );
+            ]),
+        body: FutureBuilder(
+            future: API(context).getReportDataForStudent(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasData) {
+                if (snapshot.data != null) {
+                  List<ReportModel>? data = snapshot.data;
+                  return ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: data!.length,
+                      itemBuilder: ((context, index) {
+                        ReportModel reportModel = data[index];
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) => DetailReport(
+                                            reportModel: reportModel,
+                                          )));
+                            },
+                            child: cardReport(
+                                getPathStatus(reportModel.status),
+                                reportModel.courseCourseName,
+                                reportModel.teacherName,
+                                reportModel.classesRoomNumber,
+                                reportModel.classesShiftNumber.toString(),
+                                reportModel.status,
+                                formatDate(reportModel.createdAt),
+                                reportModel.courseTotalWeeks.toString(),
+                                formatDate(reportModel.feedbackCreatedAt),
+                                formatTime(reportModel.feedbackCreatedAt)),
+                          ),
+                        );
+                      }));
+                }
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+              return Text('Alo ALo');
+            }));
   }
 
   Container cardReport(
@@ -109,8 +105,8 @@ class _ReportPageState extends State<ReportPage> {
       String returnDate,
       String timeReport) {
     return Container(
-      width: 405,
-      height: 200,
+      width: MediaQuery.of(context).size.width * 0.1,
+      height: MediaQuery.of(context).size.height * 0.26,
       decoration: const BoxDecoration(
           color: AppColors.cardReport,
           borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -121,6 +117,7 @@ class _ReportPageState extends State<ReportPage> {
                 offset: Offset(0.0, 0.0))
           ]),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 10, right: 10),
@@ -130,17 +127,15 @@ class _ReportPageState extends State<ReportPage> {
               height: 35,
             ),
           ),
-          const SizedBox(
-            width: 5,
-          ),
           Container(
             width: 220,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(
-                  height: 10,
-                ),
+                // const SizedBox(
+                //   height: 10,
+                // ),
                 customRichText(
                     'Class: ',
                     className,
@@ -149,7 +144,7 @@ class _ReportPageState extends State<ReportPage> {
                     AppColors.primaryText,
                     AppColors.primaryText),
                 const SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 customRichText(
                     'Lectuer: ',
@@ -159,7 +154,7 @@ class _ReportPageState extends State<ReportPage> {
                     AppColors.primaryText,
                     AppColors.primaryText),
                 const SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 Row(
                   children: [
@@ -183,7 +178,7 @@ class _ReportPageState extends State<ReportPage> {
                   ],
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 customRichText(
                     'Status: ',
@@ -193,7 +188,7 @@ class _ReportPageState extends State<ReportPage> {
                     AppColors.primaryText,
                     getColorBasedOnStatus(status)),
                 const SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 Row(
                   children: [
@@ -217,7 +212,7 @@ class _ReportPageState extends State<ReportPage> {
                   ],
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 customRichText(
                     'Return Date: ',
@@ -227,7 +222,7 @@ class _ReportPageState extends State<ReportPage> {
                     AppColors.primaryText,
                     AppColors.primaryText),
                 const SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 customRichText(
                     'Time: ',
@@ -239,22 +234,6 @@ class _ReportPageState extends State<ReportPage> {
               ],
             ),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 20, left: 0, right: 15),
-          //   child: Container(
-          //       margin: const EdgeInsets.only(bottom: 25),
-          //       height: 180,
-          //       width: 2,
-          //       color: AppColors.primaryText),
-          // ),
-          // const SizedBox(
-          //   width: 5,
-          // ),
-          // const CustomText(
-          //     message: 'Detail',
-          //     fontSize: 15,
-          //     fontWeight: FontWeight.bold,
-          //     color: AppColors.primaryButton)
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -321,4 +300,69 @@ class _ReportPageState extends State<ReportPage> {
       return AppColors.primaryText;
     }
   }
+
+  String formatDate(String date) {
+    DateTime serverDateTime = DateTime.parse(date).toLocal();
+    String formattedDate = DateFormat('MMMM d, y').format(serverDateTime);
+    return formattedDate;
+  }
+
+  String formatTime(String time) {
+    DateTime serverDateTime = DateTime.parse(time).toLocal();
+    String formattedTime = DateFormat("HH:mm:ss a").format(serverDateTime);
+    return formattedTime;
+  }
 }
+// cardReport(
+//                   'assets/icons/successfully.png',
+//                   'Quản trị hệ thống thông tin doanh nghiệp',
+//                   'Mai Van Manh',
+//                   'A0503',
+//                   '5',
+//                   'Approved',
+//                   '20/11/2023',
+//                   '10',
+//                   '21/11/2023',
+//                   '11:43 AM'),
+//               const SizedBox(
+//                 height: 10,
+//               ),
+//               cardReport(
+//                   'assets/icons/pending.png',
+//                   'Quản trị hệ thống thông tin doanh nghiệp',
+//                   'Mai Van Manh',
+//                   'A0503',
+//                   '5',
+//                   'Pending',
+//                   '20/11/2023',
+//                   '10',
+//                   '21/11/2023',
+//                   '11:43 AM'),
+//               const SizedBox(
+//                 height: 10,
+//               ),
+//               cardReport(
+//                   'assets/icons/cancel.png',
+//                   'Quản trị hệ thống thông tin doanh nghiệp',
+//                   'Mai Van Manh',
+//                   'A0503',
+//                   '5',
+//                   'Denied',
+//                   '20/11/2023',
+//                   '10',
+//                   '21/11/2023',
+//                   '11:43 AM'),
+//               const SizedBox(
+//                 height: 10,
+//               ),
+//               cardReport(
+//                   'assets/icons/cancel.png',
+//                   'Quản trị hệ thống thông tin doanh nghiệp',
+//                   'Mai Van Manh',
+//                   'A0503',
+//                   '5',
+//                   'Denied',
+//                   '20/11/2023',
+//                   '10',
+//                   '21/11/2023',
+//                   '11:43 AM'),

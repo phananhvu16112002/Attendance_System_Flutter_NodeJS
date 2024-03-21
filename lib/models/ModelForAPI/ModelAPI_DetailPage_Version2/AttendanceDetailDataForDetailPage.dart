@@ -1,5 +1,7 @@
 import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/AttendanceFormDataForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/Feedback.dart';
 import 'package:attendance_system_nodejs/models/ModelForAPI/ModelAPI_DetailPage_Version2/ReportDataForDetailPage.dart';
+import 'package:attendance_system_nodejs/models/ModelForAPI/ReportImage.dart';
 
 class AttendanceDetailDataForDetailPage {
   final String studentDetail;
@@ -27,12 +29,12 @@ class AttendanceDetailDataForDetailPage {
     required this.longitude,
     required this.url,
     required this.createdAt,
-    this.report,
+    required this.report,
   });
 
   factory AttendanceDetailDataForDetailPage.fromJson(
       Map<String, dynamic> json) {
-        print(json['result'].runtimeType);
+    print(json['report'].runtimeType);
     return AttendanceDetailDataForDetailPage(
       studentDetail: json['studentDetail'],
       classDetail: json['classDetail'],
@@ -46,8 +48,7 @@ class AttendanceDetailDataForDetailPage {
       longitude: double.parse(json['longitude'].toString()),
       url: json['url'],
       createdAt: json['createdAt'] ?? '',
-      report:
-          json['report'] != null ? ReportData.fromJson(json['report']) : null,
+      report: json['report'] != null ? ReportData.fromJson(json['report']) : null
     );
   }
 }
