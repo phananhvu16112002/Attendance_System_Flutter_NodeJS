@@ -50,6 +50,10 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration.zero,(){
+      var socketServerProvider = Provider.of<SocketServerProvider>(context, listen: false);
+      socketServerProvider.connectToSocketServer(attendanceForm.classes);
+    });
     attendanceForm = widget.attendanceForm;
     // studentClassesBox = Hive.box<StudentClasses>('student_classes');
     attendanceFormBox = Hive.box<AttendanceForm>('AttendanceFormBoxes');
@@ -133,6 +137,7 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
+            socketDataProvider.disconnectSocketServer();
             Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (builder) => const HomePage()),
@@ -146,7 +151,7 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
           ),
         ),
         title: const Text(
-          'Attendance Form QR',
+          'Attendance Form',
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
         ),

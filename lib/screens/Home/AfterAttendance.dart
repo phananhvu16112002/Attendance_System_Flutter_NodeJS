@@ -3,14 +3,21 @@ import 'package:attendance_system_nodejs/common/bases/CustomText.dart';
 import 'package:attendance_system_nodejs/common/colors/colors.dart';
 import 'package:attendance_system_nodejs/models/AttendanceDetail.dart';
 import 'package:attendance_system_nodejs/models/ClassesStudent.dart';
+import 'package:attendance_system_nodejs/providers/socketServer_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
+import 'package:attendance_system_nodejs/screens/Home/HomePage.dart';
+import 'package:attendance_system_nodejs/utils/SecureStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class AfterAttendance extends StatefulWidget {
-  const AfterAttendance({super.key, required this.attendanceDetail, required this.classesStudent});
+  const AfterAttendance(
+      {super.key,
+      required this.attendanceDetail,
+      required this.classesStudent});
   final AttendanceDetail attendanceDetail;
   final ClassesStudent classesStudent;
 
@@ -33,6 +40,8 @@ class _AfterAttendanceState extends State<AfterAttendance> {
   Widget build(BuildContext context) {
     final studentClasses =
         Provider.of<StudentClassesDataProvider>(context, listen: false);
+    final socketServerProvider =
+        Provider.of<SocketServerProvider>(context, listen: false);
     var temp = studentClasses.getDataForClass(data.classDetail);
     return Scaffold(
         body: SingleChildScrollView(
@@ -138,25 +147,20 @@ class _AfterAttendanceState extends State<AfterAttendance> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 10, right: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const CustomText(
-                    message: 'Location: ',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.secondaryText),
-                const SizedBox(
-                  width: 150,
-                ),
-                Expanded(
-                  child: CustomText(
-                      message: data.location,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const CustomText(
+                      message: 'Location: ',
                       fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryText),
-                )
-              ],
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.secondaryText),
+                  customText(data.location, 13, FontWeight.bold,
+                      AppColors.primaryText),
+                ],
+              ),
             ),
           ),
           const SizedBox(
@@ -209,10 +213,19 @@ class _AfterAttendanceState extends State<AfterAttendance> {
                     backgroundColorButton: AppColors.primaryButton,
                     borderColor: Colors.transparent,
                     textColor: Colors.white,
-                    function: () {},
+                    function: () async {
+                      socketServerProvider.disconnectSocketServer();
+                      await SecureStorage().deleteSecureData('image');
+                      await SecureStorage().deleteSecureData('imageOffline');
+                      await Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (builder) => HomePage()),
+                          (route) => false);
+                      setState(() {});
+                    },
                     height: 60,
-                    width: 350,
-                    fontSize: 20),
+                    width: 300,
+                    fontSize: 15),
                 const SizedBox(
                   height: 15,
                 ),
@@ -220,7 +233,7 @@ class _AfterAttendanceState extends State<AfterAttendance> {
                   onTap: () {},
                   child: const CustomText(
                       message: 'Take a screenshot',
-                      fontSize: 20,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryButton),
                 )
@@ -231,6 +244,15 @@ class _AfterAttendanceState extends State<AfterAttendance> {
       ),
     ));
   }
+}
+
+Widget customText(
+    String message, double fontSize, FontWeight fontWeight, Color color) {
+  return Text(message,
+      // maxLines: null,
+      overflow: TextOverflow.ellipsis,
+      style: GoogleFonts.inter(
+          fontSize: fontSize, fontWeight: fontWeight, color: color));
 }
 
 String formatDate(String date) {

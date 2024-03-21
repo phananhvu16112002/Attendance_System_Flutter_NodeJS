@@ -72,13 +72,13 @@ class SocketServerProvider with ChangeNotifier {
     var jsonData = {
       'studentDetail': studentID,
       'classDetail': classID,
-      'formID': formID,
+      // 'formID': formID,
       'dateTimeAttendance': dateTimeAttendance,
-      'location': location,
-      'latitude': latitude,
-      'longitude': longitude,
+      // 'location': location,
+      // 'latitude': latitude,
+      // 'longitude': longitude,
       'result': result,
-      'image': image
+      // 'image': image 
     };
 
     var jsonString = jsonEncode(jsonData);

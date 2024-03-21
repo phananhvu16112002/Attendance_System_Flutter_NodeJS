@@ -354,8 +354,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.5,
       height: location.isNotEmpty && location.length >= 50
-          ? MediaQuery.of(context).size.height * 0.30
-          : MediaQuery.of(context).size.height * 0.25,
+          ? MediaQuery.of(context).size.height * 0.31
+          : MediaQuery.of(context).size.height * 0.26,
       decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
