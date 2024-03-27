@@ -248,16 +248,14 @@ class _AttendancePageState extends State<AttendanceFormPageOffline> {
                                 height: 140,
                                 width: 140,
                                 color: Colors.amber,
-                                child: Center(
-                                  child: Text(attendanceForm.formID),
-                                ),
+                                child:   Image.asset('assets/icons/face_camera.png')
                               )
                             : Container(
                                 margin:
                                     const EdgeInsets.only(right: 10, top: 10),
                                 height: 140,
                                 width: 140,
-                                color: Colors.black,
+                                 child: Image.asset('assets/icons/face_camera.png')
                               )
                       ],
                     )

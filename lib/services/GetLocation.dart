@@ -94,7 +94,7 @@ class GetLocation {
 
   Future<bool> updateLocation(StudentDataProvider provider) async {
     Position position = await determinePosition();
-    if (!(await hasNetworkConnection())) {
+    if ((await hasNetworkConnection()) == true) {
       provider.setLatitude(position.latitude);
       provider.setLongtitude(position.longitude);
       await SecureStorage()

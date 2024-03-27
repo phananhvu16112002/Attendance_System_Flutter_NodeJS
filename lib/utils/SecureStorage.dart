@@ -4,13 +4,14 @@ class SecureStorage {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
 
   Future<void> writeSecureData(String key, String value) async {
-    print('Write local successfully');
+    print('Write local successfully: $key:$value');
     await storage.write(key: key, value: value);
   }
 
   Future<String> readSecureData(String key) async {
     String value = await storage.read(key: key) ?? 'No Data Found';
-    // print('Data read from secure storage: $value');
+    print('Data read from secure storage: $key');
+    print('Data read from secure storage: $value');
     return value;
   }
 

@@ -77,8 +77,8 @@ class _DetailPageOfflineState extends State<DetailPageOffline> {
                     child: customCard(
                       'startTime',
                       'endTime',
-                      'date',
-                      dataOffline!.dateAttendanced,
+                      formatDate(dataOffline!.dateAttendanced),
+                      formatTime(dataOffline!.dateAttendanced),
                       'Pending',
                       dataOffline!.location,
                     ));
@@ -166,26 +166,6 @@ class _DetailPageOfflineState extends State<DetailPageOffline> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      customRichText(
-                          'Start Time: ',
-                          startTime,
-                          FontWeight.w600,
-                          FontWeight.w500,
-                          AppColors.primaryText,
-                          AppColors.primaryText),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      customRichText(
-                          'End Time: ',
-                          endTime,
-                          FontWeight.w600,
-                          FontWeight.w500,
-                          AppColors.primaryText,
-                          AppColors.primaryText),
-                      const SizedBox(
-                        height: 10,
-                      ),
                       customRichText(
                           'Location: ',
                           location,

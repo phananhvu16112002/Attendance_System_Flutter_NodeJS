@@ -122,7 +122,7 @@ class _EditReportPageState extends State<EditReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(120),
+          preferredSize: const Size.fromHeight(150),
           child: AppBar(
             leading: GestureDetector(
               onTap: () {
@@ -137,7 +137,7 @@ class _EditReportPageState extends State<EditReportPage> {
             ),
             backgroundColor: AppColors.colorAppbar,
             flexibleSpace: Padding(
-              padding: const EdgeInsets.only(left: 50.0, top: 0, bottom: 0),
+              padding: const EdgeInsets.only(left: 40, top: 0, bottom: 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -307,7 +307,7 @@ class _EditReportPageState extends State<EditReportPage> {
                                           padding:
                                               const EdgeInsets.only(left: 8.0),
                                           child: Container(
-                                            width: 317,
+                                            width: 290,
                                             child: Text(
                                               items,
                                               style: const TextStyle(
@@ -416,16 +416,16 @@ class _EditReportPageState extends State<EditReportPage> {
                                           padding: const EdgeInsets.all(8.0),
                                           child: image?.imageURL is XFile
                                               ? Image(
-                                                  width: 220,
-                                                  height: 220,
+                                                  width: 195,
+                                                  height: 195,
                                                   fit: BoxFit.cover,
                                                   image: FileImage(File(
                                                       image?.imageURL.path)),
                                                 )
                                               : Image.network(
                                                   image?.imageURL,
-                                                  width: 220,
-                                                  height: 220,
+                                                  width: 195,
+                                                  height: 195,
                                                   fit: BoxFit.cover,
                                                 ),
                                         ),
@@ -444,8 +444,8 @@ class _EditReportPageState extends State<EditReportPage> {
                                           child: imageFile != null
                                               ? Center(
                                                   child: Image(
-                                                    width: 240,
-                                                    height: 240,
+                                                    width: 195,
+                                                    height: 195,
                                                     fit: BoxFit.cover,
                                                     image: FileImage(
                                                         File(imageFile.path)),

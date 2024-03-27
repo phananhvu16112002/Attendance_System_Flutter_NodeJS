@@ -787,11 +787,12 @@ class _DetailPageBodyState extends State<DetailPageBody> {
   }
 
   String getResult(double result) {
-    if (result.ceil() == 1) {
+    print('Result: ${result.toString()}');
+    if (result.toString() == '1.0') {
       return 'Present';
-    } else if (result == 0.5) {
+    } else if (result.toString() == '0.5') {
       return 'Late';
-    } else if (result.ceil() == 0) {
+    } else if (result.toString() == '0.0') {
       return 'Absence';
     } else {
       return 'Absence';

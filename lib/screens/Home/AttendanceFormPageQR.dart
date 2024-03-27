@@ -289,16 +289,14 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
                                 height: 140,
                                 width: 140,
                                 color: Colors.amber,
-                                child: Center(
-                                  child: Text(attendanceForm.formID),
-                                ),
+                                child:  Image.asset('assets/icons/face_camera.png')
                               )
                             : Container(
                                 margin:
                                     const EdgeInsets.only(right: 10, top: 10),
                                 height: 140,
                                 width: 140,
-                                color: Colors.black,
+                                 child: Image.asset('assets/icons/face_camera.png')
                               )
                       ],
                     )
@@ -534,7 +532,7 @@ class _AttendancePageState extends State<AttendanceFormPageQR> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              attendanceForm.typeAttendance == 0
+              attendanceForm.typeAttendance == 1
                   ? ElevatedButton.icon(
                       onPressed: () {
                         Navigator.push(

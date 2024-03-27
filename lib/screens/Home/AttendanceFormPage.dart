@@ -473,16 +473,13 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                       height: 140,
                       width: 140,
                       color: Colors.amber,
-                      child: Center(
-                        child: Text(attendanceFormDataForDetailPageProvider
-                            .attendanceFormData.formID),
-                      ),
+                       child: Image.asset('assets/icons/face_camera.png'),
                     )
                   : Container(
                       margin: const EdgeInsets.only(right: 10, top: 10),
                       height: 140,
                       width: 140,
-                      color: Colors.black,
+                      child: Image.asset('assets/icons/face_camera.png'),
                     )
             ],
           )
@@ -538,7 +535,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              attendanceFormDataProvider.attendanceFormData.type == 0
+              attendanceFormDataProvider.attendanceFormData.type == 1
                   ? ElevatedButton.icon(
                       onPressed: () {
                         Navigator.push(

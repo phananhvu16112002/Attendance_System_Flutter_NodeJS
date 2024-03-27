@@ -207,7 +207,7 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                         children: [
                           const CustomText(
                               message: "Didn't recieved code ? ",
-                              fontSize: 15,
+                              fontSize: 13,
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryText),
                           GestureDetector(
@@ -237,7 +237,7 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                                 message: canResend // true
                                     ? "Re-send"
                                     : "Resend in $secondsRemaining seconds",
-                                fontSize: 15,
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.importantText),
                           )

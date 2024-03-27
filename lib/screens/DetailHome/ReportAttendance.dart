@@ -86,7 +86,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(150),
+          preferredSize: const Size.fromHeight(175),
           child: AppBar(
             leading: GestureDetector(
               onTap: () {
@@ -102,7 +102,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
             backgroundColor: AppColors.colorAppbar,
             flexibleSpace: Padding(
               padding: EdgeInsets.only(
-                  left: 50.0,
+                  left: 40,
                   top: classesStudent.courseName.length >= 8 ? 50 : 25,
                   bottom: 25),
               child: Column(
@@ -255,7 +255,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                 height: 5,
                               ),
                               Container(
-                                width: 370,
+                                width: 350,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8.0),
                                   border: Border.all(
@@ -274,7 +274,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                           padding:
                                               const EdgeInsets.only(left: 8.0),
                                           child: Container(
-                                            width: 317,
+                                            width: 298,
                                             child: Text(
                                               items,
                                               style: const TextStyle(
@@ -379,8 +379,8 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                                           child: imageFile != null
                                               ? Center(
                                                   child: Image(
-                                                    width: 240,
-                                                    height: 240,
+                                                    width: 210,
+                                                    height: 210,
                                                     fit: BoxFit.cover,
                                                     image: FileImage(
                                                         File(imageFile.path)),
