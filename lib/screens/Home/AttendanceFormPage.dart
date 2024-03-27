@@ -32,7 +32,6 @@ class AttendanceFormPage extends StatefulWidget {
   // final AttendanceForm attendanceForm;
   final ClassesStudent classesStudent;
 
-
   @override
   State<AttendanceFormPage> createState() => _AttendancePageState();
 }
@@ -221,7 +220,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             Padding(
               padding: const EdgeInsets.only(left: 15),
               child: file != null
-                  ? Container(
+                  ? SizedBox(
                       width: 350,
                       height: 320,
                       child: Center(
@@ -384,7 +383,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
             children: [
               Container(
                 margin: const EdgeInsets.only(left: 15, top: 10),
-                child: Container(
+                child: SizedBox(
                   width: 190,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -473,7 +472,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
                       height: 140,
                       width: 140,
                       color: Colors.amber,
-                       child: Image.asset('assets/icons/face_camera.png'),
+                      child: Image.asset('assets/icons/face_camera.png'),
                     )
                   : Container(
                       margin: const EdgeInsets.only(right: 10, top: 10),
@@ -535,7 +534,7 @@ class _AttendancePageState extends State<AttendanceFormPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              attendanceFormDataProvider.attendanceFormData.type == 1
+              attendanceFormDataProvider.attendanceFormData.type == 0
                   ? ElevatedButton.icon(
                       onPressed: () {
                         Navigator.push(
