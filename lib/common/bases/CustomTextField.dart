@@ -30,7 +30,7 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 380,
+      // width: 380,
       child: TextFormField(
         readOnly: readOnly,
         controller: controller,

@@ -18,6 +18,7 @@ import 'package:attendance_system_nodejs/providers/socketServer_data_provider.da
 import 'package:attendance_system_nodejs/providers/studentClass_data_provider.dart';
 import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/CreateNewPassword.dart';
+import 'package:attendance_system_nodejs/screens/Authentication/FlashScreen.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/ForgotPassword.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/ForgotPasswordOTPPage.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/OTPPage.dart';
@@ -108,7 +109,7 @@ class _MyAppState extends State<MyApp> {
         '/ProfilePage': (context) => const ProfilePage(),
         // '/DetailReport': (context) => const DetailReport(),
       },
-      home:  WelcomePage(),
+      home: const FlashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -6,7 +6,7 @@ class SocketServer {
   late IO.Socket socket;
 
   connectToSocketServer(data) {
-    socket = IO.io('http://192.168.1.4:9000', <String, dynamic>{
+    socket = IO.io('http://192.168.1.15:9000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'headers': {'Content-Type': 'application/json'},

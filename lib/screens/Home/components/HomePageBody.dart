@@ -60,7 +60,7 @@ class _HomePageBodyState extends State<HomePageBody> {
     studentClassesBox = Hive.box<StudentClasses>('student_classes');
     dataOfflineBox = Hive.box<DataOffline>('DataOfflineBoxes');
     classesStudentBox = Hive.box<ClassesStudent>('classes_student_box');
-    checkLocationService();
+    // checkLocationService();
     Future.delayed(Duration.zero, () {
       if (mounted) {
         var studentDataProvider =
@@ -120,71 +120,6 @@ class _HomePageBodyState extends State<HomePageBody> {
       print('Data is not available');
     }
   }
-
-  // void _onQRViewCreated(QRViewController controller) {
-  //   this.controller = controller;
-  //   controller.scannedDataStream.listen((scanData) {
-  //     setState(() {
-  //       result = scanData;
-  //     });
-  //     if (result != null && result!.code != null && result!.code!.isNotEmpty) {
-  //       print('-------------Result:${result!.code}');
-  //       print(
-  //           'JSON: ${jsonDecode(result!.code.toString())}'); // modify and get value here.
-  //       var temp = jsonDecode(result!.code.toString());
-  //       if (isConnected) {
-  //         // check connection(internet)
-  //         if (temp['typeAttendanced'] == 0 || temp['typeAttendanced'] == 1) {
-  //           Navigator.push(
-  //             context,
-  //             MaterialPageRoute(
-  //                 builder: (context) => AttendanceFormPageQR(
-  //                       attendanceForm: AttendanceForm(
-  //                           formID: temp['formID'],
-  //                           classes: temp['classID'],
-  //                           startTime: temp['startTime'],
-  //                           endTime: temp['endTime'],
-  //                           dateOpen: temp['dateOpen'],
-  //                           status: false,
-  //                           typeAttendance: temp['typeAttendanced'],
-  //                           location: '',
-  //                           latitude: 0.0,
-  //                           longtitude: 0.0,
-  //                           radius: 0.0),
-  //                     )),
-  //           );
-
-  //           //Send request(formid, classID, dateAttendanced, studentID, location, latitude, longitude)
-  //         } else {
-  //           print('Send Request---------');
-  //         }
-  //       } else {
-  //         controller.pauseCamera();
-  //         Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //               builder: (context) => AttendanceFormPageOffline(
-  //                     attendanceForm: AttendanceForm(
-  //                         formID: temp['formID'],
-  //                         classes: temp['classID'],
-  //                         startTime: temp['startTime'],
-  //                         endTime: temp['endTime'],
-  //                         dateOpen: temp['dateOpen'],
-  //                         status: false,
-  //                         typeAttendance:
-  //                             0, //0 vì không có mạng mặc định là quét mặt
-  //                         location: '',
-  //                         latitude: 0.0,
-  //                         longtitude: 0.0,
-  //                         radius: 0.0),
-  //                   )),
-  //         );
-  //       }
-  //     } else {
-  //       print('Data is not available');
-  //     }
-  //   });
-  // }\
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
@@ -271,40 +206,6 @@ class _HomePageBodyState extends State<HomePageBody> {
         studentDataProvider.userData.location,
       );
     }
-  }
-
-  Future<void> checkLocationService() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      showSettingsAlert();
-    }
-  }
-
-  void showSettingsAlert() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Location Permission'),
-        content: const Text('Please grant permission to get your location.'),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context); // Đóng hộp thoại
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await Geolocator.openLocationSettings();
-            },
-            child: const Text(
-              'Open Settings',
-              style: TextStyle(color: AppColors.primaryButton),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   //--Hive--
@@ -671,9 +572,9 @@ class _HomePageBodyState extends State<HomePageBody> {
                               Navigator.push(
                                 context,
                                 PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation, secondaryAnimation) =>
-                                          DetailPage(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      DetailPage(
                                     classesStudent: data,
                                   ),
                                   transitionDuration:
@@ -993,7 +894,8 @@ class _HomePageBodyState extends State<HomePageBody> {
                 itemBuilder: (BuildContext context, int index) {
                   var data = classesStudentBox.getAt(index);
                   return Padding(
-                    padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
+                    padding:
+                        const EdgeInsets.only(left: 5, right: 5, bottom: 10),
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -1004,9 +906,10 @@ class _HomePageBodyState extends State<HomePageBody> {
                                     DetailPageOffline(
                               classesStudent: data,
                             ),
-                            transitionDuration: const Duration(milliseconds: 200),
-                            transitionsBuilder:
-                                (context, animation, secondaryAnimation, child) {
+                            transitionDuration:
+                                const Duration(milliseconds: 200),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
                               return ScaleTransition(
                                 scale: animation,
                                 child: child,

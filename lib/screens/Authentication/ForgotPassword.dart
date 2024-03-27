@@ -197,7 +197,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ),
               ),
             ),
-          )
+          ),
+          const SizedBox(height: 20,),
         ],
       ),
     ));
