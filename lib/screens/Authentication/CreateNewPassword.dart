@@ -247,7 +247,8 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                   ),
                 ),
               ),
-            )
+            ),
+            const SizedBox(height: 20,),
           ],
         ),
       ),

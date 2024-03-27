@@ -8,6 +8,7 @@ import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/SignInPage.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
@@ -114,6 +115,7 @@ class _OTPPageState extends State<OTPPage> {
                     Padding(
                       padding: const EdgeInsets.only(right: 0),
                       child: OTPTextField(
+                        inputFormatter: [FilteringTextInputFormatter.digitsOnly],
                         controller: otpController,
                         textFieldAlignment: MainAxisAlignment.spaceEvenly,
                         length: 6,

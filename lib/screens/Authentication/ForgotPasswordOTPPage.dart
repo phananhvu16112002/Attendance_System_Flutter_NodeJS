@@ -8,6 +8,7 @@ import 'package:attendance_system_nodejs/providers/student_data_provider.dart';
 import 'package:attendance_system_nodejs/screens/Authentication/CreateNewPassword.dart';
 import 'package:attendance_system_nodejs/services/Authenticate.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
@@ -114,6 +115,9 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                     Padding(
                       padding: const EdgeInsets.only(right: 20),
                       child: OTPTextField(
+                        inputFormatter: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         controller: otpController,
                         textFieldAlignment: MainAxisAlignment.spaceEvenly,
                         length: 6,
@@ -192,6 +196,7 @@ class _ForgotPasswordOTPPageState extends State<ForgotPasswordOTPPage> {
                             }
                           } catch (e) {
                             // ignore: avoid_print
+                            await _progressDialog.hide();
                             print(e);
                           } finally {
                             await _progressDialog.hide();
