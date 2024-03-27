@@ -11,10 +11,10 @@ class ReportModel {
   String classesTeacherID;
   String courseCourseID;
   String courseCourseName;
-  int courseTotalWeeks;
-  int courseRequiredWeeks;
-  int courseCredit;
-  int feedbackFeedbackID;
+  int? courseTotalWeeks;
+  int? courseRequiredWeeks;
+  int? courseCredit;
+  int? feedbackFeedbackID;
   String feedbackTopic;
   String feedbackMessage;
   String feedbackConfirmStatus;
@@ -75,41 +75,43 @@ class ReportModel {
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
     return ReportModel(
-      classesClassID: json['classes_classID'],
-      classesRoomNumber: json['classes_roomNumber'],
-      classesShiftNumber: json['classes_shiftNumber'],
-      classesStartTime: json['classes_startTime'],
-      classesEndTime: json['classes_endTime'],
-      classesClassType: json['classes_classType'],
-      classesGroup: json['classes_group'],
-      classesSubGroup: json['classes_subGroup'],
-      classesCourseID: json['classes_courseID'],
-      classesTeacherID: json['classes_teacherID'],
-      courseCourseID: json['course_courseID'],
-      courseCourseName: json['course_courseName'],
-      courseTotalWeeks: json['course_totalWeeks'],
-      courseRequiredWeeks: json['course_requiredWeeks'],
-      courseCredit: json['course_credit'],
-      feedbackFeedbackID: json['feedback_feedbackID'],
-      feedbackTopic: json['feedback_topic'],
-      feedbackMessage: json['feedback_message'],
-      feedbackConfirmStatus: json['feedback_confirmStatus'],
-      feedbackCreatedAt: json['feedback_createdAt'],
-      feedbackReportID: json['feedback_reportID'],
-      reportID: json['reportID'],
-      topic: json['topic'],
-      problem: json['problem'],
-      message: json['message'],
-      status: json['status'],
+      classesClassID: json['classes_classID'] ?? '',
+      classesRoomNumber: json['classes_roomNumber'] ?? '',
+      classesShiftNumber: int.parse(json['classes_shiftNumber']) ?? 0,
+      classesStartTime: json['classes_startTime'] ?? '',
+      classesEndTime: json['classes_endTime'] ?? '',
+      classesClassType: json['classes_classType'] ?? '',
+      classesGroup: json['classes_group'] ?? '',
+      classesSubGroup: json['classes_subGroup'] ?? '',
+      classesCourseID: json['classes_courseID'] ?? '',
+      classesTeacherID: json['classes_teacherID'] ?? '',
+      courseCourseID: json['course_courseID'] ?? '',
+      courseCourseName: json['course_courseName'] ?? '',
+      courseTotalWeeks: int.parse(json['course_totalWeeks'].toString()) ?? 0,
+      courseRequiredWeeks:
+          int.parse(json['course_requiredWeeks'].toString()) ?? 0,
+      courseCredit: int.parse(json['course_credit'].toString()) ?? 0,
+      feedbackFeedbackID:
+          int.parse(json['feedback_feedbackID'].toString()) ?? 0,
+      feedbackTopic: json['feedback_topic'] ?? '',
+      feedbackMessage: json['feedback_message'] ?? '',
+      feedbackConfirmStatus: json['feedback_confirmStatus'] ?? '',
+      feedbackCreatedAt: json['feedback_createdAt'] ?? '',
+      feedbackReportID: int.parse(json['feedback_reportID'].toString()) ?? 0,
+      reportID: int.parse(json['reportID'].toString()) ?? 0,
+      topic: json['topic'] ?? '',
+      problem: json['problem'] ?? '',
+      message: json['message'] ?? '',
+      status: json['status'] ?? '',
       createdAt: json['createdAt'] ?? '',
-      isNew: json['new'],
-      isImportant: json['important'],
-      studentID: json['studentID'],
-      classID: json['classID'],
-      formID: json['formID'],
-      teacherID: json['teacherID'],
-      teacherEmail: json['teacherEmail'],
-      teacherName: json['teacherName'],
+      isNew: int.parse(json['new'].toString()) ?? 0,
+      isImportant: int.parse(json['important'].toString()) ?? 0,
+      studentID: json['studentID'] ?? '',
+      classID: json['classID'] ?? '',
+      formID: json['formID'] ?? '',
+      teacherID: json['teacherID'] ?? '',
+      teacherEmail: json['teacherEmail'] ?? '',
+      teacherName: json['teacherName'] ?? '',
     );
   }
 }

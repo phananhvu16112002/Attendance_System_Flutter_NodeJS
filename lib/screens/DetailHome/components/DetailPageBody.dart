@@ -46,7 +46,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
 
   void _scrollDown() {
     _controller.animateTo(_controller.position.maxScrollExtent,
-        duration: Duration(seconds: 2), curve: Curves.fastOutSlowIn);
+        duration: const Duration(seconds: 2), curve: Curves.fastOutSlowIn);
   }
 
   @override
@@ -265,7 +265,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                         .setAttendanceFormData(data!);
                                   });
                                   return Padding(
-                                    padding: const EdgeInsets.only(left: 10, right: 10),
+                                    padding: const EdgeInsets.only(
+                                        left: 10, right: 10),
                                     child: customCardStream(
                                         formatTime(data!.startTime),
                                         formatTime(data.endTime),
@@ -311,8 +312,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                         ? formatTime(data
                                             .dateAttendanced) //timeAttendance
                                         : 'null',
-                                    getResult(data.result
-                                        ), //Status attendance
+                                    getResult(data.result), //Status attendance
                                     data.dateAttendanced != ''
                                         ? data.location
                                         : 'null',
@@ -389,7 +389,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             children: [
               Container(
                 margin: const EdgeInsets.only(left: 5, right: 5),
-                child: Container(
+                child: SizedBox(
                   width: 220,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -628,7 +628,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
             children: [
               Container(
                 margin: const EdgeInsets.only(left: 5, right: 5),
-                child: Container(
+                child: SizedBox(
                   width: 220,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -813,7 +813,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
 
   Widget customLoading() {
     return Container(
-      width: 405,
+      width: 390,
       height: 220,
       decoration: const BoxDecoration(
           color: Colors.white,
@@ -847,8 +847,8 @@ class _DetailPageBodyState extends State<DetailPageBody> {
               children: [
                 Container(
                   margin: const EdgeInsets.only(left: 10),
-                  child: Container(
-                    width: 230,
+                  child: SizedBox(
+                    width: 210,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -872,7 +872,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                 highlightColor:
                                     const Color.fromARGB(146, 255, 255, 255),
                                 child: Container(
-                                    width: 110,
+                                    width: 105,
                                     height: 10,
                                     color: Colors.white)),
                           ],
@@ -900,7 +900,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                 highlightColor:
                                     const Color.fromARGB(146, 255, 255, 255),
                                 child: Container(
-                                    width: 110,
+                                    width: 100,
                                     height: 10,
                                     color: Colors.white)),
                           ],
@@ -956,7 +956,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                 highlightColor:
                                     const Color.fromARGB(146, 255, 255, 255),
                                 child: Container(
-                                    width: 175,
+                                    width: 160,
                                     height: 10,
                                     color: Colors.white)),
                           ],
@@ -984,7 +984,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                                 highlightColor:
                                     const Color.fromARGB(146, 255, 255, 255),
                                 child: Container(
-                                    width: 170,
+                                    width: 155,
                                     height: 10,
                                     color: Colors.white)),
                           ],
@@ -1000,7 +1000,7 @@ class _DetailPageBodyState extends State<DetailPageBody> {
                     baseColor: const Color.fromARGB(78, 158, 158, 158),
                     highlightColor: const Color.fromARGB(146, 255, 255, 255),
                     child: Container(
-                      width: 130,
+                      width: 110,
                       height: 130,
                       decoration: const BoxDecoration(
                           color: Colors.white,

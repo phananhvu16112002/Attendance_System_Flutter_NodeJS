@@ -87,7 +87,7 @@ class _DetailPageState extends State<DetailPage> {
     return PreferredSize(
       preferredSize: Size.fromHeight(classesStudent.courseName.length >= 28
           ? MediaQuery.of(context).size.height * 0.22
-          : MediaQuery.of(context).size.height * 0.22),
+          : MediaQuery.of(context).size.height * 0.165),
       child: AppBar(
         leading: GestureDetector(
           onTap: () {

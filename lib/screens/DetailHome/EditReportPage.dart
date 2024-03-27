@@ -122,22 +122,24 @@ class _EditReportPageState extends State<EditReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(150),
+          preferredSize: Size.fromHeight(classesStudent.courseName.length >= 28
+              ? MediaQuery.of(context).size.height * 0.22
+              : MediaQuery.of(context).size.height * 0.165),
           child: AppBar(
             leading: GestureDetector(
               onTap: () {
-                // setState(() {});
+                setState(() {});
                 Navigator.pop(context);
               },
               child: Container(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(15),
                 child: const Icon(Icons.arrow_back,
                     color: Colors.white), // Thay đổi icon và màu sắc tùy ý
               ),
             ),
             backgroundColor: AppColors.colorAppbar,
             flexibleSpace: Padding(
-              padding: const EdgeInsets.only(left: 40, top: 0, bottom: 0),
+              padding: const EdgeInsets.only(left: 60, top: 0, bottom: 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -227,7 +229,7 @@ class _EditReportPageState extends State<EditReportPage> {
                     const SizedBox(
                       height: 15,
                     ),
-                    Container(
+                    SizedBox(
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height,
                         child: Padding(
@@ -306,7 +308,7 @@ class _EditReportPageState extends State<EditReportPage> {
                                         child: Padding(
                                           padding:
                                               const EdgeInsets.only(left: 8.0),
-                                          child: Container(
+                                          child: SizedBox(
                                             width: 290,
                                             child: Text(
                                               items,
@@ -349,6 +351,7 @@ class _EditReportPageState extends State<EditReportPage> {
                                 if (value!.isEmpty) {
                                   return 'Enter your message';
                                 }
+                                return null;
                               }),
                               const SizedBox(
                                 height: 10,
@@ -430,7 +433,7 @@ class _EditReportPageState extends State<EditReportPage> {
                                                 ),
                                         ),
                                       );
-                                    }).toList(),
+                                    }),
                                     ..._imageFiles.asMap().entries.map((entry) {
                                       final index = entry.key;
                                       final XFile? imageFile = entry.value;
@@ -454,7 +457,7 @@ class _EditReportPageState extends State<EditReportPage> {
                                               : null,
                                         ),
                                       );
-                                    }).toList(),
+                                    }),
                                   ]),
                                 ),
                               ),
@@ -484,7 +487,7 @@ class _EditReportPageState extends State<EditReportPage> {
                                                     _message.text,
                                                     _imageFiles,
                                                     deleteList);
-                                            if (result == '') {
+                                            if (result != '') {
                                               print('Success');
                                               await _progressDialog.hide();
                                               await _showDialog(
@@ -528,7 +531,7 @@ class _EditReportPageState extends State<EditReportPage> {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Container(
+        return SizedBox(
           height: 150,
           width: 200,
           child: AlertDialog(
